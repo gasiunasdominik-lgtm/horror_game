@@ -2,8 +2,12 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Vchod.Core;
 using Vchod.Player;
+using Vchod.Systems;
+using Vchod.World;
 using Vchod.UI;
 using static Vchod.EditorTools.SceneBuildUtil;
 
@@ -27,6 +31,11 @@ namespace Vchod.EditorTools
             EnsureFolder(DataFolder);
             var player = SetupPlayer();
             SetupUI(player);
+            var systems = FindOrCreateRoot("Systems");
+            GetOrAdd<GameBootstrap>(systems);
+            var lightTimer = SetupLightTimer(systems);
+            SetupHouse(player, lightTimer);
+            SetupEnvironment();
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -70,6 +79,47 @@ namespace Vchod.EditorTools
             var interactor = GetOrAdd<PlayerInteractor>(root);
             SetRef(interactor, "controller", controller);
             return controller;
+        }
+
+        private static LightTimer SetupLightTimer(GameObject systems)
+        {
+            var config = LoadOrCreateAsset<LightTimerConfig>($"{DataFolder}/LightTimerConfig.asset");
+            var timer = GetOrAdd<LightTimer>(systems);
+            SetRef(timer, "config", config);
+            return timer;
+        }
+
+        private static void SetupHouse(PlayerController player, LightTimer lightTimer)
+        {
+            var houseConfig = GreyboxAssetBuilder.BuildAll();
+            var house = FindOrCreateRoot("House");
+            house.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+            var builder = GetOrAdd<ModuleLayoutBuilder>(house);
+            SetRef(builder, "config", houseConfig);
+            SetRef(builder, "lightTimer", lightTimer);
+            SetRef(builder, "player", player);
+        }
+
+        /// <summary>Indoor night: no sun, dark ambient, dark fog that limits view (also a perf budget).</summary>
+        private static void SetupEnvironment()
+        {
+            var sun = GameObject.Find("/Directional Light");
+            if (sun != null) sun.SetActive(false);
+
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            RenderSettings.ambientLight = new Color(0.05f, 0.055f, 0.07f);
+            RenderSettings.skybox = null;
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogColor = new Color(0.015f, 0.016f, 0.02f);
+            RenderSettings.fogDensity = 0.07f;
+
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                cam.clearFlags = CameraClearFlags.SolidColor;
+                cam.backgroundColor = Color.black;
+            }
         }
 
         private static void SetupUI(PlayerController player)
