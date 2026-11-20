@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vchod.Core;
 using Vchod.Player;
+using Vchod.Systems;
+using Vchod.World;
 
 namespace Vchod.DebugTools
 {
@@ -45,10 +47,14 @@ namespace Vchod.DebugTools
         }
 
         public PlayerController Player { get; private set; }
+        public ModuleLayoutBuilder House { get; private set; }
+        public LightTimer LightTimer { get; private set; }
 
         private void Refresh()
         {
             Player = FindFirstObjectByType<PlayerController>();
+            House = FindFirstObjectByType<ModuleLayoutBuilder>();
+            LightTimer = FindFirstObjectByType<LightTimer>();
         }
 
         private float _worstThisWindow;
@@ -130,6 +136,13 @@ namespace Vchod.DebugTools
                 timeScale = Time.timeScale,
                 godMode = GodMode,
             };
+
+            if (House != null && House.Plan != null)
+            {
+                snapshot.layoutHash = House.LayoutHash.ToString("X8");
+                snapshot.reshuffleIndex = House.ReshuffleIndex;
+            }
+            if (LightTimer != null) snapshot.lightOn = LightTimer.IsOn;
 
             var player = PlayerTransform;
             if (player != null)

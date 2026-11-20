@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 using Vchod.Core;
+using Vchod.World;
 
 namespace Vchod.DebugTools
 {
@@ -49,14 +51,50 @@ namespace Vchod.DebugTools
             if (PlaytestLogger.Instance != null) PlaytestLogger.Instance.Log("debug", message);
         }
 
+        private int _zoneCursor;
+        private readonly List<int> _zones = new();
+
+        /// <summary>Cycles stairwell → window → CO source → player door, facing the feature.</summary>
         private void TeleportToNextZone()
         {
-            Report("Teleport: no zones yet");
+            var ctx = DebugContext.Instance;
+            var house = ctx.House;
+            if (house == null || house.Plan == null || ctx.Player == null)
+            {
+                Report("Teleport: no house in scene");
+                return;
+            }
+
+            var plan = house.Plan;
+            _zones.Clear();
+            _zones.Add(LayoutPlan.StartIndex);
+            AddZone(plan.FindFeature(CellFeature.Window));
+            AddZone(plan.CoSourceIndex);
+            AddZone(plan.FindFeature(CellFeature.PlayerDoor));
+
+            _zoneCursor = (_zoneCursor + 1) % _zones.Count;
+            var index = _zones[_zoneCursor];
+            var cell = plan.Cells[index];
+            var yaw = index == LayoutPlan.StartIndex ? Direction.North.Yaw() : cell.FeatureSide.Yaw();
+            ctx.Player.Teleport(house.GetCellCenter(index), yaw);
+            Report($"Teleport: {(cell.IsCoSource ? "CO source" : cell.Feature.ToString())} {cell.Pos}");
+        }
+
+        private void AddZone(int index)
+        {
+            if (index >= 0 && !_zones.Contains(index)) _zones.Add(index);
         }
 
         private void ForceReshuffle()
         {
-            Report("Reshuffle: no house yet");
+            var house = DebugContext.Instance.House;
+            if (house == null)
+            {
+                Report("Reshuffle: no house in scene");
+                return;
+            }
+            house.Reshuffle();
+            Report($"Reshuffle #{house.ReshuffleIndex} hash {house.LayoutHash:X8}");
         }
 
         private bool _fogAndPostOff;
