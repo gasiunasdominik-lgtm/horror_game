@@ -11,7 +11,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-002 | (Volitelně) soukromý GitHub repozitář pro zálohu | D | DONE | P3 | Repo existuje, Claude ví URL |
 | T-003 | Založit Unity projekt, git, přenést CLAUDE.md, docs, .claude (START_PROMPT Část A) | C | DONE | P1 | Projekt se otevře, první commit a tag `m0-start` |
 | T-004 | Baseline URP (Volume, kamera, kvalita, UI stack), ověření screenshotem | C | DONE | P1 | Screenshot osvětlený, bez chyb v konzoli |
-| T-005 | Debug a QA infrastruktura: SeedService, DebugOverlay (F1), BugReporter (F8), PlaytestLogger, cheaty F2–F10 | C | TODO | P1 | F8 vytvoří kompletní složku v `BugReports/`, F1 ukáže seed a CO, `-seed N` funguje |
+| T-005 | Debug a QA infrastruktura: SeedService, DebugOverlay (F1), BugReporter (F8), PlaytestLogger, cheaty F2–F10 | C | DONE | P1 | F8 vytvoří kompletní složku v `BugReports/`, F1 ukáže seed a CO, `-seed N` funguje |
 | T-006 | FPS controller + kamera + vstup | C | TODO | P1 | Postava se pohybuje, rozhlíží, skáče/neskáče dle GDD |
 | T-007 | Greybox chodba z modulů + schodišťové světlo na časovač | C | TODO | P1 | Tlačítko rozsvítí na ~20 s, světlo zhasne |
 | T-008 | ModuleLayout: přeskládání modulů při zhasnutí podle seedu, validace cesty | C | TODO | P1 | Po zhasnutí je dům jiný, stejný seed = stejné rozložení, 200 seedů projde sweepem |

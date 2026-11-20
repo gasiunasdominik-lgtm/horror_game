@@ -141,3 +141,5 @@ crashlytics-build.properties
 /BugReports/
 /PlaytestLogs/
 /Builds/
+/[Aa]ssets/_Project/Resources/BuildInfo.txt*
+/Screenshots/
