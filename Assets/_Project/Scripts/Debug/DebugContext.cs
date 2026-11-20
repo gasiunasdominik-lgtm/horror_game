@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vchod.Core;
+using Vchod.Player;
 
 namespace Vchod.DebugTools
 {
@@ -43,8 +44,11 @@ namespace Vchod.DebugTools
             ApplyInputBlock();
         }
 
+        public PlayerController Player { get; private set; }
+
         private void Refresh()
         {
+            Player = FindFirstObjectByType<PlayerController>();
         }
 
         private float _worstThisWindow;
@@ -90,6 +94,11 @@ namespace Vchod.DebugTools
 
         private void ApplyInputBlock()
         {
+            if (Player != null)
+            {
+                Player.SetInputLock(this, InputBlocked);
+                return;
+            }
             Cursor.lockState = InputBlocked ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = InputBlocked;
         }
@@ -98,6 +107,7 @@ namespace Vchod.DebugTools
         {
             get
             {
+                if (Player != null) return Player.transform;
                 var cam = Camera.main;
                 return cam != null ? cam.transform : null;
             }
