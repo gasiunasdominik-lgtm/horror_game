@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git switch:*)",
+      "Bash(git branch:*)",
+      "Bash(git tag:*)",
+      "Bash(git stash:*)",
+      "Bash(unity status:*)",
+      "Bash(unity recompile:*)",
+      "Bash(unity logs:*)",
+      "Bash(unity doctor:*)",
+      "Bash(unity editors:*)",
+      "Bash(unity releases:*)",
+      "Bash(unity commands:*)",
+      "Bash(unity command:*)",
+      "Bash(unity test:*)",
+      "Bash(unity --version)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)",
+      "Bash(unity bug:*)",
+      "Bash(unity auth logout:*)",
+      "Bash(unity license return:*)",
+      "Bash(unity self-uninstall:*)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  }
+}
