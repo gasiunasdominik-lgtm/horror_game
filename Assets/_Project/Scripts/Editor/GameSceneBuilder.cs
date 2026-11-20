@@ -8,6 +8,7 @@ using Vchod.Core;
 using Vchod.Player;
 using Vchod.Systems;
 using Vchod.World;
+using Vchod.Audio;
 using Vchod.UI;
 using static Vchod.EditorTools.SceneBuildUtil;
 
@@ -25,6 +26,8 @@ namespace Vchod.EditorTools
         [MenuItem("Vchod/Rebuild Game Scene Wiring")]
         public static void BuildAll()
         {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+                throw new System.InvalidOperationException("Exit Play Mode before rebuilding the scene wiring");
             var scene = EditorSceneManager.GetActiveScene();
             if (scene.path != ScenePath) scene = EditorSceneManager.OpenScene(ScenePath);
 
@@ -34,7 +37,8 @@ namespace Vchod.EditorTools
             var systems = FindOrCreateRoot("Systems");
             GetOrAdd<GameBootstrap>(systems);
             var lightTimer = SetupLightTimer(systems);
-            SetupHouse(player, lightTimer);
+            var house = SetupHouse(player, lightTimer);
+            SetupCo(systems, player, house);
             SetupEnvironment();
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -89,7 +93,36 @@ namespace Vchod.EditorTools
             return timer;
         }
 
-        private static void SetupHouse(PlayerController player, LightTimer lightTimer)
+        private static void SetupCo(GameObject systems, PlayerController player, ModuleLayoutBuilder house)
+        {
+            var config = LoadOrCreateAsset<CoConfig>($"{DataFolder}/CoConfig.asset");
+            var co = GetOrAdd<CoSystem>(systems);
+            SetRef(co, "config", config);
+            SetRef(co, "player", player);
+            SetRef(co, "house", house);
+
+            var cam = player.CameraPivot.GetComponentInChildren<Camera>().gameObject;
+            var lowPass = GetOrAdd<AudioLowPassFilter>(cam);
+            lowPass.cutoffFrequency = SymptomState.OpenCutoff;
+            var hum = GetOrAdd<AudioSource>(cam);
+            hum.playOnAwake = false;
+            hum.spatialBlend = 0f;
+            hum.loop = true;
+
+            var symptoms = GetOrAdd<SymptomEffects>(systems);
+            SetRef(symptoms, "co", co);
+            SetRef(symptoms, "player", player);
+            SetRef(symptoms, "lowPass", lowPass);
+            SetRef(symptoms, "hum", hum);
+
+            var detectorGo = FindOrCreateRoot("CoDetector");
+            GetOrAdd<AudioSource>(detectorGo);
+            var detector = GetOrAdd<CoDetectorBeeper>(detectorGo);
+            SetRef(detector, "co", co);
+            SetRef(detector, "house", house);
+        }
+
+        private static ModuleLayoutBuilder SetupHouse(PlayerController player, LightTimer lightTimer)
         {
             var houseConfig = GreyboxAssetBuilder.BuildAll();
             var house = FindOrCreateRoot("House");
@@ -98,6 +131,7 @@ namespace Vchod.EditorTools
             SetRef(builder, "config", houseConfig);
             SetRef(builder, "lightTimer", lightTimer);
             SetRef(builder, "player", player);
+            return builder;
         }
 
         /// <summary>Indoor night: no sun, dark ambient, dark fog that limits view (also a perf budget).</summary>

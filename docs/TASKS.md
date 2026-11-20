@@ -15,9 +15,9 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-006 | FPS controller + kamera + vstup | C | DONE | P1 | Postava se pohybuje, rozhlíží, skáče/neskáče dle GDD |
 | T-007 | Greybox chodba z modulů + schodišťové světlo na časovač | C | DONE | P1 | Tlačítko rozsvítí na ~20 s, světlo zhasne |
 | T-008 | ModuleLayout: přeskládání modulů při zhasnutí podle seedu, validace cesty | C | DONE | P1 | Po zhasnutí je dům jiný, stejný seed = stejné rozložení, 200 seedů projde sweepem |
-| T-009 | CoModel + SymptomEffects + pípání detektoru podle vzdálenosti ke zdroji | C | TODO | P1 | Hladina CO roste u zdroje, efekty a zvuk se mění podle prahů |
+| T-009 | CoModel + SymptomEffects + pípání detektoru podle vzdálenosti ke zdroji | C | DONE | P1 | Hladina CO roste u zdroje, efekty a zvuk se mění podle prahů |
 | T-010 | Playtest #1 (10 min) + FEEL hodnocení | D | TODO | P1 | `FEEL:` odpověď v chatu |
-| T-011 | EditMode testy: CoModel, SeedService, validace ModuleLayout | C | TODO | P2 | Testy zelené |
+| T-011 | EditMode testy: CoModel, SeedService, validace ModuleLayout | C | DONE | P2 | Testy zelené |
 | T-012 | Zapsat měření výkonu na Zenbooku do TESTING.md | C | TODO | P2 | Hodnoty FPS zapsané |
 
 ## M1 Smyčka (30. 11. – 20. 12. 2026)

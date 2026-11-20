@@ -49,12 +49,14 @@ namespace Vchod.DebugTools
         public PlayerController Player { get; private set; }
         public ModuleLayoutBuilder House { get; private set; }
         public LightTimer LightTimer { get; private set; }
+        public CoSystem Co { get; private set; }
 
         private void Refresh()
         {
             Player = FindFirstObjectByType<PlayerController>();
             House = FindFirstObjectByType<ModuleLayoutBuilder>();
             LightTimer = FindFirstObjectByType<LightTimer>();
+            Co = FindFirstObjectByType<CoSystem>();
         }
 
         private float _worstThisWindow;
@@ -89,6 +91,7 @@ namespace Vchod.DebugTools
 
         private void ApplyGodMode()
         {
+            if (Co != null && Co.Model != null) Co.Model.Frozen = GodMode;
         }
 
         public void SetInputBlocked(object owner, bool blocked)
@@ -143,6 +146,11 @@ namespace Vchod.DebugTools
                 snapshot.reshuffleIndex = House.ReshuffleIndex;
             }
             if (LightTimer != null) snapshot.lightOn = LightTimer.IsOn;
+            if (Co != null && Co.Model != null)
+            {
+                snapshot.coLevel = Co.Level;
+                snapshot.coStage = Co.Stage;
+            }
 
             var player = PlayerTransform;
             if (player != null)
