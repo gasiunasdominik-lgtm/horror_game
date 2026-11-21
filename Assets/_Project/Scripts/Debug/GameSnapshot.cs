@@ -17,6 +17,7 @@ namespace Vchod.DebugTools
         public int seed;
         public string layoutHash = "n/a";
         public int reshuffleIndex = -1;
+        public int floor = -1;
         public Vector3 playerPosition;
         public float playerYaw;
         public float coLevel = -1f;

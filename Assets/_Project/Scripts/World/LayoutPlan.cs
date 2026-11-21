@@ -61,6 +61,8 @@ namespace Vchod.World
         private readonly Dictionary<GridPos, int> _index = new();
 
         public int Seed { get; internal set; }
+        /// <summary>Only the player's floor has their door and the CO source (the neighbour's flat).</summary>
+        public bool IsPlayerFloor { get; internal set; } = true;
         public List<LayoutCell> Cells { get; } = new();
         /// <summary>Cell indices from the stairwell to the player's door.</summary>
         public List<int> MainPath { get; } = new();

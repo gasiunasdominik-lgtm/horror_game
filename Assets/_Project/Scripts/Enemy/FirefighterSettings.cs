@@ -49,6 +49,9 @@ namespace Vchod.Enemy
         [Tooltip("Search points are picked within this many metres of the last known position.")]
         public float searchRadius = 8f;
 
+        [Tooltip("If he was after the player when they changed floors, he comes up/down the stairs after this many seconds.")]
+        public float followDelay = 6f;
+
         [Header("Hiding spots")]
         [Tooltip("Chance he checks a nearby hiding spot when picking the next search point.")]
         [Range(0f, 1f)] public float hidingCheckChance = 0.5f;

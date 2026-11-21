@@ -61,6 +61,7 @@ namespace Vchod.Enemy
             EventBus.Subscribe<LayoutRebuilt>(OnLayoutRebuilt);
             EventBus.Subscribe<NoiseMade>(OnNoise);
             EventBus.Subscribe<LightTurnedOn>(OnLightOn);
+            EventBus.Subscribe<FloorChanged>(OnFloorChanged);
         }
 
         private void OnDisable()
@@ -68,6 +69,33 @@ namespace Vchod.Enemy
             EventBus.Unsubscribe<LayoutRebuilt>(OnLayoutRebuilt);
             EventBus.Unsubscribe<NoiseMade>(OnNoise);
             EventBus.Unsubscribe<LightTurnedOn>(OnLightOn);
+            EventBus.Unsubscribe<FloorChanged>(OnFloorChanged);
+        }
+
+        // Floor changes: one firefighter, always on the player's floor. Calm, he is simply
+        // elsewhere on it; hunting, he follows up or down the stairs a few seconds later.
+        private bool _floorChanged;
+        private bool _following;
+        private float _arriveAt = -1f;
+        private static readonly Vector3 Offstage = new(0f, -500f, 0f);
+
+        public bool IsOffstage => _arriveAt >= 0f;
+
+        private void OnFloorChanged(FloorChanged e)
+        {
+            _floorChanged = true;
+            _following = Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
+        }
+
+        private void ArriveByStairs()
+        {
+            _arriveAt = -1f;
+            var stairs = house.GetCellCenter(LayoutPlan.StartIndex) + Vector3.forward * 1.6f;
+            var target = NavMesh.SamplePosition(stairs, out var hit, 2.5f, NavMesh.AllAreas) ? hit.position : SpawnPoint();
+            transform.position = target;
+            _agent.enabled = true;
+            _agent.Warp(target);
+            Brain.Force(FirefighterState.Search, player.transform.position);
         }
 
         private void OnNoise(NoiseMade e)
@@ -86,6 +114,28 @@ namespace Vchod.Enemy
 
         private void OnLayoutRebuilt(LayoutRebuilt e)
         {
+            if (_floorChanged)
+            {
+                _floorChanged = false;
+                _checking = null;
+                _sawHide = null;
+                if (_following)
+                {
+                    _agent.enabled = false;
+                    transform.position = Offstage;
+                    _arriveAt = Time.time + config.settings.followDelay;
+                    return;
+                }
+                _arriveAt = -1f;
+                var spawn = SpawnPoint();
+                transform.position = spawn;
+                _agent.enabled = true;
+                _agent.Warp(spawn);
+                Brain.Force(FirefighterState.Patrol, spawn);
+                return;
+            }
+            if (IsOffstage) return;
+
             var target = _placed && OnCurrentFloor(transform.position, out var kept) ? kept : SpawnPoint();
             // Move first: an agent enabled off the new NavMesh logs an error.
             transform.position = target;
@@ -123,6 +173,13 @@ namespace Vchod.Enemy
         private void Update()
         {
             if (!_placed || Brain.HasCaughtPlayer) return;
+            if (IsOffstage)
+            {
+                SeesPlayer = false;
+                _hasStimulus = false;
+                if (Time.time >= _arriveAt) ArriveByStairs();
+                return;
+            }
 
             var hiddenNow = player.IsHidden;
             if (hiddenNow && !_playerWasHidden && SeesPlayer) _sawHide = player.HiddenIn as HidingSpot;

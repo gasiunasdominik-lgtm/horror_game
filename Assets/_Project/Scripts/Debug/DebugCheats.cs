@@ -24,7 +24,11 @@ namespace Vchod.DebugTools
                 ctx.SetGodMode(!ctx.GodMode);
                 Report($"God mode {(ctx.GodMode ? "ON" : "off")}");
             }
-            if (k.f3Key.wasPressedThisFrame) TeleportToNextZone();
+            if (k.f3Key.wasPressedThisFrame)
+            {
+                if (k.shiftKey.isPressed) NextFloor();
+                else TeleportToNextZone();
+            }
             if (k.f4Key.wasPressedThisFrame)
             {
                 if (k.shiftKey.isPressed) GameBootstrap.RestartRound(SeedService.NewRandomSeed());
@@ -95,8 +99,19 @@ namespace Vchod.DebugTools
             var index = _zones[_zoneCursor];
             var cell = plan.Cells[index];
             var yaw = index == LayoutPlan.StartIndex ? Direction.North.Yaw() : cell.FeatureSide.Yaw();
-            ctx.Player.Teleport(house.GetCellCenter(index), yaw);
+            ctx.Player.Teleport(index == LayoutPlan.StartIndex ? house.StartPoint : house.GetCellCenter(index), yaw);
             Report($"Teleport: {(cell.IsCoSource ? "CO source" : cell.Feature.ToString())} {cell.Pos}");
+        }
+
+        /// <summary>Shift+F3: next floor (wraps), arriving beside the stairs.</summary>
+        private void NextFloor()
+        {
+            var ctx = DebugContext.Instance;
+            var house = ctx.House;
+            if (house == null || ctx.Player == null) return;
+            house.GoToFloor((house.Floor + 1) % house.Config.floorCount);
+            ctx.Player.Teleport(house.StartPoint, Direction.North.Yaw());
+            Report($"Floor {house.Floor}{(house.IsPlayerFloor ? " (player's floor)" : "")}");
         }
 
         private void AddZone(int index)

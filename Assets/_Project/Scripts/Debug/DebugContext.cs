@@ -148,6 +148,7 @@ namespace Vchod.DebugTools
             {
                 snapshot.layoutHash = House.LayoutHash.ToString("X8");
                 snapshot.reshuffleIndex = House.ReshuffleIndex;
+                snapshot.floor = House.Floor;
             }
             if (LightTimer != null) snapshot.lightOn = LightTimer.IsOn;
             if (Co != null && Co.Model != null)

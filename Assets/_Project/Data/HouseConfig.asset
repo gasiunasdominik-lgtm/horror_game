@@ -15,6 +15,10 @@ MonoBehaviour:
   cellSize: 4
   wallHeight: 2.8
   wallThickness: 0.2
+  floorCount: 3
+  playerFloor: 2
+  floorHeight: 2.72
+  startOffset: {x: 1, y: 0, z: 0.9}
   rules:
     mainPathMin: 5
     mainPathMax: 7
@@ -32,6 +36,11 @@ MonoBehaviour:
   wallPrefab: {fileID: 6475654001388458131, guid: 0809771aa9152c5419ca1b9d1275b94a, type: 3}
   lampPrefab: {fileID: 397431468767693097, guid: b639269d297b212458046103875beb69, type: 3}
   stairwellPrefab: {fileID: 8751694214920840073, guid: ee1bfe43921264c4c864b08915c2363e, type: 3}
+  stairsDownPrefab: {fileID: 2979430047389772376, guid: a9d3df3af39723b449f377ad90865b4d, type: 3}
+  stairwellFloorPrefab: {fileID: 7865462293618471667, guid: 9f4f3ac3f0d03374f910643adf8425d0, type: 3}
+  stairwellGroundPrefab: {fileID: 2030142054347755070, guid: cd193f7d9c22e724dabfa1452788511b, type: 3}
+  stairwellTopRailPrefab: {fileID: 6339377373185323012, guid: d24670272590adf468b9cb215bbccfa2, type: 3}
+  stairwellCeilingPrefab: {fileID: 9810168729289627, guid: e0388b4195cafaf40a545b2fac98ec83, type: 3}
   lightButtonPrefab: {fileID: 2646982281973879143, guid: a27613e2ee72dc645b02870e1e1beb87, type: 3}
   apartmentDoorPrefab: {fileID: 7883225035112388346, guid: db9744eeb83c60b4a91e9ea5bd65ae01, type: 3}
   playerDoorPrefab: {fileID: 8825444291744159223, guid: b2ed8e8886b520846bd680d1a215e4c5, type: 3}

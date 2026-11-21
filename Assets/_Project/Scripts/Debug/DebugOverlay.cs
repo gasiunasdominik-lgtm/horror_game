@@ -69,14 +69,14 @@ namespace Vchod.DebugTools
             var s = ctx.Capture();
             _text.Clear();
             _text.Append("FPS ").Append(ctx.Fps.ToString("0")).Append("  worst ").Append(ctx.WorstFrameMs.ToString("0.0")).Append(" ms\n");
-            _text.Append("Seed ").Append(s.seed).Append("  layout ").Append(s.layoutHash).Append(" #").Append(s.reshuffleIndex).Append('\n');
+            _text.Append("Seed ").Append(s.seed).Append("  layout ").Append(s.layoutHash).Append(" #").Append(s.reshuffleIndex).Append("  floor ").Append(s.floor).Append('\n');
             _text.Append("CO ").Append(s.coLevel < 0 ? "n/a" : s.coLevel.ToString("0.0")).Append("  stage ").Append(s.coStage < 0 ? "n/a" : s.coStage.ToString()).Append('\n');
             _text.Append("Enemy ").Append(s.enemyState).Append("  light ").Append(s.lightOn ? "ON" : "off").Append('\n');
             _text.Append("Pos ").Append(s.playerPosition.ToString("F1")).Append("  yaw ").Append(s.playerYaw.ToString("0")).Append('\n');
             _text.Append("Round ").Append(s.roundTime.ToString("0.0")).Append(" s  timeScale ").Append(s.timeScale.ToString("0.##"));
             if (s.godMode) _text.Append("  GOD");
             _text.Append('\n');
-            _text.Append("F1 overlay  F2 god  F3 teleport  F4 reshuffle (Shift: new seed)\n");
+            _text.Append("F1 overlay  F2 god  F3 teleport (Shift: floor)  F4 reshuffle (Shift: new seed)\n");
             _text.Append("F5 enemy  F6 time  F7 fog/post  F8 bug report  F9 restart  F10 ending");
             return _text.ToString();
         }

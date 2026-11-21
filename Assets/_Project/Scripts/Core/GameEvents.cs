@@ -32,6 +32,14 @@ namespace Vchod.Core
         public int Seed;
         public int ReshuffleIndex;
         public uint LayoutHash;
+        public int Floor;
+    }
+
+    /// <summary>The player walked onto the half-landing and the house swapped to another floor.</summary>
+    public struct FloorChanged
+    {
+        public int From;
+        public int To;
     }
 
     public struct CoStageChanged

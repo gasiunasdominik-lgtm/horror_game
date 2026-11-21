@@ -192,20 +192,74 @@ namespace Vchod.EditorTools
                 Hiding(root, HidingKind.Table, view: new Vector3(0, 0.36f, 0.3f), exit: 1.2f, check: 1.05f, noise: 0f, yawLimit: 60f);
             });
 
+            // Two-flight stairwell, authored from the south wall's inner face (+Z north).
+            // Up: west flight to the half-landing. Down: east flight to the half-landing below.
+            const int steps = 8;
+            const float rise = 0.17f, run = 0.28f, landing = 1.0f, flightW = 1.7f, fx = 0.95f;
+            var half = rise * steps;
+            var storey = half * 2f;
+            var inner = size * 0.5f - t;
+            var flightEnd = landing + run * steps;
+
             config.stairwellPrefab = Save("Stairwell", root =>
             {
-                // A flight going up against the back wall, left side; the landing stays clear.
-                const int steps = 8;
-                const float stepH = 0.17f, stepD = 0.28f, width = 1.3f, x = -1.05f;
                 for (var i = 0; i < steps; i++)
                 {
-                    var height = stepH * (i + 1);
-                    var depthFromWall = (steps - i) * stepD;
-                    Box(root, $"Step{i}", new Vector3(x, height * 0.5f, depthFromWall - stepD * 0.5f),
-                        new Vector3(width, height, stepD), stairs, collider: true);
+                    var top = rise * (i + 1);
+                    Box(root, $"Up{i}", new Vector3(-fx, top * 0.5f, flightEnd - run * (i + 0.5f)), new Vector3(flightW, top, run), stairs, collider: true);
                 }
-                Box(root, "Rail", new Vector3(x + width * 0.5f + 0.03f, 1.6f, steps * stepD * 0.5f),
-                    new Vector3(0.04f, 0.04f, steps * stepD), metal, collider: false);
+                Box(root, "Landing", new Vector3(0, half - 0.05f, landing * 0.5f), new Vector3(inner * 2f, 0.1f, landing), stairs, collider: true);
+                // The next floor's flight, seen from the landing (visual only: the floor swaps first).
+                for (var k = 0; k < steps; k++)
+                {
+                    var top = half + rise * (k + 1);
+                    Box(root, $"Above{k}", new Vector3(fx, top - 0.1f, landing + run * (k + 0.5f)), new Vector3(flightW, 0.2f, run), stairs, collider: false);
+                }
+                Box(root, "Rail", new Vector3(-0.12f, half + 0.9f, flightEnd * 0.5f + landing * 0.5f), new Vector3(0.04f, 0.04f, run * steps), metal, collider: false);
+            });
+
+            config.stairsDownPrefab = Save("StairsDown", root =>
+            {
+                for (var k = 0; k < steps - 1; k++)
+                {
+                    var top = -rise * (k + 1);
+                    var height = top + half;
+                    Box(root, $"Down{k}", new Vector3(fx, -half + height * 0.5f, flightEnd - run * (k + 0.5f)), new Vector3(flightW, height, run), stairs, collider: true);
+                }
+                Box(root, "Landing", new Vector3(0, -half - 0.05f, landing * 0.5f), new Vector3(inner * 2f, 0.1f, landing), stairs, collider: true);
+                // The previous floor's flight below (visual only).
+                for (var i = 0; i < steps; i++)
+                {
+                    var top = -storey + rise * (i + 1);
+                    Box(root, $"Below{i}", new Vector3(-fx, top - 0.1f, flightEnd - run * (i + 0.5f)), new Vector3(flightW, 0.2f, run), stairs, collider: false);
+                }
+                Box(root, "BelowFloor", new Vector3(-fx, -storey - 0.05f, (flightEnd + inner * 2f) * 0.5f), new Vector3(flightW, 0.1f, inner * 2f - flightEnd), floor, collider: false);
+            });
+
+            config.stairwellFloorPrefab = Save("StairwellFloor", root =>
+            {
+                Box(root, "West", new Vector3(-fx, -0.05f, (landing + inner * 2f) * 0.5f), new Vector3(flightW, 0.1f, inner * 2f - landing), floor, collider: true);
+                Box(root, "North", new Vector3(0.85f, -0.05f, (flightEnd + inner * 2f) * 0.5f), new Vector3(1.9f, 0.1f, inner * 2f - flightEnd), floor, collider: true);
+                // Wall between the two flights, from the landing below to rail height above the one up.
+                Box(root, "Spine", new Vector3(0, (-half + 2.4f) * 0.5f, (landing + flightEnd) * 0.5f), new Vector3(0.2f, half + 2.4f, run * steps), wallHigh, collider: true);
+            });
+
+            config.stairwellGroundPrefab = Save("StairwellGround", root =>
+            {
+                Box(root, "East", new Vector3(fx, -0.05f, (landing + flightEnd) * 0.5f), new Vector3(flightW, 0.1f, run * steps), floor, collider: true);
+                Box(root, "South", new Vector3(0, -0.05f, landing * 0.5f), new Vector3(inner * 2f, 0.1f, landing), floor, collider: true);
+            });
+
+            config.stairwellTopRailPrefab = Save("StairwellTopRail", root =>
+            {
+                Box(root, "Rail", new Vector3(-fx, 0.5f, landing), new Vector3(flightW, 1.0f, 0.06f), wallLow, collider: true);
+            });
+
+            config.stairwellCeilingPrefab = Save("StairwellCeiling", root =>
+            {
+                const float split = 2.2f;
+                Box(root, "Low", new Vector3(0, h + 0.05f, (split + inner * 2f) * 0.5f), new Vector3(inner * 2f, 0.1f, inner * 2f - split), ceiling, collider: true);
+                Box(root, "High", new Vector3(0, half + h + 0.05f, split * 0.5f), new Vector3(inner * 2f, 0.1f, split), ceiling, collider: true);
             });
 
             EditorUtility.SetDirty(config);

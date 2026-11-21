@@ -12,12 +12,12 @@ namespace Vchod.World
         private const int StraightWeight = 3;
         private const int TurnWeight = 1;
 
-        public static LayoutPlan Generate(int seed, LayoutRules rules)
+        public static LayoutPlan Generate(int seed, LayoutRules rules, bool playerFloor = true)
         {
             var rng = new Random(seed);
             for (var attempt = 0; attempt < rules.maxAttempts; attempt++)
             {
-                var plan = TryGenerate(rng, rules);
+                var plan = TryGenerate(rng, rules, playerFloor);
                 if (plan == null) continue;
                 plan.Seed = seed;
                 if (LayoutValidator.Validate(plan, rules).Count == 0) return plan;
@@ -25,9 +25,9 @@ namespace Vchod.World
             throw new InvalidOperationException($"No valid layout for seed {seed} in {rules.maxAttempts} attempts");
         }
 
-        private static LayoutPlan TryGenerate(Random rng, LayoutRules rules)
+        private static LayoutPlan TryGenerate(Random rng, LayoutRules rules, bool playerFloor)
         {
-            var plan = new LayoutPlan();
+            var plan = new LayoutPlan { IsPlayerFloor = playerFloor };
             plan.Add(new LayoutCell
             {
                 Pos = new GridPos(0, 0),
@@ -50,7 +50,8 @@ namespace Vchod.World
             }
 
             var door = plan.Cells[current];
-            door.Feature = CellFeature.PlayerDoor;
+            // Other floors end in a neighbour's door: same dead end, different door.
+            door.Feature = playerFloor ? CellFeature.PlayerDoor : CellFeature.ApartmentDoor;
             door.FeatureSide = door.InDirection; // dead end: the wall straight ahead
 
             // Side branches off the main path (never from the stairwell or the door cell).
@@ -96,10 +97,13 @@ namespace Vchod.World
             if (doors.Count < rules.minApartmentDoors) return null;
             foreach (var i in doors) AssignFeature(rng, plan.Cells[i], CellFeature.ApartmentDoor);
 
-            // The CO source is one neighbour's flat; avoid the cell right next to the stairs if possible.
-            var candidates = doors.FindAll(i => plan.Cells[i].Depth >= 2);
-            if (candidates.Count == 0) candidates = doors;
-            plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
+            // The CO source is one neighbour's flat on the player's floor; avoid the cell right next to the stairs if possible.
+            if (playerFloor)
+            {
+                var candidates = doors.FindAll(i => plan.Cells[i].Depth >= 2);
+                if (candidates.Count == 0) candidates = doors;
+                plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
+            }
 
             PlaceHidingSpots(rng, plan, rules);
             PlaceLightSwitches(rng, plan);

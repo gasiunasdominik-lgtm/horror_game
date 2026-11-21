@@ -11,6 +11,15 @@ namespace Vchod.World
         public float wallHeight = 2.8f;
         public float wallThickness = 0.2f;
 
+        [Header("Floors")]
+        [Min(1)] public int floorCount = 3;
+        [Tooltip("0 = ground floor. The player's flat and the CO source are on this floor.")]
+        public int playerFloor = 2;
+        [Tooltip("Storey height; the half-landing between floors sits at half of it (8 steps × 0.17).")]
+        public float floorHeight = 2.72f;
+        [Tooltip("Round start on the ground floor, relative to the stairwell cell centre.")]
+        public Vector3 startOffset = new(1.0f, 0f, 0.9f);
+
         [Header("Generation")]
         public LayoutRules rules = new();
 
@@ -21,7 +30,16 @@ namespace Vchod.World
         public GameObject lampPrefab;
 
         [Header("Feature prefabs")]
+        [Tooltip("Up flight, half-landing and the next floor's flight above (not on the top floor).")]
         public GameObject stairwellPrefab;
+        [Tooltip("Down flight, half-landing below and the previous flight (not on the ground floor).")]
+        public GameObject stairsDownPrefab;
+        public GameObject stairwellFloorPrefab;
+        [Tooltip("Ground floor only: slab where upper floors have the down flight.")]
+        public GameObject stairwellGroundPrefab;
+        [Tooltip("Top floor only: rail where lower floors have the up flight.")]
+        public GameObject stairwellTopRailPrefab;
+        public GameObject stairwellCeilingPrefab;
         public GameObject lightButtonPrefab;
         public GameObject apartmentDoorPrefab;
         public GameObject playerDoorPrefab;

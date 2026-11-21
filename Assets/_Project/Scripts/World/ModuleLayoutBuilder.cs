@@ -23,21 +23,37 @@ namespace Vchod.World
 
         private Transform _floorRoot;
         private bool _reshufflePending;
+        // After a floor swap the player stands on the other floor's half-landing: no swap back
+        // until they have stepped off it.
+        private bool _landingArmed = true;
+        private const float LandingDepth = 1.0f;
+        private const float LandingTrigger = 1.0f;
 
         public HouseConfig Config => config;
         public LayoutPlan Plan { get; private set; }
         public int ReshuffleIndex { get; private set; }
         public uint LayoutHash { get; private set; }
         public Vector3 CoSourcePosition { get; private set; }
+        public bool HasCoSource { get; private set; }
+        public int Floor { get; private set; }
+        public bool IsPlayerFloor => Floor == config.playerFloor;
+        public bool IsTopFloor => Floor == config.floorCount - 1;
+        /// <summary>
+        /// Safe arrival point: on the ground floor beside the stairs (round start); upper floors have
+        /// the down flight there, so the first corridor cell instead.
+        /// </summary>
+        public Vector3 StartPoint => Floor == 0
+            ? GetCellCenter(LayoutPlan.StartIndex) + config.startOffset
+            : GetCellCenter(Plan.MainPath[1]);
 
         private void OnEnable() => EventBus.Subscribe<LightTurnedOff>(OnLightOff);
         private void OnDisable() => EventBus.Unsubscribe<LightTurnedOff>(OnLightOff);
 
         private void Start()
         {
+            Floor = 0;
             Build(0);
-            var start = GetCellCenter(LayoutPlan.StartIndex);
-            player.Teleport(start, Direction.North.Yaw());
+            player.Teleport(StartPoint, Direction.North.Yaw());
         }
 
         private void OnLightOff(LightTurnedOff e)
@@ -50,9 +66,51 @@ namespace Vchod.World
 
         private void Update()
         {
+            UpdateStairs();
             if (!_reshufflePending || player.IsHidden) return;
             _reshufflePending = false;
             if (lightTimer == null || !lightTimer.IsOn) Reshuffle();
+        }
+
+        /// <summary>
+        /// The half-landing between floors exists on both: as the up landing (+half) of the lower
+        /// floor and the down landing (−half) of the upper one. Stepping onto it swaps the floor
+        /// and shifts the player by one storey, so nothing visibly jumps.
+        /// </summary>
+        private void UpdateStairs()
+        {
+            if (Plan == null || player.IsHidden) return;
+            var p = player.transform.position;
+            var onLanding = IsInStairwell(p) && WallDistanceSouth(p) < LandingDepth;
+            if (!onLanding)
+            {
+                _landingArmed = true;
+                return;
+            }
+            if (!_landingArmed) return;
+            if (p.y > LandingTrigger && !IsTopFloor) GoToFloor(Floor + 1);
+            else if (p.y < -LandingTrigger && Floor > 0) GoToFloor(Floor - 1);
+        }
+
+        private float WallDistanceSouth(Vector3 world) =>
+            world.z - (GetCellCenter(LayoutPlan.StartIndex).z - config.cellSize * 0.5f + config.wallThickness);
+
+        /// <summary>Swaps to another floor, keeping the player's spot on the stairs.</summary>
+        public void GoToFloor(int floor)
+        {
+            floor = Mathf.Clamp(floor, 0, config.floorCount - 1);
+            if (floor == Floor) return;
+            var from = Floor;
+            var shift = (from - floor) * config.floorHeight;
+            var t = player.transform;
+            var pos = t.position + Vector3.up * shift;
+            var yaw = t.eulerAngles.y;
+
+            Floor = floor;
+            _landingArmed = false;
+            EventBus.Publish(new FloorChanged { From = from, To = floor });
+            Build(ReshuffleIndex);
+            player.Teleport(pos, yaw);
         }
 
         /// <summary>Next layout of the same seed. The player keeps their depth along the corridor.</summary>
@@ -66,8 +124,10 @@ namespace Vchod.World
         public void Build(int reshuffleIndex)
         {
             ReshuffleIndex = reshuffleIndex;
-            var layoutSeed = SeedService.DeriveSeed(SeedService.Seed, LayoutStream, reshuffleIndex);
-            Plan = LayoutGenerator.Generate(layoutSeed, config.rules);
+            var layoutSeed = SeedService.DeriveSeed(SeedService.Seed, $"{LayoutStream}/f{Floor}", reshuffleIndex);
+            Plan = LayoutGenerator.Generate(layoutSeed, config.rules, IsPlayerFloor);
+            HasCoSource = false;
+            CoSourcePosition = new Vector3(0f, -1000f, 0f); // other floors: far away, detector silent
             LayoutHash = Plan.ComputeHash();
 
             if (_floorRoot != null)
@@ -78,7 +138,7 @@ namespace Vchod.World
                 _floorRoot.gameObject.SetActive(false);
                 Destroy(_floorRoot.gameObject);
             }
-            _floorRoot = new GameObject($"Floor_{reshuffleIndex}").transform;
+            _floorRoot = new GameObject($"Floor{Floor}_{reshuffleIndex}").transform;
             _floorRoot.SetParent(transform, false);
 
             for (var i = 0; i < Plan.Count; i++) BuildCell(i, Plan.Cells[i]);
@@ -93,6 +153,7 @@ namespace Vchod.World
                 Seed = SeedService.Seed,
                 ReshuffleIndex = reshuffleIndex,
                 LayoutHash = LayoutHash,
+                Floor = Floor,
             });
         }
 
@@ -103,16 +164,22 @@ namespace Vchod.World
             var center = GetCellCenter(index);
             var up = Vector3.up * config.wallHeight;
 
-            Spawn(config.floorPrefab, center, Quaternion.identity, root);
-            Spawn(config.ceilingPrefab, center + up, Quaternion.identity, root);
-            Spawn(config.lampPrefab, center + up, Quaternion.identity, root);
+            if (index == LayoutPlan.StartIndex)
+            {
+                BuildStairwell(center, root);
+            }
+            else
+            {
+                Spawn(config.floorPrefab, center, Quaternion.identity, root);
+                Spawn(config.ceilingPrefab, center + up, Quaternion.identity, root);
+                Spawn(config.lampPrefab, center + up, Quaternion.identity, root);
+            }
 
             foreach (var d in DirectionUtil.All)
                 if (!cell.IsOpen(d)) Spawn(config.wallPrefab, WallPoint(center, d), Inward(d), root);
 
             var feature = cell.Feature switch
             {
-                CellFeature.Stairwell => config.stairwellPrefab,
                 CellFeature.ApartmentDoor => config.apartmentDoorPrefab,
                 CellFeature.PlayerDoor => config.playerDoorPrefab,
                 CellFeature.Window => config.windowPrefab,
@@ -137,15 +204,41 @@ namespace Vchod.World
 
             if (index == LayoutPlan.StartIndex)
             {
-                // The switch is on the stairwell's east wall, beside the corridor opening.
-                var pos = WallPoint(center, Direction.East) + ToVector(Direction.North) * 1.0f;
+                // The switch is on the stairwell's east wall by the corridor opening, clear of the down flight.
+                var pos = WallPoint(center, Direction.East) + ToVector(Direction.North) * 1.65f;
                 Spawn(config.lightButtonPrefab, pos, Inward(Direction.East), root);
             }
 
             if (cell.IsCoSource)
             {
+                HasCoSource = true;
                 CoSourcePosition = center + ToVector(cell.FeatureSide) * (config.cellSize * 0.5f + config.coSourceDepth)
                                    + Vector3.up * 1.2f;
+            }
+        }
+
+        /// <summary>
+        /// Two-flight panelák stairwell. Pieces are authored in the stairwell frame: origin on the
+        /// south wall's inner face, +Z north. Walls repeat one storey up and down, so looking up
+        /// or down the stairs never shows the void.
+        /// </summary>
+        private void BuildStairwell(Vector3 center, Transform root)
+        {
+            var origin = WallPoint(center, Direction.South);
+            var frame = Inward(Direction.South);
+            Spawn(config.stairwellFloorPrefab, origin, frame, root);
+            Spawn(config.stairwellCeilingPrefab, origin, frame, root);
+            Spawn(config.lampPrefab, center + ToVector(Direction.North) * 0.9f + Vector3.up * config.wallHeight, Quaternion.identity, root);
+            if (IsTopFloor) Spawn(config.stairwellTopRailPrefab, origin, frame, root);
+            else Spawn(config.stairwellPrefab, origin, frame, root);
+            if (Floor == 0) Spawn(config.stairwellGroundPrefab, origin, frame, root);
+            else Spawn(config.stairsDownPrefab, origin, frame, root);
+
+            var storey = Vector3.up * config.floorHeight;
+            foreach (var d in DirectionUtil.All)
+            {
+                Spawn(config.wallPrefab, WallPoint(center, d) + storey, Inward(d), root);
+                Spawn(config.wallPrefab, WallPoint(center, d) - storey, Inward(d), root);
             }
         }
 

@@ -63,10 +63,11 @@ namespace Vchod.World
                 }
             }
 
-            if (playerDoors != 1) errors.Add($"expected 1 player door, found {playerDoors}");
+            var expected = plan.IsPlayerFloor ? 1 : 0;
+            if (playerDoors != expected) errors.Add($"expected {expected} player door, found {playerDoors}");
             if (windows < 1) errors.Add("no window");
             if (apartmentDoors < rules.minApartmentDoors) errors.Add($"only {apartmentDoors} apartment doors");
-            if (coSources != 1) errors.Add($"expected 1 CO source, found {coSources}");
+            if (coSources != expected) errors.Add($"expected {expected} CO source, found {coSources}");
             if (hiding < rules.minHidingSpots) errors.Add($"only {hiding} hiding spots");
             if (rules.minHidingSpots > 0 && hidingOnMain == 0) errors.Add("no hiding spot on the main path");
 
