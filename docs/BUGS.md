@@ -18,4 +18,25 @@ Stavy: `OPEN` · `REPRO` (reprodukováno) · `NOREPRO` · `FIXED` (čeká na ov�
 ```
 
 ## Záznamy
-(zatím žádné)
+
+### B-001 — Spínač světla nejde zapnout
+- Severity: S2
+- Stav: FIXED (čeká na ověření Dominikem)
+- Kdy/kde: m0, playtest #1 (T-010), Editor
+- Seed: libovolný
+- Kroky: 1) Play 2) najít spínač ve tmě 3) E
+- Očekáváno: spínač ve tmě svítí, E rozsvítí chodbu
+- Skutečnost: spínač je ve tmě neviditelný, hráč ho nenajde
+- Příčina: URP Lit materiál vytvořený kódem ztratil klíčové slovo `_EMISSION`, takže spínač, žárovky ani okna nesvítily. Raycast a E fungovaly (ověřeno).
+- Oprava: svítící materiály (`M_LightButton`, `M_LampOn`, `M_WindowNight`) přes Unlit shader s HDR barvou; větší kolizní box spínače (0,45 × 0,5 m); dosah interakce 2,2 → 2,6 m. Test `GreyboxMaterialTests`.
+
+### B-002 — Bez světla příliš velká tma
+- Severity: S3
+- Stav: FIXED (čeká na ověření Dominikem)
+- Kdy/kde: m0, playtest #1 (T-010)
+- Kroky: 1) Play, nerozsvěcet
+- Očekáváno: hůř se orientuješ, ale chodba je čitelná (GDD)
+- Skutečnost: skoro černý obraz
+- Příčina: ambient 0,05 + tonemapping ACES a kontrast potlačily tmavé tóny
+- Oprava: ambient 0,05 → 0,20 (modravý), okna slabě svítí. Bod v regresním seznamu `TESTING.md`.
+

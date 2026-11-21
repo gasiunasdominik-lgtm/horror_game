@@ -30,6 +30,9 @@ namespace Vchod.Player
         /// <summary>1 = normal. Lowered by CO symptoms ("slower turning").</summary>
         public float LookMultiplier { get; set; } = 1f;
 
+        /// <summary>Degrees of head tilt from symptoms (nausea sway).</summary>
+        public float CameraRoll { get; set; }
+
         public bool IsSprinting { get; private set; }
         public float PlanarSpeed => _planarVelocity.magnitude;
 
@@ -74,6 +77,7 @@ namespace Vchod.Player
         {
             var dt = Time.deltaTime;
             if (InputEnabled) UpdateLook(dt);
+            cameraPivot.localRotation = Quaternion.Euler(_pitch, 0f, CameraRoll);
             UpdateMove(dt);
         }
 
@@ -85,7 +89,6 @@ namespace Vchod.Player
 
             transform.Rotate(0f, look.x, 0f, Space.Self);
             _pitch = Mathf.Clamp(_pitch - look.y, -config.maxPitch, config.maxPitch);
-            cameraPivot.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
         }
 
         private void UpdateMove(float dt)

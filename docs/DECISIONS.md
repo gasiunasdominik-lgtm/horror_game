@@ -30,3 +30,6 @@ Zapisuj každé rozhodnutí, které ovlivní hru, nástroje nebo rozsah. Formát
 | D-024 | 20. 11. 2026 | Zvuky v M0 syntetizované kódem (pípání, hučení) | Žádné cizí assety ani licence; nahradí audio pass M2 | C |
 | D-025 | 20. 11. 2026 | `SampleScene` přesunuta na `Assets/_Project/Scenes/Game.unity`, jediná scéna v buildu; zapojení scény generuje menu `Vchod/Rebuild Game Scene Wiring` | ARCHITECTURE: scéna `Game`; zapojení opakovatelné z kódu | C |
 | D-026 | 20. 11. 2026 | Výzva k interakci v češtině („E  Rozsvítit“) jako placeholder | Lokalizace CZ/EN se řeší později (GDD) | C |
+| D-027 | 21. 11. 2026 | CO na chodbě +0,08 → +0,04/s (100 za ~40 min), tlak dělá blízkost zdroje | FEEL playtest #1: růst daleko od zdroje působí nefér (pilíř 3). GDD „pomalu na chodbě“ zůstává | C |
+| D-028 | 21. 11. 2026 | Práh 60 přidává kymácení hlavy (náklon ±4°) a „dýchání“ FOV (±6°) k zkreslení čočky | FEEL: obraz při 60 nepůsobil jako nevolnost | C |
+| D-029 | 21. 11. 2026 | Svítící prvky (spínač, žárovky, okna) jsou Unlit materiály | Nezávislé na osvětlení a na klíčových slovech URP Lit (B-001) | C |

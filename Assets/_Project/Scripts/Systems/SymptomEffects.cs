@@ -17,6 +17,9 @@ namespace Vchod.Systems
         [SerializeField] private PlayerController player;
         [SerializeField] private AudioLowPassFilter lowPass;
         [SerializeField] private AudioSource hum;
+        [SerializeField] private Camera view;
+
+        private float _baseFov;
 
         private VolumeProfile _profile;
         private Vignette _vignette;
@@ -45,6 +48,7 @@ namespace Vchod.Systems
             volume.priority = VolumePriority;
             volume.sharedProfile = _profile;
 
+            _baseFov = view.fieldOfView;
             hum.clip = Audio.ProceduralAudio.CreateTinnitus();
             hum.loop = true;
             hum.volume = 0f;
@@ -76,6 +80,8 @@ namespace Vchod.Systems
 
             player.SpeedMultiplier = state.SpeedMultiplier;
             player.LookMultiplier = state.LookMultiplier;
+            player.CameraRoll = state.CameraRoll;
+            view.fieldOfView = _baseFov + state.FovOffset;
 
             hum.volume = state.HumVolume;
             if (lowPass != null) lowPass.cutoffFrequency = state.LowPassCutoff;

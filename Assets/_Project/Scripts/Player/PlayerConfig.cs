@@ -20,7 +20,7 @@ namespace Vchod.Player
         public float maxPitch = 85f;
 
         [Header("Interaction")]
-        public float interactDistance = 2.2f;
+        public float interactDistance = 2.6f;
         public LayerMask interactMask = ~0;
     }
 }

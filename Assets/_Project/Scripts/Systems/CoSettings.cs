@@ -13,7 +13,7 @@ namespace Vchod.Systems
         [Tooltip("Rise at the source itself. 2.5/s = about 40 s from nothing to collapse.")]
         public float sourceMaxRate = 2.5f;
         [Tooltip("Slow rise anywhere in the corridors (gas spreads through the shafts).")]
-        public float corridorRate = 0.08f;
+        public float corridorRate = 0.04f;
         [Tooltip("Stairwell: slowly clears (negative = falls).")]
         public float stairwellRate = -0.3f;
         [Tooltip("At an open window: clears fast.")]

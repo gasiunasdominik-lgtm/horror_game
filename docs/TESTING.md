@@ -64,7 +64,7 @@ Playtest log (vyplňuje `/playtest`):
 
 | Datum | Build | Strach | Srozum. | Fér. | Tempo | Poznámka |
 |---|---|---|---|---|---|---|
-| | | | | | | |
+| 21. 11. 2026 | m0 (Editor) | – | – | – | 2 | Dominik: „menší napětí s lehkou úzkostí, rozumím nastavení; docela nefér, že CO roste i daleko od zdroje; při 60 obraz nevypadá, že by mi bylo špatně.“ Čísla os kromě tempa nezadal. Nálezy: B-001, B-002 |
 
 ## 7. Severity chyb
 
@@ -77,7 +77,7 @@ Playtest log (vyplňuje `/playtest`):
 
 ## 8. Regresní seznam
 Každá opravená chyba, kterou nejde pokrýt testem, dostane bod sem. Dominik ho projde před milníkem (5 minut).
-- [ ] (zatím prázdné)
+- [ ] B-002: bez rozsvícení je chodba tmavá, ale čitelný tvar chodby, dveře a oranžový spínač.
 
 ## 9. Výkon (měření na Zenbooku)
 | Milník | Datum | Scéna | FPS (průměr / min) | Frame time | Poznámka |

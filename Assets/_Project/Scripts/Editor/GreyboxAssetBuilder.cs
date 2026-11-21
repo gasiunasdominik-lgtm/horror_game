@@ -16,7 +16,10 @@ namespace Vchod.EditorTools
         public const string MaterialFolder = "Assets/_Project/Art/Materials";
         public const string PrefabFolder = "Assets/_Project/Prefabs/Modules";
 
+        public const string UnlitShaderName = "Universal Render Pipeline/Unlit";
+
         private static Shader Lit => Shader.Find("Universal Render Pipeline/Lit");
+        private static Shader Unlit => Shader.Find(UnlitShaderName);
 
         [MenuItem("Vchod/Rebuild Greybox Modules")]
         public static HouseConfig BuildAll()
@@ -34,7 +37,7 @@ namespace Vchod.EditorTools
             var frame = Mat("M_Frame", new Color(0.18f, 0.18f, 0.18f));
             var metal = Mat("M_Metal", new Color(0.55f, 0.55f, 0.52f), smoothness: 0.5f);
             var windowFrame = Mat("M_WindowFrame", new Color(0.80f, 0.80f, 0.77f));
-            var glass = Mat("M_WindowNight", new Color(0.02f, 0.03f, 0.06f), emission: new Color(0.05f, 0.08f, 0.18f));
+            var glass = Mat("M_WindowNight", new Color(0.02f, 0.03f, 0.06f), emission: new Color(0.10f, 0.16f, 0.35f));
             var lampOn = Mat("M_LampOn", new Color(1f, 0.9f, 0.7f), emission: new Color(2.0f, 1.7f, 1.2f));
             var lampOff = Mat("M_LampOff", new Color(0.35f, 0.34f, 0.32f));
             var button = Mat("M_LightButton", new Color(0.9f, 0.4f, 0.1f), emission: new Color(5f, 2f, 0.4f));
@@ -86,8 +89,9 @@ namespace Vchod.EditorTools
                 Box(root, "Plate", new Vector3(0, 1.3f, 0.01f), new Vector3(0.12f, 0.16f, 0.02f), frame, collider: false);
                 Box(root, "Button", new Vector3(0, 1.3f, 0.025f), new Vector3(0.06f, 0.08f, 0.02f), button, collider: false);
                 var col = root.AddComponent<BoxCollider>();
-                col.center = new Vector3(0, 1.3f, 0.06f);
-                col.size = new Vector3(0.3f, 0.35f, 0.12f);
+                // Generous target: in the dark the player aims at a glowing dot.
+                col.center = new Vector3(0, 1.3f, 0.08f);
+                col.size = new Vector3(0.45f, 0.5f, 0.16f);
                 root.AddComponent<LightButton>();
             });
 
@@ -174,18 +178,22 @@ namespace Vchod.EditorTools
         {
             var path = $"{MaterialFolder}/{name}.mat";
             var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
-            if (mat != null) return mat;
-
-            mat = new Material(Lit) { name = name };
-            mat.SetColor("_BaseColor", color);
-            mat.SetFloat("_Smoothness", smoothness);
-            if (emission.HasValue)
+            if (mat == null)
             {
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", emission.Value);
-                mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+                mat = new Material(emission.HasValue ? Unlit : Lit) { name = name };
+                AssetDatabase.CreateAsset(mat, path);
+                mat.SetColor("_BaseColor", emission ?? color);
+                mat.SetFloat("_Smoothness", smoothness);
             }
-            AssetDatabase.CreateAsset(mat, path);
+
+            // B-001: URP Lit dropped the _EMISSION keyword at runtime, so nothing glowed.
+            // Self-lit parts use Unlit with an HDR colour instead: always visible, bloom picks it up.
+            if (emission.HasValue && mat.shader != Unlit)
+            {
+                mat.shader = Unlit;
+                mat.SetColor("_BaseColor", emission.Value);
+            }
+            EditorUtility.SetDirty(mat);
             return mat;
         }
     }

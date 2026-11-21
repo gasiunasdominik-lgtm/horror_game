@@ -48,6 +48,24 @@ namespace Vchod.Tests
         }
 
         [Test]
+        public void At60_HeadSwaysAndFovBreathes_NotBefore()
+        {
+            var maxRoll = 0f;
+            var maxFov = 0f;
+            for (var t = 0f; t < 20f; t += 0.1f)
+            {
+                var s = SymptomState.Evaluate(S, 60f, false, t);
+                maxRoll = UnityEngine.Mathf.Max(maxRoll, UnityEngine.Mathf.Abs(s.CameraRoll));
+                maxFov = UnityEngine.Mathf.Max(maxFov, UnityEngine.Mathf.Abs(s.FovOffset));
+                var calm = SymptomState.Evaluate(S, 45f, false, t);
+                Assert.AreEqual(0f, calm.CameraRoll, 1e-4f);
+                Assert.AreEqual(0f, calm.FovOffset, 1e-4f);
+            }
+            Assert.Greater(maxRoll, S.warpRoll * 0.5f);
+            Assert.Greater(maxFov, S.warpFov * 0.5f);
+        }
+
+        [Test]
         public void At80_NearlyDarkAndWalking30PercentSlower()
         {
             var s = At(80f);

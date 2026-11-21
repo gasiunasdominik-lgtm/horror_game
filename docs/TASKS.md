@@ -16,7 +16,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-007 | Greybox chodba z modulů + schodišťové světlo na časovač | C | DONE | P1 | Tlačítko rozsvítí na ~20 s, světlo zhasne |
 | T-008 | ModuleLayout: přeskládání modulů při zhasnutí podle seedu, validace cesty | C | DONE | P1 | Po zhasnutí je dům jiný, stejný seed = stejné rozložení, 200 seedů projde sweepem |
 | T-009 | CoModel + SymptomEffects + pípání detektoru podle vzdálenosti ke zdroji | C | DONE | P1 | Hladina CO roste u zdroje, efekty a zvuk se mění podle prahů |
-| T-010 | Playtest #1 (10 min) + FEEL hodnocení | D | TODO | P1 | `FEEL:` odpověď v chatu |
+| T-010 | Playtest #1 (10 min) + FEEL hodnocení | D | DONE | P1 | `FEEL:` odpověď v chatu |
 | T-011 | EditMode testy: CoModel, SeedService, validace ModuleLayout | C | DONE | P2 | Testy zelené |
 | T-012 | Zapsat měření výkonu na Zenbooku do TESTING.md | C | DONE | P2 | Hodnoty FPS zapsané |
 
@@ -62,7 +62,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-066 | Tag `m3` | C | TODO | P2 | Tag existuje |
 
 ## Nápady (neimplementovat; Dominik/Claude zde zapisují)
-- (C) Více spínačů světla (u každých dveří nebo v polovině chodby), pokud se při playtestu ukáže, že jediný spínač u schodů je moc trestající.
+- (D, playtest #1) Více spínačů světla, ať hráč nemusí hledat jediný u schodů. Návrh C: spínač v každé 2.–3. buňce chodby. Zařadit do M1 spolu s T-024 (víc pater)?
 - (C) Zvuk cvaknutí spínače a relé při zhasnutí (audio pass M2).
 - (C) PlayMode smoke test (načíst scénu, 60 s bot, kontrola výjimek) podle TESTING.md, vrstva 2; zatím nezařazeno do milníku.
 

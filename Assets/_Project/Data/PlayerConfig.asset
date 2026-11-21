@@ -19,7 +19,7 @@ MonoBehaviour:
   mouseSensitivity: 0.08
   gamepadLookSpeed: 140
   maxPitch: 85
-  interactDistance: 2.2
+  interactDistance: 2.6
   interactMask:
     serializedVersion: 2
     m_Bits: 4294967295

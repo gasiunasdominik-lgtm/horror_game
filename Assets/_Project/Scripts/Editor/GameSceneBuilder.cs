@@ -114,6 +114,7 @@ namespace Vchod.EditorTools
             SetRef(symptoms, "player", player);
             SetRef(symptoms, "lowPass", lowPass);
             SetRef(symptoms, "hum", hum);
+            SetRef(symptoms, "view", cam.GetComponent<Camera>());
 
             var detectorGo = FindOrCreateRoot("CoDetector");
             GetOrAdd<AudioSource>(detectorGo);
@@ -141,7 +142,7 @@ namespace Vchod.EditorTools
             if (sun != null) sun.SetActive(false);
 
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.05f, 0.055f, 0.07f);
+            RenderSettings.ambientLight = new Color(0.2f, 0.21f, 0.26f);
             RenderSettings.skybox = null;
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;

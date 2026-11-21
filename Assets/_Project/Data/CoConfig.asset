@@ -16,7 +16,7 @@ MonoBehaviour:
     startLevel: 5
     sourceRadius: 10
     sourceMaxRate: 2.5
-    corridorRate: 0.08
+    corridorRate: 0.04
     stairwellRate: -0.3
     windowRate: -4
     thresholds:
@@ -37,6 +37,8 @@ MonoBehaviour:
     warpDistortion: 0.35
     warpSpeed: 0.7
     warpChromatic: 0.6
+    warpRoll: 4
+    warpFov: 6
     muffledCutoff: 1200
     darkThreshold: 80
     darkVignette: 0.62

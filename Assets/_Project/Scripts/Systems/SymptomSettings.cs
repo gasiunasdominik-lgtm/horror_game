@@ -27,6 +27,10 @@ namespace Vchod.Systems
         [Range(0f, 1f)] public float warpDistortion = 0.35f;
         public float warpSpeed = 0.7f;
         [Range(0f, 1f)] public float warpChromatic = 0.6f;
+        [Tooltip("Camera roll sway (degrees): the 'I feel sick' part, not just a lens effect.")]
+        public float warpRoll = 4f;
+        [Tooltip("Field of view breathing (degrees).")]
+        public float warpFov = 6f;
         public float muffledCutoff = 1200f;
 
         [Header("80: nearly dark, walking -30 %")]
@@ -50,6 +54,8 @@ namespace Vchod.Systems
         public float LowPassCutoff;
         public float PostExposure;
         public float SpeedMultiplier;
+        public float CameraRoll;
+        public float FovOffset;
 
         public const float OpenCutoff = 22000f;
 
@@ -65,7 +71,10 @@ namespace Vchod.Systems
                 HumVolume = s.humMaxVolume * hum * Mathf.Lerp(0.5f, 1f, level / 100f),
                 Vignette = Mathf.Lerp(Mathf.Lerp(s.baseVignette, s.narrowVignette, narrow), s.darkVignette, dark),
                 LookMultiplier = Mathf.Lerp(1f, s.narrowLookMultiplier, narrow),
-                LensDistortion = s.warpDistortion * warp * Mathf.Sin(time * s.warpSpeed),
+                // Two incommensurate sines: a sway that never settles into a rhythm.
+                LensDistortion = s.warpDistortion * warp * Wave(time * s.warpSpeed),
+                CameraRoll = s.warpRoll * warp * Wave(time * s.warpSpeed * 1.3f + 1f),
+                FovOffset = s.warpFov * warp * Wave(time * s.warpSpeed * 0.8f + 2f),
                 ChromaticAberration = s.warpChromatic * warp,
                 LowPassCutoff = Mathf.Lerp(OpenCutoff, s.muffledCutoff, warp),
                 PostExposure = s.darkPostExposure * dark,
@@ -80,6 +89,8 @@ namespace Vchod.Systems
             }
             return state;
         }
+
+        private static float Wave(float t) => (Mathf.Sin(t) + 0.5f * Mathf.Sin(t * 2.37f)) / 1.5f;
 
         /// <summary>0 below (threshold − ramp), 1 at the threshold and above, smooth between.</summary>
         public static float Weight(SymptomSettings s, float level, float threshold) =>
