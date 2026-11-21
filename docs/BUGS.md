@@ -21,7 +21,7 @@ Stavy: `OPEN` · `REPRO` (reprodukováno) · `NOREPRO` · `FIXED` (čeká na ov�
 
 ### B-001 — Spínač světla nejde zapnout
 - Severity: S2
-- Stav: FIXED (čeká na ověření Dominikem)
+- Stav: VERIFIED (21. 11. 2026)
 - Kdy/kde: m0, playtest #1 (T-010), Editor
 - Seed: libovolný
 - Kroky: 1) Play 2) najít spínač ve tmě 3) E
@@ -32,7 +32,7 @@ Stavy: `OPEN` · `REPRO` (reprodukováno) · `NOREPRO` · `FIXED` (čeká na ov�
 
 ### B-002 — Bez světla příliš velká tma
 - Severity: S3
-- Stav: FIXED (čeká na ověření Dominikem)
+- Stav: VERIFIED (21. 11. 2026)
 - Kdy/kde: m0, playtest #1 (T-010)
 - Kroky: 1) Play, nerozsvěcet
 - Očekáváno: hůř se orientuješ, ale chodba je čitelná (GDD)

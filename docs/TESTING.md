@@ -77,7 +77,7 @@ Playtest log (vyplňuje `/playtest`):
 
 ## 8. Regresní seznam
 Každá opravená chyba, kterou nejde pokrýt testem, dostane bod sem. Dominik ho projde před milníkem (5 minut).
-- [ ] B-002: bez rozsvícení je chodba tmavá, ale čitelný tvar chodby, dveře a oranžový spínač.
+- [x] B-002 (ověřeno 21. 11. 2026): bez rozsvícení je chodba tmavá, ale čitelný tvar chodby, dveře a oranžový spínač.
 
 ## 9. Výkon (měření na Zenbooku)
 | Milník | Datum | Scéna | FPS (průměr / min) | Frame time | Poznámka |

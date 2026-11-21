@@ -33,3 +33,5 @@ Zapisuj každé rozhodnutí, které ovlivní hru, nástroje nebo rozsah. Formát
 | D-027 | 21. 11. 2026 | CO na chodbě +0,08 → +0,04/s (100 za ~40 min), tlak dělá blízkost zdroje | FEEL playtest #1: růst daleko od zdroje působí nefér (pilíř 3). GDD „pomalu na chodbě“ zůstává | C |
 | D-028 | 21. 11. 2026 | Práh 60 přidává kymácení hlavy (náklon ±4°) a „dýchání“ FOV (±6°) k zkreslení čočky | FEEL: obraz při 60 nepůsobil jako nevolnost | C |
 | D-029 | 21. 11. 2026 | Svítící prvky (spínač, žárovky, okna) jsou Unlit materiály | Nezávislé na osvětlení a na klíčových slovech URP Lit (B-001) | C |
+| D-030 | 21. 11. 2026 | Víc spínačů světla (každá 2.–3. buňka chodby) jako součást T-024 v M1 | Nápad z playtestu #1, Dominik potvrdil výchozí odpověď (OK) | D |
+| D-031 | 21. 11. 2026 | `main` a tag `m0` pushnuty na GitHub | Výslovný pokyn Dominika | D |

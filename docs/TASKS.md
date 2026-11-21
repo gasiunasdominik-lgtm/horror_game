@@ -28,7 +28,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-021 | Senzory hasiče (sluch, zrak, světlo) + audio (dech, výstroj, baterka) | C | TODO | P1 | Hráč pozná polohu podle zvuku |
 | T-022 | Skrýše (skříň, stůl) a interakce | C | TODO | P1 | Hráč se schová a hasič ho přejde nebo najde |
 | T-023 | Okna s čerstvým vzduchem a pokles CO | C | TODO | P1 | U okna CO klesá |
-| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje | C | TODO | P1 | Dá se dojít od vchodu ke dveřím |
+| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | TODO | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
 | T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | TODO | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
 | T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | TODO | P1 | Všechny tři konce dosažitelné |
 | T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | TODO | P1 | Po konci lze začít nové kolo |
@@ -62,7 +62,6 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-066 | Tag `m3` | C | TODO | P2 | Tag existuje |
 
 ## Nápady (neimplementovat; Dominik/Claude zde zapisují)
-- (D, playtest #1) Více spínačů světla, ať hráč nemusí hledat jediný u schodů. Návrh C: spínač v každé 2.–3. buňce chodby. Zařadit do M1 spolu s T-024 (víc pater)?
 - (C) Zvuk cvaknutí spínače a relé při zhasnutí (audio pass M2).
 - (C) PlayMode smoke test (načíst scénu, 60 s bot, kontrola výjimek) podle TESTING.md, vrstva 2; zatím nezařazeno do milníku.
 
