@@ -35,3 +35,6 @@ Zapisuj každé rozhodnutí, které ovlivní hru, nástroje nebo rozsah. Formát
 | D-029 | 21. 11. 2026 | Svítící prvky (spínač, žárovky, okna) jsou Unlit materiály | Nezávislé na osvětlení a na klíčových slovech URP Lit (B-001) | C |
 | D-030 | 21. 11. 2026 | Víc spínačů světla (každá 2.–3. buňka chodby) jako součást T-024 v M1 | Nápad z playtestu #1, Dominik potvrdil výchozí odpověď (OK) | D |
 | D-031 | 21. 11. 2026 | `main` a tag `m0` pushnuty na GitHub | Výslovný pokyn Dominika | D |
+| D-032 | 21. 11. 2026 | Hasič: hlídka 1,2 m/s, honička 3,0 m/s (chůze hráče 2,0, sprint 3,6). Vidí 14 m při světle, 6 m ve tmě, zorné pole 110°, do 2 m cítí hráče kolem dokola. Rozsvícení prozradí polohu spínače, kroky slyší do 4 m (sprint 12 m) | Útěk je možný jen sprintem, který je hlučný: rozhodnutí hráče má cenu (pilíř 3). Ladí se v `FirefighterConfig` / `PlayerConfig` | C |
+| D-033 | 21. 11. 2026 | Chycení v M1 zatím jen zablokuje ovládání a pošle `PlayerCaught`; konec 2 (evakuace) napojí T-026 | Konce jsou samostatný úkol | C |
+| D-034 | 21. 11. 2026 | NavMesh se peče za běhu po každém přeskládání (`NavMeshSurface` na `House`, kolidery). Hasič zůstává na místě, pokud je na novém patře, jinak se objeví v nejvzdálenější buňce; ve tmě po přeskládání přejde do hledání | Moduly se mění, pevný NavMesh nejde | C |

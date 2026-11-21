@@ -9,6 +9,8 @@ using Vchod.Player;
 using Vchod.Systems;
 using Vchod.World;
 using Vchod.Audio;
+using Vchod.Enemy;
+using Unity.AI.Navigation;
 using Vchod.UI;
 using static Vchod.EditorTools.SceneBuildUtil;
 
@@ -39,6 +41,7 @@ namespace Vchod.EditorTools
             var lightTimer = SetupLightTimer(systems);
             var house = SetupHouse(player, lightTimer);
             SetupCo(systems, player, house);
+            SetupFirefighter(player, house, lightTimer);
             SetupEnvironment();
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -123,6 +126,24 @@ namespace Vchod.EditorTools
             SetRef(detector, "house", house);
         }
 
+        private static void SetupFirefighter(PlayerController player, ModuleLayoutBuilder house, LightTimer lightTimer)
+        {
+            var config = LoadOrCreateAsset<FirefighterConfig>($"{DataFolder}/FirefighterConfig.asset");
+            var prefab = FirefighterAssetBuilder.Build();
+
+            var existing = GameObject.Find("/Firefighter");
+            if (existing != null) Object.DestroyImmediate(existing);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instance.transform.position = new Vector3(0f, 0f, 20f);
+
+            var controller = instance.GetComponent<FirefighterController>();
+            SetRef(controller, "config", config);
+            SetRef(controller, "player", player);
+            SetRef(controller, "house", house);
+            SetRef(controller, "lightTimer", lightTimer);
+            SetRef(controller, "eyes", instance.transform.Find("Eyes"));
+        }
+
         private static ModuleLayoutBuilder SetupHouse(PlayerController player, LightTimer lightTimer)
         {
             var houseConfig = GreyboxAssetBuilder.BuildAll();
@@ -132,6 +153,14 @@ namespace Vchod.EditorTools
             SetRef(builder, "config", houseConfig);
             SetRef(builder, "lightTimer", lightTimer);
             SetRef(builder, "player", player);
+
+            var surface = GetOrAdd<NavMeshSurface>(house);
+            surface.collectObjects = CollectObjects.Children;
+            surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
+            SetRef(builder, "navMeshSurface", surface);
+
+            var noise = GetOrAdd<PlayerNoise>(player.gameObject);
+            SetRef(noise, "controller", player);
             return builder;
         }
 

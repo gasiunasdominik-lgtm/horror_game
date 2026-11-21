@@ -1,3 +1,4 @@
+using Unity.AI.Navigation;
 using UnityEngine;
 using Vchod.Core;
 using Vchod.Player;
@@ -17,6 +18,7 @@ namespace Vchod.World
         [SerializeField] private HouseConfig config;
         [SerializeField] private LightTimer lightTimer;
         [SerializeField] private PlayerController player;
+        [SerializeField] private NavMeshSurface navMeshSurface;
         [SerializeField] private bool reshuffleOnLightOff = true;
 
         private Transform _floorRoot;
@@ -59,7 +61,9 @@ namespace Vchod.World
 
             if (_floorRoot != null)
             {
-                // Deactivate first so old colliders vanish this frame, Destroy happens at frame end.
+                // Detach and deactivate first: old colliders vanish this frame and the NavMesh
+                // bake below only sees the new floor. Destroy happens at frame end.
+                _floorRoot.SetParent(null);
                 _floorRoot.gameObject.SetActive(false);
                 Destroy(_floorRoot.gameObject);
             }
@@ -71,6 +75,7 @@ namespace Vchod.World
             var lightOn = lightTimer != null && lightTimer.IsOn;
             foreach (var lamp in _floorRoot.GetComponentsInChildren<StairLamp>()) lamp.SetOn(lightOn);
             foreach (var button in _floorRoot.GetComponentsInChildren<LightButton>()) button.Bind(lightTimer);
+            if (navMeshSurface != null) navMeshSurface.BuildNavMesh();
 
             EventBus.Publish(new LayoutRebuilt
             {

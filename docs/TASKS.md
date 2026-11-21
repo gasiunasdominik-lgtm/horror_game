@@ -24,7 +24,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 
 | ID | Úkol | Vl. | Stav | P | Hotovo, když |
 |---|---|---|---|---|---|
-| T-020 | Hasič: model (placeholder), NavMesh, stavový automat (Patrol, Investigate, Chase, Call, Search) | C | TODO | P1 | Hasič hlídá, reaguje na světlo a hluk, honí, ztrácí hráče |
+| T-020 | Hasič: model (placeholder), NavMesh, stavový automat (Patrol, Investigate, Chase, Call, Search) | C | DONE | P1 | Hasič hlídá, reaguje na světlo a hluk, honí, ztrácí hráče |
 | T-021 | Senzory hasiče (sluch, zrak, světlo) + audio (dech, výstroj, baterka) | C | TODO | P1 | Hráč pozná polohu podle zvuku |
 | T-022 | Skrýše (skříň, stůl) a interakce | C | TODO | P1 | Hráč se schová a hasič ho přejde nebo najde |
 | T-023 | Okna s čerstvým vzduchem a pokles CO | C | TODO | P1 | U okna CO klesá |

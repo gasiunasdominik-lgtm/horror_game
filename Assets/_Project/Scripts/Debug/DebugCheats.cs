@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Vchod.Core;
+using Vchod.Enemy;
 using Vchod.World;
 
 namespace Vchod.DebugTools
@@ -29,7 +30,7 @@ namespace Vchod.DebugTools
                 if (k.shiftKey.isPressed) GameBootstrap.RestartRound(SeedService.NewRandomSeed());
                 else ForceReshuffle();
             }
-            if (k.f5Key.wasPressedThisFrame) Report("Enemy states: not implemented until M1 (T-020)");
+            if (k.f5Key.wasPressedThisFrame) CycleFirefighterState();
             if (k.f6Key.wasPressedThisFrame)
             {
                 _timeScaleIndex = (_timeScaleIndex + 1) % TimeScales.Length;
@@ -49,6 +50,24 @@ namespace Vchod.DebugTools
         {
             DebugContext.Instance.Notify(message);
             if (PlaytestLogger.Instance != null) PlaytestLogger.Instance.Log("debug", message);
+        }
+
+        private static readonly FirefighterState[] ForcedStates =
+            { FirefighterState.Patrol, FirefighterState.Chase, FirefighterState.Call, FirefighterState.Search };
+        private int _forcedIndex;
+
+        private void CycleFirefighterState()
+        {
+            var ctx = DebugContext.Instance;
+            if (ctx.Firefighter == null || ctx.Player == null)
+            {
+                Report("Firefighter: not in scene");
+                return;
+            }
+            _forcedIndex = (_forcedIndex + 1) % ForcedStates.Length;
+            var state = ForcedStates[_forcedIndex];
+            ctx.Firefighter.Brain.Force(state, ctx.Player.transform.position);
+            Report($"Firefighter forced to {state}");
         }
 
         private int _zoneCursor;

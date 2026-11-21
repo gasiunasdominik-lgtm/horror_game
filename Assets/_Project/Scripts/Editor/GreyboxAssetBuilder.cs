@@ -174,6 +174,13 @@ namespace Vchod.EditorTools
             }
         }
 
+        /// <summary>Shared material factory for other greybox builders.</summary>
+        public static Material Material(string name, Color color, float smoothness = 0.15f, Color? emission = null)
+        {
+            EnsureFolder(MaterialFolder);
+            return Mat(name, color, smoothness, emission);
+        }
+
         private static Material Mat(string name, Color color, float smoothness = 0.15f, Color? emission = null)
         {
             var path = $"{MaterialFolder}/{name}.mat";

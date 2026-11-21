@@ -23,11 +23,11 @@ namespace Vchod.Systems
             if (_logic.Tick(Time.deltaTime)) EventBus.Publish(new LightTurnedOff());
         }
 
-        public void Press()
+        public void Press(Vector3 position)
         {
             _logic.Duration = config.duration;
             _logic.Press();
-            EventBus.Publish(new LightTurnedOn { Duration = config.duration });
+            EventBus.Publish(new LightTurnedOn { Duration = config.duration, Position = position });
         }
 
         public void ForceOff()

@@ -1033,6 +1033,7 @@ GameObject:
   m_Component:
   - component: {fileID: 737851963}
   - component: {fileID: 737851962}
+  - component: {fileID: 737851964}
   m_Layer: 0
   m_Name: House
   m_TagString: Untagged
@@ -1055,6 +1056,7 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: 3b68d3d47b92fd7469c9a1eb5aef6140, type: 2}
   lightTimer: {fileID: 709658178}
   player: {fileID: 1359410194}
+  navMeshSurface: {fileID: 737851964}
   reshuffleOnLightOff: 1
 --- !u!4 &737851963
 Transform:
@@ -1071,6 +1073,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &737851964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737851961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1276,6 +1310,7 @@ GameObject:
   - component: {fileID: 1359410195}
   - component: {fileID: 1359410194}
   - component: {fileID: 1359410193}
+  - component: {fileID: 1359410197}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1351,6 +1386,101 @@ Transform:
   - {fileID: 2024635459}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1359410197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359410192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0145ca443a1a34387497945e2b4779, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Vchod.Gameplay::Vchod.Player.PlayerNoise
+  controller: {fileID: 1359410194}
+--- !u!1001 &1750882640
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: eyes
+      value: 
+      objectReference: {fileID: 1750882641}
+    - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: house
+      value: 
+      objectReference: {fileID: 737851962}
+    - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: config
+      value: 
+      objectReference: {fileID: 11400000, guid: 0491def3d35ba864c8465ebe7da2c3a0, type: 2}
+    - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 1359410194}
+    - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: lightTimer
+      value: 
+      objectReference: {fileID: 709658178}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6740069713950007414, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8715887204017757435, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+      propertyPath: m_Name
+      value: Firefighter
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+--- !u!4 &1750882641 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5922709406779430679, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
+  m_PrefabInstance: {fileID: 1750882640}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2024635458
 GameObject:
   m_ObjectHideFlags: 0
@@ -1395,3 +1525,4 @@ SceneRoots:
   - {fileID: 1359410196}
   - {fileID: 737851963}
   - {fileID: 1040000080}
+  - {fileID: 1750882640}
