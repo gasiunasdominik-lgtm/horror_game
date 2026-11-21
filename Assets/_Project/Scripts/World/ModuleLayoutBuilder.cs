@@ -44,6 +44,9 @@ namespace Vchod.World
         public bool IsPlayerFloor => Floor == config.playerFloor;
         public bool IsTopFloor => Floor == config.floorCount - 1;
         public int FloorCount => config.floorCount;
+        /// <summary>Where the player stands after coming out of this floor's fire door, and their yaw.</summary>
+        public Vector3 FireDoorPoint { get; private set; }
+        public float FireDoorYaw { get; private set; }
         public int HomeFloor => config.playerFloor;
         /// <summary>
         /// Safe arrival point: on the ground floor beside the stairs (round start); upper floors have
@@ -216,6 +219,15 @@ namespace Vchod.World
             };
             if (hiding != null) Spawn(hiding, WallPoint(center, cell.HidingSide), Inward(cell.HidingSide), root);
 
+            if (cell.HasFireDoor && config.fireDoorPrefab != null)
+            {
+                var wall = WallPoint(center, cell.FireDoorSide);
+                var go = Instantiate(config.fireDoorPrefab, wall, Inward(cell.FireDoorSide), root);
+                go.GetComponent<FireDoor>()?.Setup(this, player);
+                FireDoorPoint = wall + Inward(cell.FireDoorSide) * Vector3.forward * 0.9f;
+                FireDoorYaw = cell.FireDoorSide.Yaw() + 180f;
+            }
+
             if (cell.HasSwitch)
             {
                 // Off-centre, so it never sits behind a door, window or wardrobe on the next wall.
@@ -249,6 +261,19 @@ namespace Vchod.World
             GoToFloor(Floor + 1, viaStairs: false);
             var cell = Plan.Cells[Plan.MainPath[1]];
             player.Teleport(StartPoint, cell.InDirection.Yaw());
+        }
+
+        /// <summary>
+        /// FEEL #2 escape route: the fire door's emergency stairs, one floor up or down, coming out
+        /// of the other floor's fire door. Not the main stairs, so a hunting firefighter loses you.
+        /// </summary>
+        public void TakeFireStairs(bool up)
+        {
+            var target = Floor + (up ? 1 : -1);
+            if (target < 0 || target >= config.floorCount) return;
+            GoToFloor(target, viaStairs: false);
+            player.Teleport(FireDoorPoint, FireDoorYaw);
+            EventBus.Publish(new NoiseMade { Position = FireDoorPoint, Radius = 5f }); // the heavy door slams
         }
 
         /// <summary>

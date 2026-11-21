@@ -108,6 +108,7 @@ namespace Vchod.World
                 plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
             }
 
+            if (!PlaceFireDoor(rng, plan)) return null;
             PlaceHidingSpots(rng, plan, rules);
             PlaceLightSwitches(rng, plan);
             return plan;
@@ -202,6 +203,28 @@ namespace Vchod.World
         /// Playtest #1: one switch at the stairs was too far. Walking outward by depth, a cell gets a
         /// switch unless it or a neighbour already has one, so a switch is never more than 2 cells away.
         /// </summary>
+        /// <summary>
+        /// FEEL #2: "one way up, nowhere to run". The fire door to the emergency stairs sits as
+        /// far from the stairwell as possible (the other end of the corridor), on a free wall.
+        /// </summary>
+        private static bool PlaceFireDoor(Random rng, LayoutPlan plan)
+        {
+            var best = -1;
+            for (var i = 1; i < plan.Count; i++)
+            {
+                var c = plan.Cells[i];
+                if (c.Feature == CellFeature.PlayerDoor || c.Feature == CellFeature.Elevator) continue;
+                if (FreeSides(c).Count == 0) continue;
+                if (best < 0 || c.Depth > plan.Cells[best].Depth) best = i;
+            }
+            if (best < 0) return false;
+            var cell = plan.Cells[best];
+            var sides = FreeSides(cell);
+            cell.HasFireDoor = true;
+            cell.FireDoorSide = sides[rng.Next(sides.Count)];
+            return true;
+        }
+
         private static void PlaceLightSwitches(Random rng, LayoutPlan plan)
         {
             var order = new List<int>();
@@ -224,7 +247,8 @@ namespace Vchod.World
         {
             var sides = new List<Direction>(3);
             foreach (var d in DirectionUtil.All)
-                if (!cell.IsOpen(d) && (cell.Feature == CellFeature.None || d != cell.FeatureSide)) sides.Add(d);
+                if (!cell.IsOpen(d) && (cell.Feature == CellFeature.None || d != cell.FeatureSide) &&
+                    !(cell.HasFireDoor && d == cell.FireDoorSide)) sides.Add(d);
             return sides;
         }
 

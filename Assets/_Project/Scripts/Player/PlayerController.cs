@@ -22,6 +22,8 @@ namespace Vchod.Player
 
         public PlayerConfig Config => config;
         public Transform CameraPivot => cameraPivot;
+        /// <summary>Look pitch in degrees: negative = looking up, positive = looking down.</summary>
+        public float Pitch => _pitch;
         public PlayerInputActions Input => _input;
 
         /// <summary>1 = normal. Lowered by CO symptoms.</summary>

@@ -38,8 +38,10 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-031 | Klidný úvod: hasič se v kole objeví až po prodlevě (~90 s) a přichází zdola po schodech, nikdy ne blízko hráče | C | DONE | P1 | FEEL #2: „sotva se rozkoukám, už běží“ |
 | T-032 | Hasič má vlastní patro a prochází dům; na patro hráče jde jen za stopou (světlo, hluk) | C | DONE | P1 | Ne vždy na stejném patře |
 | T-033 | Férovější skrýše: kontrola náhodné skrýše 50 % → 20 %, jistá jen když tě viděl zalézt | C | DONE | P1 | FEEL #2: „kontrola skrýše vysoká“ |
-| T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | TODO | P1 | Hráč má kudy uniknout |
+| T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | DONE | P1 | Hráč má kudy uniknout |
 | T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | DONE | P2 | Stihne se přečíst, má efekt |
+| T-036 | Zvukový mix honičky: tišší dech a cinkání, těžké kroky hasiče odlišné od výstroje, slyšitelné vlastní kroky (chůze/běh) | C | TODO | P1 | IDEA 21. 11.: „dech a cinkání nahlas, kroky by ho měly přebít, mé kroky slyšet“ |
+| T-037 | Hasič hledá: po prověření bez nálezu většinou odejde na jiné patro; náhodné chování (zastavení, rozhlédnutí, zaklepání na dveře bytu) | C | TODO | P1 | IDEA 21. 11.: „neměl by cyklit na patře“, „randomizovat chování“ |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 
@@ -74,6 +76,9 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 - (D, 21. 11.) Hluk podle rychlosti a překážek: sprint zvyšuje dosah hluku (už je: chůze 4 m, sprint 12 m); nově útlum hluku vzdáleností a zdmi/dveřmi (raycast nebo průchod NavMesh). Střední úkol, M2.
 - (D, 21. 11.) Detektor CO tišší, v pozadí, „pokud vůbec bude“. Hlasitost lze snížit hned; odstranění detektoru je změna pilíře 1 (detektor = fér signál) → jen s výslovným ano.
 - (D, 21. 11.) Realistický layout: za dveřmi skutečný byt, ne zeď. Velký rozsah (moduly bytů, výkon, art) → navázat na T-042 art pass a 5 bytů z GDD; rozhodnout na G2/G3.
+- (D, 21. 11.) Zvuky interakcí: cvaknutí spínače, dveře, skříň, okno; hlasitost podle síly zvuku (audio pass T-043, M2).
+- (D, 21. 11.) Okno: zvuk ulice města místo větru (auta v dálce, tramvaj, pes) a přesvědčivější výhled (protější panelák, světla oken, lampy). Art/audio pass M2 (T-042/T-043).
+- (D, 21. 11.) Hasič otevře okno na chvíli (větrá, sedí s kánonem). Mění CO u okna → po T-037, M2.
 
 ## Blokace
 - (zatím prázdné)

@@ -156,6 +156,17 @@ namespace Vchod.EditorTools
                 Box(root, "Doormat", new Vector3(0, 0.01f, 0.45f), new Vector3(0.8f, 0.02f, 0.5f), door, collider: false);
             });
 
+            var fireDoor = Mat("M_FireDoor", new Color(0.30f, 0.32f, 0.30f), smoothness: 0.35f);
+            var exitSign = Mat("M_ExitSign", new Color(0.1f, 0.8f, 0.3f), emission: new Color(0.3f, 2.4f, 0.8f));
+            config.fireDoorPrefab = Save("FireDoor", root =>
+            {
+                DoorPiece(root, fireDoor, frame, metal);
+                // Push bar and the green emergency-exit sign: readable in the dark from the far end.
+                Box(root, "PushBar", new Vector3(0, 1.0f, 0.08f), new Vector3(0.75f, 0.05f, 0.05f), metal, collider: false);
+                Box(root, "ExitSign", new Vector3(0, 2.28f, 0.05f), new Vector3(0.42f, 0.16f, 0.04f), exitSign, collider: false);
+                root.AddComponent<FireDoor>();
+            });
+
             var night = Mat("M_NightOutside", new Color(0.01f, 0.012f, 0.03f), emission: new Color(0.03f, 0.05f, 0.12f));
             var farLight = Mat("M_FarWindowLight", new Color(1f, 0.8f, 0.5f), emission: new Color(1.2f, 0.9f, 0.5f));
             config.windowPrefab = Save("Window", root =>

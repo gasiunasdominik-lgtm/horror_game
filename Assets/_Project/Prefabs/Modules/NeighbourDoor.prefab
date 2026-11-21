@@ -831,7 +831,7 @@ MonoBehaviour:
   answerDelay: 1.6
   knockNoiseRadius: 6
   closeDistance: 5
-  lineTime: 3.2
+  lineGap: 0.4
 --- !u!1 &6707575061051653663
 GameObject:
   m_ObjectHideFlags: 0
