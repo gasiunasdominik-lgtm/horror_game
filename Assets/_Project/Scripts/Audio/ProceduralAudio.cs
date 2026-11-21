@@ -175,6 +175,47 @@ namespace Vchod.Audio
             return Make("Knock", data);
         }
 
+        /// <summary>
+        /// An old lady's voice through a door crack: syllables of a muffled, slightly wavering
+        /// voice with natural pauses. No words: the subtitle carries the meaning. Drowsy = slower and lower.
+        /// </summary>
+        public static AudioClip CreateMumble(int seed, float length, bool drowsy)
+        {
+            var rng = new System.Random(seed);
+            var samples = Mathf.Max(1, (int)(SampleRate * length));
+            var data = new float[samples];
+            var baseF0 = drowsy ? 175f : 215f;
+            var rate = drowsy ? 0.75f : 1f;
+            float phase = 0f, lp1 = 0f, lp2 = 0f, hp = 0f, prev = 0f;
+            var syllableStart = 0f;
+            var syllableLength = 0.18f;
+            var pitch = baseF0;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var s = t - syllableStart;
+                if (s > syllableLength)
+                {
+                    // Next syllable, sometimes after a short breath.
+                    syllableStart = t + (rng.NextDouble() < 0.18 ? 0.25f : 0.03f) / rate;
+                    syllableLength = (0.11f + (float)rng.NextDouble() * 0.16f) / rate;
+                    pitch = baseF0 * (0.88f + (float)rng.NextDouble() * 0.24f);
+                    s = t - syllableStart;
+                }
+                var env = s >= 0f && s <= syllableLength ? Mathf.Sin(Mathf.PI * s / syllableLength) : 0f;
+                var tail = Mathf.Clamp01((length - t) / 0.3f); // fade out at the end of the line
+                var f0 = pitch * (1f + 0.025f * Mathf.Sin(2f * Mathf.PI * 5.5f * t)); // old-voice wobble
+                phase += f0 / SampleRate;
+                var saw = 2f * (phase - Mathf.Floor(phase)) - 1f;
+                lp1 += 0.09f * (saw - lp1);   // through a door: dull
+                lp2 += 0.09f * (lp1 - lp2);
+                hp = 0.97f * (hp + lp2 - prev);
+                prev = lp2;
+                data[i] = Mathf.Clamp(hp * env * tail * 5f, -0.8f, 0.8f);
+            }
+            return Make("Mumble", data);
+        }
+
         private static AudioClip Make(string name, float[] data)
         {
             var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);

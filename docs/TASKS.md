@@ -39,7 +39,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-032 | Hasič má vlastní patro a prochází dům; na patro hráče jde jen za stopou (světlo, hluk) | C | TODO | P1 | Ne vždy na stejném patře |
 | T-033 | Férovější skrýše: kontrola náhodné skrýše 50 % → 20 %, jistá jen když tě viděl zalézt | C | DONE | P1 | FEEL #2: „kontrola skrýše vysoká“ |
 | T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | TODO | P1 | Hráč má kudy uniknout |
-| T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | TODO | P2 | Stihne se přečíst, má efekt |
+| T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | DONE | P2 | Stihne se přečíst, má efekt |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 

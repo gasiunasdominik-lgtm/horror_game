@@ -23,7 +23,7 @@ namespace Vchod.World
         [SerializeField] private float answerDelay = 1.6f;
         [SerializeField] private float knockNoiseRadius = 6f;
         [SerializeField] private float closeDistance = 5f;
-        [SerializeField] private float lineTime = 3.2f;
+        [SerializeField] private float lineGap = 0.4f;
 
         private static readonly string[] TrapLines =
         {
@@ -111,8 +111,11 @@ namespace Vchod.World
             if (delay > 0f) yield return new WaitForSeconds(delay);
             foreach (var line in lines)
             {
-                EventBus.Publish(new SubtitleRequested { Text = line, Duration = lineTime });
-                yield return new WaitForSeconds(lineTime);
+                var time = SubtitleTiming.ReadTime(line);
+                EventBus.Publish(new SubtitleRequested { Text = line, Duration = time });
+                // Muffled voice through the door crack: you hear her talk, the words are the subtitle.
+                if (knock != null) knock.PlayOneShot(Audio.ProceduralAudio.CreateMumble(line.GetHashCode(), time * 0.85f, _trap));
+                yield return new WaitForSeconds(time + lineGap);
                 if (_phase == Phase.Closed) yield break; // walked away
             }
         }

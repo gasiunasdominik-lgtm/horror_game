@@ -19,8 +19,8 @@ namespace Vchod.UI
         private void OnLine(SubtitleRequested e)
         {
             text.text = e.Text;
-            _shownFor = e.Duration;
-            _until = Time.time + e.Duration;
+            _shownFor = SubtitleTiming.Duration(e.Text, e.Duration);
+            _until = Time.time + _shownFor;
         }
 
         private void Update()
