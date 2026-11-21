@@ -50,8 +50,33 @@ namespace Vchod.Audio
             _last = transform.position;
         }
 
-        private void OnEnable() => EventBus.Subscribe<FirefighterStateChanged>(OnState);
-        private void OnDisable() => EventBus.Unsubscribe<FirefighterStateChanged>(OnState);
+        private AudioClip _knock;
+
+        private void OnEnable()
+        {
+            EventBus.Subscribe<FirefighterStateChanged>(OnState);
+            EventBus.Subscribe<FirefighterKnocked>(OnKnock);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<FirefighterStateChanged>(OnState);
+            EventBus.Unsubscribe<FirefighterKnocked>(OnKnock);
+        }
+
+        // Evacuating the house: a heavy-gloved knock, sometimes a muffled call through the mask.
+        private void OnKnock(FirefighterKnocked e)
+        {
+            if (_knock == null) _knock = ProceduralAudio.CreateKnock();
+            steps.PlayOneShot(_knock, 1f);
+            if (e.Call) StartCoroutine(CallAfter(1.6f));
+        }
+
+        private System.Collections.IEnumerator CallAfter(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            voice.PlayOneShot(_call);
+        }
 
         private void OnState(FirefighterStateChanged e)
         {

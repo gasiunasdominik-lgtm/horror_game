@@ -71,6 +71,22 @@ namespace Vchod.Enemy
         [Tooltip("Seconds he needs to come to a floor where the light went on.")]
         public float lightResponseDelay = 12f;
 
+        [Header("Patrol behaviour")]
+        [Tooltip("After a search or light check that found nobody, chance he goes off to another floor.")]
+        [Range(0f, 1f)] public float leaveAfterSearch = 0.7f;
+        [Tooltip("Calm patrol on one floor lasts this long (random in range), then he moves on.")]
+        public float patrolStayMin = 45f;
+        public float patrolStayMax = 80f;
+        [Tooltip("Chance he does something at a patrol point instead of walking straight on.")]
+        [Range(0f, 1f)] public float idleChance = 0.4f;
+        [Tooltip("Share of those that are knocking on a flat (when a door is near).")]
+        [Range(0f, 1f)] public float knockShare = 0.5f;
+        public float knockDoorRange = 8f;
+        [Tooltip("At least this long between two knocks; each door only once per visit to a floor.")]
+        public float knockCooldown = 20f;
+        public float lookAroundTime = 2.5f;
+        public float knockTime = 3.5f;
+
         [Header("Hiding spots")]
         [Tooltip("Chance he checks a nearby hiding spot when picking the next search point.")]
         [Range(0f, 1f)] public float hidingCheckChance = 0.2f;

@@ -46,6 +46,10 @@ namespace Vchod.World
         public int FloorCount => config.floorCount;
         /// <summary>Where the player stands after coming out of this floor's fire door, and their yaw.</summary>
         public Vector3 FireDoorPoint { get; private set; }
+        /// <summary>Standing points in front of the flats' doors on this floor (the firefighter knocks there).</summary>
+        public readonly System.Collections.Generic.List<Vector3> DoorFronts = new();
+        /// <summary>The door itself, same order as DoorFronts.</summary>
+        public readonly System.Collections.Generic.List<Vector3> DoorWalls = new();
         public float FireDoorYaw { get; private set; }
         public int HomeFloor => config.playerFloor;
         /// <summary>
@@ -142,6 +146,8 @@ namespace Vchod.World
             _neighbourCell = Floor == _neighbourFloor ? NeighbourPlacement.DoorCell(Plan, SeedService.Seed, Floor, reshuffleIndex) : -1;
             _neighbourTrap = Floor == config.playerFloor;
             HasCoSource = false;
+            DoorFronts.Clear();
+            DoorWalls.Clear();
             CoSourcePosition = new Vector3(0f, -1000f, 0f); // other floors: far away, detector silent
             LayoutHash = Plan.ComputeHash();
 
@@ -201,6 +207,11 @@ namespace Vchod.World
                 CellFeature.Elevator => config.elevatorPrefab,
                 _ => null,
             };
+            if (cell.Feature == CellFeature.ApartmentDoor)
+            {
+                DoorWalls.Add(WallPoint(center, cell.FeatureSide));
+                DoorFronts.Add(WallPoint(center, cell.FeatureSide) + Inward(cell.FeatureSide) * Vector3.forward * 0.75f);
+            }
             if (index == _neighbourCell && config.neighbourDoorPrefab != null)
             {
                 var go = Instantiate(config.neighbourDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);

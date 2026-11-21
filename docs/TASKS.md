@@ -41,7 +41,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | DONE | P1 | Hráč má kudy uniknout |
 | T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | DONE | P2 | Stihne se přečíst, má efekt |
 | T-036 | Zvukový mix honičky: tišší dech a cinkání, těžké kroky hasiče odlišné od výstroje, slyšitelné vlastní kroky (chůze/běh) | C | DONE | P1 | IDEA 21. 11.: „dech a cinkání nahlas, kroky by ho měly přebít, mé kroky slyšet“ |
-| T-037 | Hasič hledá: po prověření bez nálezu většinou odejde na jiné patro; náhodné chování (zastavení, rozhlédnutí, zaklepání na dveře bytu) | C | TODO | P1 | IDEA 21. 11.: „neměl by cyklit na patře“, „randomizovat chování“ |
+| T-037 | Hasič hledá: po prověření bez nálezu většinou odejde na jiné patro; náhodné chování (zastavení, rozhlédnutí, zaklepání na dveře bytu) | C | DONE | P1 | IDEA 21. 11.: „neměl by cyklit na patře“, „randomizovat chování“ |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 
