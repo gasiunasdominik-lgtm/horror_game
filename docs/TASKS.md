@@ -31,7 +31,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | DONE | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
 | T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | DONE | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
 | T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | DONE | P1 | Všechny tři konce dosažitelné |
-| T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | TODO | P1 | Po konci lze začít nové kolo |
+| T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | DONE | P1 | Po konci lze začít nové kolo |
 | T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
 | T-030 | Měření výkonu, tag `m1` | C | TODO | P2 | Tag existuje |

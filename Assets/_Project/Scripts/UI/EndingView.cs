@@ -18,11 +18,17 @@ namespace Vchod.UI
         [SerializeField] private float fadeTime = 2.5f;
         [SerializeField] private float hintDelay = 4f;
 
+        [SerializeField] private float introFade = 2f;
+
         private float _shownAt = -1f;
+        private float _introStart;
 
         private void Awake()
         {
-            group.alpha = 0f;
+            // Every round opens from black.
+            group.alpha = 1f;
+            title.text = body.text = string.Empty;
+            _introStart = Time.unscaledTime;
             hint.enabled = false;
             AudioListener.pause = false;
             AudioListener.volume = 1f;
@@ -41,7 +47,11 @@ namespace Vchod.UI
 
         private void Update()
         {
-            if (_shownAt < 0f) return;
+            if (_shownAt < 0f)
+            {
+                group.alpha = 1f - Mathf.Clamp01((Time.unscaledTime - _introStart) / introFade);
+                return;
+            }
             var t = Time.unscaledTime - _shownAt;
             group.alpha = Mathf.Clamp01(t / fadeTime);
             AudioListener.volume = 1f - group.alpha;

@@ -12,7 +12,17 @@ namespace Vchod.Systems
         [SerializeField] private PlayerController player;
         [SerializeField] private CoSystem co;
 
+        [SerializeField] private string introLine = "Po noční směně. Domů, do druhého patra.";
+        [SerializeField] private float introDelay = 1.5f;
+
         private CollapseCause _cause = CollapseCause.Corridor;
+
+        private System.Collections.IEnumerator Start()
+        {
+            yield return new WaitForSeconds(introDelay);
+            if (Ending == EndingId.None)
+                EventBus.Publish(new SubtitleRequested { Text = introLine, Duration = 4f });
+        }
 
         public EndingId Ending { get; private set; }
 
