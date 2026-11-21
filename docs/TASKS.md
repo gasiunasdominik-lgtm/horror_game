@@ -34,7 +34,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | DONE | P1 | Po konci lze začít nové kolo |
 | T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
-| T-030 | Měření výkonu, tag `m1` | C | ČEKÁ (Dominik: stroj přiškrcený, viz TESTING §9) | P2 | Tag existuje |
+| T-030 | Měření výkonu, tag `m1` | C | ČEKÁ (50–56 FPS, pod cílem; optimalizace před tagem) | P2 | Tag existuje |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 

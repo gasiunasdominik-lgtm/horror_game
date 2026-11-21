@@ -14,7 +14,7 @@ M1 obsahově hotový na větvi `feat/t020-firefighter` (T-020 až T-027 DONE, 88
 - Rozhodnutí D-032 až D-047.
 
 ## Rozpracováno
-- T-030: měření dalo 4–5 FPS, ale stroj byl přiškrcený (CPU 21 % výkonu, i prázdná scéna 15 FPS). Měření je neplatné, viz TESTING §9.
+- T-030: platné měření 50–56 FPS (1 % low 28–32), cíl 60/45 nesplněn. Tag `m1` až po optimalizaci.
 
 ## Další krok
 1. Dominik: přepnout Zenbook do režimu výkonu (MyASUS / Windows napájení), restart, pak `! powershell.exe -c "Start-Process 'Builds\Dev\VchodC.exe' -ArgumentList '-seed 4242 -perf 30 -screen-width 1920 -screen-height 1080 -screen-fullscreen 1' -Wait"`, nebo dej vědět a změřím já.
