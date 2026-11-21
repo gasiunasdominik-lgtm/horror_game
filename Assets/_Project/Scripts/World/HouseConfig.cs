@@ -43,6 +43,8 @@ namespace Vchod.World
         public GameObject lightButtonPrefab;
         public GameObject apartmentDoorPrefab;
         public GameObject playerDoorPrefab;
+        [Tooltip("Fire door to the emergency stairs, one per floor.")]
+        public GameObject fireDoorPrefab;
         public GameObject windowPrefab;
         public GameObject elevatorPrefab;
         [Tooltip("Neighbour 1 (the cake lady): replaces one apartment door on her floor.")]

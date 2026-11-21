@@ -13,4 +13,19 @@ namespace Vchod.Enemy
     {
         public Vector3 Position;
     }
+
+    /// <summary>He knocks on a flat's door while patrolling (evacuating the house). Call = he also calls out.</summary>
+    public struct FirefighterKnocked
+    {
+        public UnityEngine.Vector3 Position;
+        public bool Call;
+    }
+
+    /// <summary>He left the player's floor for another one.</summary>
+    public struct FirefighterLeftFloor
+    {
+        public int From;
+        public int To;
+    }
+
 }

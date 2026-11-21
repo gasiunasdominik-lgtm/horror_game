@@ -165,6 +165,11 @@ namespace Vchod.EditorTools
 
             var noise = GetOrAdd<PlayerNoise>(player.gameObject);
             SetRef(noise, "controller", player);
+            var stepsGo = FindOrCreateChild(player.transform, "Footsteps");
+            var stepsSrc = GetOrAdd<AudioSource>(stepsGo);
+            stepsSrc.playOnAwake = false;
+            stepsSrc.spatialBlend = 0f;
+            SetRef(noise, "steps", stepsSrc);
             return builder;
         }
 

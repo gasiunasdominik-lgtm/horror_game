@@ -23,6 +23,7 @@ namespace Vchod.World
             if (start.Feature != CellFeature.Stairwell) errors.Add("cell 0 is not the stairwell");
 
             var elevators = 0;
+            var fireDoors = 0;
             int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0, hiding = 0, hidingOnMain = 0;
             var seen = new HashSet<GridPos>();
             for (var i = 0; i < plan.Count; i++)
@@ -61,6 +62,15 @@ namespace Vchod.World
                     if (c.Feature != CellFeature.None && c.FeatureSide == c.HidingSide) errors.Add($"hiding spot at {c.Pos} blocks its {c.Feature}");
                     if (i == LayoutPlan.StartIndex || c.Feature == CellFeature.PlayerDoor) errors.Add($"hiding spot in {c.Feature} cell");
                 }
+                if (c.HasFireDoor)
+                {
+                    fireDoors++;
+                    if (c.IsOpen(c.FireDoorSide)) errors.Add($"fire door at {c.Pos} on an open side");
+                    if (c.Feature != CellFeature.None && c.FeatureSide == c.FireDoorSide) errors.Add($"fire door at {c.Pos} blocks its {c.Feature}");
+                    if (c.Hiding != HidingKind.None && c.HidingSide == c.FireDoorSide) errors.Add($"hiding spot at {c.Pos} blocks the fire door");
+                    if (c.HasSwitch && c.SwitchSide == c.FireDoorSide) errors.Add($"switch at {c.Pos} on the fire door wall");
+                    if (i == LayoutPlan.StartIndex) errors.Add("fire door in the stairwell");
+                }
                 if (c.IsCoSource)
                 {
                     coSources++;
@@ -68,6 +78,7 @@ namespace Vchod.World
                 }
             }
 
+            if (fireDoors != 1) errors.Add($"expected 1 fire door, found {fireDoors}");
             if (elevators != 1) errors.Add($"expected 1 elevator, found {elevators}");
             var expected = plan.IsPlayerFloor ? 1 : 0;
             if (playerDoors != expected) errors.Add($"expected {expected} player door, found {playerDoors}");

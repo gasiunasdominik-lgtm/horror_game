@@ -21,8 +21,14 @@ namespace Vchod.Audio
         [SerializeField] private float stepLength = 0.8f;
         [SerializeField] private float calmBreathPitch = 0.95f;
         [SerializeField] private float chaseBreathPitch = 1.35f;
+        [Tooltip("Boots are the loudest part of him; breath and gear sit under them (playtest #2).")]
+        [SerializeField] private float stepVolumeCalm = 0.85f;
+        [SerializeField] private float stepVolumeChase = 1f;
+        [SerializeField] private float gearVolume = 0.25f;
+        [Range(0f, 1f)] [SerializeField] private float gearChance = 0.35f;
 
         private AudioClip[] _steps;
+        private AudioClip[] _gear;
         private AudioClip _call;
         private float _travelled;
         private Vector3 _last;
@@ -34,13 +40,43 @@ namespace Vchod.Audio
             breath.loop = true;
             breath.Play();
             _steps = new AudioClip[StepVariants];
-            for (var i = 0; i < StepVariants; i++) _steps[i] = ProceduralAudio.CreateGearStep(i);
+            _gear = new AudioClip[StepVariants];
+            for (var i = 0; i < StepVariants; i++)
+            {
+                _steps[i] = ProceduralAudio.CreateBootStep(i);
+                _gear[i] = ProceduralAudio.CreateGearClink(i);
+            }
             _call = ProceduralAudio.CreateMaskedCall();
             _last = transform.position;
         }
 
-        private void OnEnable() => EventBus.Subscribe<FirefighterStateChanged>(OnState);
-        private void OnDisable() => EventBus.Unsubscribe<FirefighterStateChanged>(OnState);
+        private AudioClip _knock;
+
+        private void OnEnable()
+        {
+            EventBus.Subscribe<FirefighterStateChanged>(OnState);
+            EventBus.Subscribe<FirefighterKnocked>(OnKnock);
+        }
+
+        private void OnDisable()
+        {
+            EventBus.Unsubscribe<FirefighterStateChanged>(OnState);
+            EventBus.Unsubscribe<FirefighterKnocked>(OnKnock);
+        }
+
+        // Evacuating the house: a heavy-gloved knock, sometimes a muffled call through the mask.
+        private void OnKnock(FirefighterKnocked e)
+        {
+            if (_knock == null) _knock = ProceduralAudio.CreateKnock();
+            steps.PlayOneShot(_knock, 1f);
+            if (e.Call) StartCoroutine(CallAfter(1.6f));
+        }
+
+        private System.Collections.IEnumerator CallAfter(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            voice.PlayOneShot(_call);
+        }
 
         private void OnState(FirefighterStateChanged e)
         {
@@ -61,7 +97,8 @@ namespace Vchod.Audio
             if (_travelled < stepLength) return;
             _travelled = 0f;
             _stepIndex = (_stepIndex + 1) % _steps.Length;
-            steps.PlayOneShot(_steps[_stepIndex], chasing ? 1f : 0.7f);
+            steps.PlayOneShot(_steps[_stepIndex], chasing ? stepVolumeChase : stepVolumeCalm);
+            if (Random.value < gearChance) steps.PlayOneShot(_gear[_stepIndex], gearVolume);
         }
     }
 }

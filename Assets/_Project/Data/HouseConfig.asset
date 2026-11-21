@@ -44,6 +44,7 @@ MonoBehaviour:
   lightButtonPrefab: {fileID: 2646982281973879143, guid: a27613e2ee72dc645b02870e1e1beb87, type: 3}
   apartmentDoorPrefab: {fileID: 7883225035112388346, guid: db9744eeb83c60b4a91e9ea5bd65ae01, type: 3}
   playerDoorPrefab: {fileID: 8825444291744159223, guid: b2ed8e8886b520846bd680d1a215e4c5, type: 3}
+  fireDoorPrefab: {fileID: 6914156503567012417, guid: 95380a0f5fef58c4babd2c1d38b21943, type: 3}
   windowPrefab: {fileID: 6560105005496745587, guid: 899bc5825ed47624d883620e38d3aac6, type: 3}
   elevatorPrefab: {fileID: 8884270228997321508, guid: aa5b7481802fd5341a608fbd01c69d12, type: 3}
   neighbourDoorPrefab: {fileID: 6543536676901052833, guid: 2bb6879b325518641887a5c6643c67b8, type: 3}

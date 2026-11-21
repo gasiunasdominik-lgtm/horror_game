@@ -38,6 +38,9 @@ namespace Vchod.World
         public bool IsCoSource;
         public HidingKind Hiding;
         public Direction HidingSide;
+        /// <summary>Fire door to the emergency stairs: the second way between floors (one per floor).</summary>
+        public bool HasFireDoor;
+        public Direction FireDoorSide;
         public bool HasSwitch;
         public Direction SwitchSide;
 

@@ -100,6 +100,126 @@ namespace Vchod.Enemy
                          Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
         }
 
+        // Patrol life: leaving for another floor, stopping to look, knocking on flats.
+        private bool _leaving;
+        private float _leaveAt;
+        private PatrolAction _activity;
+        private float _activityUntil;
+        private Vector3 _activityTarget;
+        private Vector3 _activityFace;
+        private int _activityDoor = -1;
+        private float _nextKnock;
+        private readonly HashSet<int> _knockedDoors = new();
+        private bool _activityStarted;
+
+        public bool IsLeaving => _leaving;
+
+        private void StartPatrolClock()
+        {
+            var s = config.settings;
+            _leaveAt = Time.time + s.patrolStayMin + (float)_rng.NextDouble() * Mathf.Max(0f, s.patrolStayMax - s.patrolStayMin);
+            _activity = PatrolAction.None;
+        }
+
+        // A new floor visit (arrival, or the house reshuffled): every door is new again.
+        private void ForgetKnocks() => _knockedDoors.Clear();
+
+        private void StartLeaving()
+        {
+            _leaving = true;
+            _activity = PatrolAction.None;
+        }
+
+        private void LeaveFloor()
+        {
+            _leaving = false;
+            var from = house.Floor;
+            var up = from + 1 < house.FloorCount;
+            var down = from > 0;
+            _myFloor = up && down ? (_rng.NextDouble() < 0.5 ? from + 1 : from - 1) : up ? from + 1 : from - 1;
+            GoOffstage(-1f, hunting: false);
+            ScheduleRoam();
+            EventBus.Publish(new FirefighterLeftFloor { From = from, To = _myFloor });
+        }
+
+        /// <summary>Calm patrol on top of the brain's wandering. True = it handled movement this frame.</summary>
+        private bool UpdatePatrolLife(bool arrived)
+        {
+            if (Brain.State != FirefighterState.Patrol) return false;
+            var s = config.settings;
+            if (!_leaving && Time.time >= _leaveAt) StartLeaving();
+            if (_leaving)
+            {
+                var stairs = StairsEntry();
+                MoveTo(stairs, force: false);
+                if ((transform.position - stairs).sqrMagnitude < 1.5f * 1.5f) LeaveFloor();
+                return true;
+            }
+            if (_activity != PatrolAction.None)
+            {
+                if (!_activityStarted)
+                {
+                    if (_activity == PatrolAction.Knock && !(arrived && (transform.position - _activityTarget).sqrMagnitude < 1.2f * 1.2f))
+                    {
+                        MoveTo(_activityTarget, force: false);
+                        return true;
+                    }
+                    _activityStarted = true;
+                    _agent.isStopped = true;
+                    _activityUntil = Time.time + (_activity == PatrolAction.Knock ? s.knockTime : s.lookAroundTime);
+                    if (_activity == PatrolAction.Knock)
+                    {
+                        _knockedDoors.Add(_activityDoor);
+                        _nextKnock = Time.time + s.knockCooldown;
+                    }
+                    if (_activity == PatrolAction.Knock)
+                        EventBus.Publish(new FirefighterKnocked { Position = _activityTarget, Call = _rng.NextDouble() < 0.5 });
+                }
+                if (_activity == PatrolAction.LookAround) transform.Rotate(0f, s.lookAroundSpeed * Time.deltaTime, 0f);
+                else FaceTowards(_activityFace);
+                if (Time.time >= _activityUntil)
+                {
+                    _activity = PatrolAction.None;
+                    _agent.isStopped = false;
+                }
+                return true;
+            }
+            if (arrived || !_agent.hasPath)
+            {
+                Vector3 front = default, wall = default;
+                var door = Time.time >= _nextKnock && NearestDoor(s.knockDoorRange, out front, out wall, out _activityDoor);
+                _activityFace = door ? wall : default;
+                _activity = PatrolActivity.Pick(_rng.NextDouble(), door, s.idleChance, s.knockShare);
+                _activityStarted = false;
+                _activityTarget = front;
+                if (_activity != PatrolAction.None) return true;
+            }
+            return false;
+        }
+
+        private bool NearestDoor(float range, out Vector3 front, out Vector3 wall, out int index)
+        {
+            front = default;
+            wall = default;
+            index = -1;
+            var best = range * range;
+            var found = false;
+            for (var i = 0; i < house.DoorFronts.Count; i++)
+            {
+                if (_knockedDoors.Contains(i)) continue;
+                var d = house.DoorFronts[i];
+                var dist = (d - transform.position).sqrMagnitude;
+                if (dist > best || dist < 0.5f) continue;
+                if (!NavMesh.SamplePosition(d, out var hit, 1f, NavMesh.AllAreas)) continue;
+                best = dist;
+                front = hit.position;
+                wall = house.DoorWalls[i];
+                index = i;
+                found = true;
+            }
+            return found;
+        }
+
         private void ScheduleRoam()
         {
             var s = config.settings;
@@ -160,6 +280,9 @@ namespace Vchod.Enemy
             transform.position = target;
             _agent.enabled = true;
             _agent.Warp(target);
+            _leaving = false;
+            ForgetKnocks();
+            StartPatrolClock();
             if (_arrivalHunting) Brain.Force(FirefighterState.Search, player.transform.position);
             else if (_pendingLight) Brain.Force(FirefighterState.Investigate, _lightPosition);
             else Brain.Force(FirefighterState.Patrol, target);
@@ -234,6 +357,7 @@ namespace Vchod.Enemy
                 return;
             }
 
+            ForgetKnocks();
             var target = _placed && OnCurrentFloor(transform.position, out var kept) ? kept : SpawnPoint();
             // Move first: an agent enabled off the new NavMesh logs an error.
             transform.position = target;
@@ -326,7 +450,20 @@ namespace Vchod.Enemy
             _checking = null;
             _noiseChecked = null;
             if (Brain.State is FirefighterState.Search or FirefighterState.Investigate) _checked.Clear();
-            if (Brain.State == FirefighterState.Patrol) _sawHide = null;
+            if (Brain.State == FirefighterState.Patrol)
+            {
+                _sawHide = null;
+                StartPatrolClock();
+                // Nobody found after a search or a light check: he usually goes to look elsewhere.
+                if (previous is FirefighterState.Search or FirefighterState.Investigate &&
+                    _rng.NextDouble() < config.settings.leaveAfterSearch)
+                    StartLeaving();
+            }
+            else
+            {
+                _leaving = false;
+                _activity = PatrolAction.None;
+            }
             // Drop the old route: a new state picks its own first waypoint.
             if (_agent.isOnNavMesh) _agent.ResetPath();
             EventBus.Publish(new FirefighterStateChanged { Previous = previous, State = Brain.State });
@@ -400,6 +537,7 @@ namespace Vchod.Enemy
         {
             _agent.speed = Brain.Speed;
             if (UpdateCheck()) return;
+            if (UpdatePatrolLife(arrived)) return;
             switch (Brain.Goal)
             {
                 case FirefighterGoal.Hold when Brain.State == FirefighterState.Call:

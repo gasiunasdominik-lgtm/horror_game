@@ -62,8 +62,8 @@ namespace Vchod.EditorTools
                 spot.color = new Color(0.9f, 0.95f, 1f);
                 spot.shadows = LightShadows.None;
 
-                var breath = AudioSource3D(root, "Breath", 1.5f, 16f, 0.9f);
-                var steps = AudioSource3D(root, "Steps", 2f, 22f, 0.8f);
+                var breath = AudioSource3D(root, "Breath", 1.5f, 12f, 0.45f);
+                var steps = AudioSource3D(root, "Steps", 2f, 24f, 1f);
                 var voice = AudioSource3D(root, "Voice", 3f, 35f, 1f);
 
                 var col = root.AddComponent<CapsuleCollider>();
