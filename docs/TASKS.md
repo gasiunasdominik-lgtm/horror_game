@@ -18,7 +18,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-009 | CoModel + SymptomEffects + pípání detektoru podle vzdálenosti ke zdroji | C | DONE | P1 | Hladina CO roste u zdroje, efekty a zvuk se mění podle prahů |
 | T-010 | Playtest #1 (10 min) + FEEL hodnocení | D | TODO | P1 | `FEEL:` odpověď v chatu |
 | T-011 | EditMode testy: CoModel, SeedService, validace ModuleLayout | C | DONE | P2 | Testy zelené |
-| T-012 | Zapsat měření výkonu na Zenbooku do TESTING.md | C | TODO | P2 | Hodnoty FPS zapsané |
+| T-012 | Zapsat měření výkonu na Zenbooku do TESTING.md | C | DONE | P2 | Hodnoty FPS zapsané |
 
 ## M1 Smyčka (30. 11. – 20. 12. 2026)
 
@@ -62,7 +62,9 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-066 | Tag `m3` | C | TODO | P2 | Tag existuje |
 
 ## Nápady (neimplementovat; Dominik/Claude zde zapisují)
-- (zatím prázdné)
+- (C) Více spínačů světla (u každých dveří nebo v polovině chodby), pokud se při playtestu ukáže, že jediný spínač u schodů je moc trestající.
+- (C) Zvuk cvaknutí spínače a relé při zhasnutí (audio pass M2).
+- (C) PlayMode smoke test (načíst scénu, 60 s bot, kontrola výjimek) podle TESTING.md, vrstva 2; zatím nezařazeno do milníku.
 
 ## Blokace
 - (zatím prázdné)

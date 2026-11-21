@@ -22,6 +22,12 @@ namespace Vchod.DebugTools
             go.AddComponent<DebugCheats>();
             go.AddComponent<BugReporter>();
             go.AddComponent<DebugOverlay>();
+
+            if (PerfProbe.TryGetDuration(out var seconds))
+            {
+                var probe = go.AddComponent<PerfProbe>();
+                probe.StartCoroutine(probe.Run(seconds));
+            }
         }
     }
 }

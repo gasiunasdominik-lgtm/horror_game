@@ -20,3 +20,13 @@ Zapisuj každé rozhodnutí, které ovlivní hru, nástroje nebo rozsah. Formát
 | D-014 | 20. 11. 2026 | Herní UI: uGUI (Canvas + TextMeshPro), EventSystem s `InputSystemUIInputModule` | Výchozí volba skillu `ui` pro nové herní UI; vyzrálé, jednoduché pro menu a HUD | default |
 | D-015 | 20. 11. 2026 | Baseline post-processing: ACES, Bloom 0.9/0.6, Vignette 0.3, kontrast +12, saturace −15, Film Grain 0.2 | Tmavší retro tón dle GDD, ale čitelný; hororový tuning až v T-009/M2 | C |
 | D-016 | 20. 11. 2026 | Remote `origin` = github.com/gasiunasdominik-lgtm/horror_game, push povolen Dominikem | Záloha | D |
+| D-017 | 20. 11. 2026 | Bez skoku; chůze 2,0 m/s, sprint (Shift) 3,6 m/s jen dopředu | GDD skok nezmiňuje; útěk před hasičem potřebuje rychlejší pohyb. Ladí se v `PlayerConfig` | C |
+| D-018 | 20. 11. 2026 | Patro = strom chodeb na mřížce 4 m: schodiště (0,0) → hlavní trasa 5–7 buněk → dveře hráče, + 2 boční větve (okno na konci větve), 2+ dveře bytů, jeden byt je zdroj CO | Splňuje GDD (4–6 modulů, přeskládání), validace je jednoduchá a testovatelná | C |
+| D-019 | 20. 11. 2026 | Přeskládání při zhasnutí: další rozložení stejného seedu (`seed, "layout", index`); hráč se přesune do buňky ve stejné hloubce chodby, stejná relativní poloha a směr; ve schodišti se nic nemění | Ve tmě působí jako dezorientace (GDD: závrať), hráč nikdy neskončí ve zdi | C |
+| D-020 | 20. 11. 2026 | Jediný spínač světla u schodiště, světlo 20 s, svítí celé patro | GDD: tlačítko u schodů; víc spínačů jen podle playtestu (Nápady) | C |
+| D-021 | 20. 11. 2026 | CO: start 5, chodba +0,08/s, schodiště −0,3/s, okno −4/s, u zdroje až +2,5/s (≈40 s do kolapsu); detektor = 3D zvuk bytu se zdrojem, interval 0,3–2,2 s podle vzdálenosti | Výchozí ladění; kolo 15–25 min vydrží jen bez zbytečných zastávek u zdroje. Ladí se v `CoConfig` | C |
+| D-022 | 20. 11. 2026 | Kolaps (CO 100) v M0 jen zatmí obraz a zablokuje ovládání; konec 1 řeší T-026 | EndingsManager je M1 | C |
+| D-023 | 20. 11. 2026 | Debug nástroje se vytvářejí kódem (`[RuntimeInitializeOnLoadMethod]`), namespace `Vchod.DebugTools` (assembly `Vchod.Debug`) | Release build nemá chybějící skripty ve scéně; jméno `Debug` by kolidovalo s `UnityEngine.Debug` | C |
+| D-024 | 20. 11. 2026 | Zvuky v M0 syntetizované kódem (pípání, hučení) | Žádné cizí assety ani licence; nahradí audio pass M2 | C |
+| D-025 | 20. 11. 2026 | `SampleScene` přesunuta na `Assets/_Project/Scenes/Game.unity`, jediná scéna v buildu; zapojení scény generuje menu `Vchod/Rebuild Game Scene Wiring` | ARCHITECTURE: scéna `Game`; zapojení opakovatelné z kódu | C |
+| D-026 | 20. 11. 2026 | Výzva k interakci v češtině („E  Rozsvítit“) jako placeholder | Lokalizace CZ/EN se řeší později (GDD) | C |
