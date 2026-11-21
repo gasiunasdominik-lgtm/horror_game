@@ -87,15 +87,55 @@ namespace Vchod.Enemy
             _following = e.ViaStairs && Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
         }
 
+        private bool _arrivalHunting;
+        private readonly List<Vector3> _entries = new();
+
+        private void GoOffstage(float delay, bool hunting)
+        {
+            _agent.enabled = false;
+            transform.position = Offstage;
+            _arriveAt = Time.time + delay;
+            _arrivalHunting = hunting;
+        }
+
+        /// <summary>Debug: skip the wait and walk onto the floor now.</summary>
+        public void ArriveNow()
+        {
+            if (IsOffstage) _arriveAt = Time.time;
+        }
+
+        private Vector3 StairsEntry()
+        {
+            var stairs = house.GetCellCenter(LayoutPlan.StartIndex) + Vector3.forward * 1.6f;
+            return NavMesh.SamplePosition(stairs, out var hit, 2.5f, NavMesh.AllAreas) ? hit.position : SpawnPoint();
+        }
+
         private void ArriveByStairs()
         {
+            Vector3 target;
+            if (_arrivalHunting)
+            {
+                // Following the player: straight up/down the stairs behind them.
+                target = StairsEntry();
+            }
+            else
+            {
+                // Calm arrival: from the stairs or the far end, whichever is farther from the player.
+                _entries.Clear();
+                _entries.Add(StairsEntry());
+                _entries.Add(SpawnPoint());
+                if (!ArrivalPoint.Pick(_entries, player.transform.position, config.settings.minArrivalDistance, out target))
+                {
+                    _arriveAt = Time.time + config.settings.arrivalRetry;
+                    return;
+                }
+            }
             _arriveAt = -1f;
-            var stairs = house.GetCellCenter(LayoutPlan.StartIndex) + Vector3.forward * 1.6f;
-            var target = NavMesh.SamplePosition(stairs, out var hit, 2.5f, NavMesh.AllAreas) ? hit.position : SpawnPoint();
             transform.position = target;
             _agent.enabled = true;
             _agent.Warp(target);
-            Brain.Force(FirefighterState.Search, player.transform.position);
+            if (_arrivalHunting) Brain.Force(FirefighterState.Search, player.transform.position);
+            else Brain.Force(FirefighterState.Patrol, target);
         }
 
         private void OnNoise(NoiseMade e)
@@ -117,13 +157,12 @@ namespace Vchod.Enemy
             if (_floorChanged)
             {
                 _floorChanged = false;
+                if (IsOffstage && !_arrivalHunting && !_following) return; // still on his way in
                 _checking = null;
                 _sawHide = null;
                 if (_following)
                 {
-                    _agent.enabled = false;
-                    transform.position = Offstage;
-                    _arriveAt = Time.time + config.settings.followDelay;
+                    GoOffstage(config.settings.followDelay, hunting: true);
                     return;
                 }
                 _arriveAt = -1f;
@@ -135,6 +174,13 @@ namespace Vchod.Enemy
                 return;
             }
             if (IsOffstage) return;
+            if (!_placed)
+            {
+                // Round start: a calm minute or so before he enters the floor.
+                _placed = true;
+                GoOffstage(config.settings.introGrace, hunting: false);
+                return;
+            }
 
             var target = _placed && OnCurrentFloor(transform.position, out var kept) ? kept : SpawnPoint();
             // Move first: an agent enabled off the new NavMesh logs an error.

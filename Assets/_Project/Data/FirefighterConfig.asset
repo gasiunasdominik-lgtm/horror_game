@@ -18,11 +18,23 @@ MonoBehaviour:
     chaseSpeed: 3
     searchSpeed: 1.5
     sightRangeLit: 14
-    sightRangeDark: 6
     sightAngle: 110
+    sightRangeDark: 6
+    torchAngle: 50
+    nearSenseRadius: 2
+    lookAroundSpeed: 70
     loseSightTime: 2
     callDuration: 3.5
     searchDuration: 18
     investigateLookTime: 4
     catchRadius: 1.1
     searchRadius: 8
+    followDelay: 6
+    introGrace: 90
+    minArrivalDistance: 10
+    arrivalRetry: 5
+    hidingCheckChance: 0.2
+    checkDuration: 1.5
+    checkNearNoise: 2.5
+    tableRevealLit: 4
+    tableRevealDark: 2.5

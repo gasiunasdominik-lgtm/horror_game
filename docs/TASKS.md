@@ -35,6 +35,11 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
 | T-030 | Měření výkonu, tag `m1` | C | DONE | P2 | Tag existuje |
+| T-031 | Klidný úvod: hasič se v kole objeví až po prodlevě (~90 s) a přichází zdola po schodech, nikdy ne blízko hráče | C | DONE | P1 | FEEL #2: „sotva se rozkoukám, už běží“ |
+| T-032 | Hasič má vlastní patro a prochází dům; na patro hráče jde jen za stopou (světlo, hluk) | C | TODO | P1 | Ne vždy na stejném patře |
+| T-033 | Férovější skrýše: kontrola náhodné skrýše 50 % → 20 %, jistá jen když tě viděl zalézt | C | DONE | P1 | FEEL #2: „kontrola skrýše vysoká“ |
+| T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | TODO | P1 | Hráč má kudy uniknout |
+| T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | TODO | P2 | Stihne se přečíst, má efekt |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 
