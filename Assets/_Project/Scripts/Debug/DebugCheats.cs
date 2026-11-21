@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using Vchod.Core;
+using Vchod.Enemy;
 using Vchod.World;
 
 namespace Vchod.DebugTools
@@ -23,13 +24,17 @@ namespace Vchod.DebugTools
                 ctx.SetGodMode(!ctx.GodMode);
                 Report($"God mode {(ctx.GodMode ? "ON" : "off")}");
             }
-            if (k.f3Key.wasPressedThisFrame) TeleportToNextZone();
+            if (k.f3Key.wasPressedThisFrame)
+            {
+                if (k.shiftKey.isPressed) NextFloor();
+                else TeleportToNextZone();
+            }
             if (k.f4Key.wasPressedThisFrame)
             {
                 if (k.shiftKey.isPressed) GameBootstrap.RestartRound(SeedService.NewRandomSeed());
                 else ForceReshuffle();
             }
-            if (k.f5Key.wasPressedThisFrame) Report("Enemy states: not implemented until M1 (T-020)");
+            if (k.f5Key.wasPressedThisFrame) CycleFirefighterState();
             if (k.f6Key.wasPressedThisFrame)
             {
                 _timeScaleIndex = (_timeScaleIndex + 1) % TimeScales.Length;
@@ -42,13 +47,31 @@ namespace Vchod.DebugTools
                 Report($"Restart round, seed {SeedService.Seed}");
                 GameBootstrap.RestartRound();
             }
-            if (k.f10Key.wasPressedThisFrame) Report("Endings: not implemented until M1 (T-026)");
+            if (k.f10Key.wasPressedThisFrame) PreviewNextEnding();
         }
 
         private static void Report(string message)
         {
             DebugContext.Instance.Notify(message);
             if (PlaytestLogger.Instance != null) PlaytestLogger.Instance.Log("debug", message);
+        }
+
+        private static readonly FirefighterState[] ForcedStates =
+            { FirefighterState.Patrol, FirefighterState.Chase, FirefighterState.Call, FirefighterState.Search };
+        private int _forcedIndex;
+
+        private void CycleFirefighterState()
+        {
+            var ctx = DebugContext.Instance;
+            if (ctx.Firefighter == null || ctx.Player == null)
+            {
+                Report("Firefighter: not in scene");
+                return;
+            }
+            _forcedIndex = (_forcedIndex + 1) % ForcedStates.Length;
+            var state = ForcedStates[_forcedIndex];
+            ctx.Firefighter.Brain.Force(state, ctx.Player.transform.position);
+            Report($"Firefighter forced to {state}");
         }
 
         private int _zoneCursor;
@@ -76,8 +99,30 @@ namespace Vchod.DebugTools
             var index = _zones[_zoneCursor];
             var cell = plan.Cells[index];
             var yaw = index == LayoutPlan.StartIndex ? Direction.North.Yaw() : cell.FeatureSide.Yaw();
-            ctx.Player.Teleport(house.GetCellCenter(index), yaw);
+            ctx.Player.Teleport(index == LayoutPlan.StartIndex ? house.StartPoint : house.GetCellCenter(index), yaw);
             Report($"Teleport: {(cell.IsCoSource ? "CO source" : cell.Feature.ToString())} {cell.Pos}");
+        }
+
+        /// <summary>Shift+F3: next floor (wraps), arriving beside the stairs.</summary>
+        private void NextFloor()
+        {
+            var ctx = DebugContext.Instance;
+            var house = ctx.House;
+            if (house == null || ctx.Player == null) return;
+            house.GoToFloor((house.Floor + 1) % house.Config.floorCount);
+            ctx.Player.Teleport(house.StartPoint, Direction.North.Yaw());
+            Report($"Floor {house.Floor}{(house.IsPlayerFloor ? " (player's floor)" : "")}");
+        }
+
+        private int _previewEnding;
+
+        /// <summary>F10: show the next ending screen (1 → 2 → 3). Restart with Enter/R on it.</summary>
+        private void PreviewNextEnding()
+        {
+            _previewEnding = _previewEnding % 3 + 1;
+            var ending = (EndingId)_previewEnding;
+            EventBus.Publish(new RoundEnded { Ending = ending, Cause = CollapseCause.Home });
+            Report($"Ending preview: {ending}");
         }
 
         private void AddZone(int index)

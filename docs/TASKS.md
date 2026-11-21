@@ -24,17 +24,17 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 
 | ID | Úkol | Vl. | Stav | P | Hotovo, když |
 |---|---|---|---|---|---|
-| T-020 | Hasič: model (placeholder), NavMesh, stavový automat (Patrol, Investigate, Chase, Call, Search) | C | TODO | P1 | Hasič hlídá, reaguje na světlo a hluk, honí, ztrácí hráče |
-| T-021 | Senzory hasiče (sluch, zrak, světlo) + audio (dech, výstroj, baterka) | C | TODO | P1 | Hráč pozná polohu podle zvuku |
-| T-022 | Skrýše (skříň, stůl) a interakce | C | TODO | P1 | Hráč se schová a hasič ho přejde nebo najde |
-| T-023 | Okna s čerstvým vzduchem a pokles CO | C | TODO | P1 | U okna CO klesá |
-| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | TODO | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
-| T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | TODO | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
-| T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | TODO | P1 | Všechny tři konce dosažitelné |
-| T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | TODO | P1 | Po konci lze začít nové kolo |
+| T-020 | Hasič: model (placeholder), NavMesh, stavový automat (Patrol, Investigate, Chase, Call, Search) | C | DONE | P1 | Hasič hlídá, reaguje na světlo a hluk, honí, ztrácí hráče |
+| T-021 | Senzory hasiče (sluch, zrak, světlo) + audio (dech, výstroj, baterka) | C | DONE | P1 | Hráč pozná polohu podle zvuku |
+| T-022 | Skrýše (skříň, stůl) a interakce | C | DONE | P1 | Hráč se schová a hasič ho přejde nebo najde |
+| T-023 | Okna s čerstvým vzduchem a pokles CO | C | DONE | P1 | U okna CO klesá |
+| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | DONE | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
+| T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | DONE | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
+| T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | DONE | P1 | Všechny tři konce dosažitelné |
+| T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | DONE | P1 | Po konci lze začít nové kolo |
 | T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
-| T-030 | Měření výkonu, tag `m1` | C | TODO | P2 | Tag existuje |
+| T-030 | Měření výkonu, tag `m1` | C | DONE | P2 | Tag existuje |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 
@@ -64,6 +64,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 ## Nápady (neimplementovat; Dominik/Claude zde zapisují)
 - (C) Zvuk cvaknutí spínače a relé při zhasnutí (audio pass M2).
 - (C) PlayMode smoke test (načíst scénu, 60 s bot, kontrola výjimek) podle TESTING.md, vrstva 2; zatím nezařazeno do milníku.
+- (D, 21. 11.) Zapomenuté klíče: hráč dojde ke svým dveřím a zjistí, že nemá klíč. Náhradní má jeden konkrétní soused, kterého musí najít v přeskládávaném patře. Mění cíl kola (GDD: dojít ke dveřím) → změna designu, rozhodnout na bráně G1 po playtestu #2. Navazuje na T-025 (soused) a T-040; dá se postavit nad dveřmi bytů a dialogem souseda bez nového systému.
 
 ## Blokace
 - (zatím prázdné)

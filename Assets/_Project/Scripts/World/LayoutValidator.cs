@@ -22,7 +22,8 @@ namespace Vchod.World
             if (start.Pos != new GridPos(0, 0)) errors.Add($"stairwell not at origin: {start.Pos}");
             if (start.Feature != CellFeature.Stairwell) errors.Add("cell 0 is not the stairwell");
 
-            int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0;
+            var elevators = 0;
+            int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0, hiding = 0, hidingOnMain = 0;
             var seen = new HashSet<GridPos>();
             for (var i = 0; i < plan.Count; i++)
             {
@@ -44,9 +45,21 @@ namespace Vchod.World
                 switch (c.Feature)
                 {
                     case CellFeature.PlayerDoor: playerDoors++; break;
+                    case CellFeature.Elevator:
+                        elevators++;
+                        if (plan.MainPath.Count < 2 || i != plan.MainPath[1]) errors.Add($"elevator at {c.Pos} is not in the first corridor cell");
+                        break;
                     case CellFeature.Window: windows++; break;
                     case CellFeature.ApartmentDoor: apartmentDoors++; break;
                     case CellFeature.Stairwell when i != LayoutPlan.StartIndex: errors.Add($"extra stairwell at {c.Pos}"); break;
+                }
+                if (c.Hiding != HidingKind.None)
+                {
+                    hiding++;
+                    if (c.MainPath) hidingOnMain++;
+                    if (c.IsOpen(c.HidingSide)) errors.Add($"hiding spot at {c.Pos} on an open side");
+                    if (c.Feature != CellFeature.None && c.FeatureSide == c.HidingSide) errors.Add($"hiding spot at {c.Pos} blocks its {c.Feature}");
+                    if (i == LayoutPlan.StartIndex || c.Feature == CellFeature.PlayerDoor) errors.Add($"hiding spot in {c.Feature} cell");
                 }
                 if (c.IsCoSource)
                 {
@@ -55,18 +68,56 @@ namespace Vchod.World
                 }
             }
 
-            if (playerDoors != 1) errors.Add($"expected 1 player door, found {playerDoors}");
+            if (elevators != 1) errors.Add($"expected 1 elevator, found {elevators}");
+            var expected = plan.IsPlayerFloor ? 1 : 0;
+            if (playerDoors != expected) errors.Add($"expected {expected} player door, found {playerDoors}");
             if (windows < 1) errors.Add("no window");
             if (apartmentDoors < rules.minApartmentDoors) errors.Add($"only {apartmentDoors} apartment doors");
-            if (coSources != 1) errors.Add($"expected 1 CO source, found {coSources}");
+            if (coSources != expected) errors.Add($"expected {expected} CO source, found {coSources}");
+            if (hiding < rules.minHidingSpots) errors.Add($"only {hiding} hiding spots");
+            if (rules.minHidingSpots > 0 && hidingOnMain == 0) errors.Add("no hiding spot on the main path");
 
             var mainLength = plan.MainPath.Count - 1;
             if (mainLength < rules.mainPathMin || mainLength > rules.mainPathMax)
                 errors.Add($"main path length {mainLength} outside {rules.mainPathMin}-{rules.mainPathMax}");
 
+            for (var i = 0; i < plan.Count; i++)
+            {
+                var c = plan.Cells[i];
+                if (!SwitchDistance(plan, i, 2)) errors.Add($"cell {c.Pos} is more than 2 cells from a light switch");
+                if (!c.HasSwitch) continue;
+                if (c.IsOpen(c.SwitchSide)) errors.Add($"switch at {c.Pos} on an open side");
+                if ((c.Feature != CellFeature.None && c.FeatureSide == c.SwitchSide) || (c.Hiding != HidingKind.None && c.HidingSide == c.SwitchSide))
+                    errors.Add($"switch at {c.Pos} shares a wall with a door, window or hiding spot");
+            }
+
             var reachable = Reachable(plan);
             if (reachable.Count != plan.Count) errors.Add($"{plan.Count - reachable.Count} cells unreachable from stairwell");
             return errors;
+        }
+
+        /// <summary>True if a light switch (the stairwell always has one) is within <paramref name="steps"/> cells.</summary>
+        public static bool SwitchDistance(LayoutPlan plan, int from, int steps)
+        {
+            var frontier = new List<int> { from };
+            var seen = new HashSet<int> { from };
+            for (var s = 0; s <= steps; s++)
+            {
+                var next = new List<int>();
+                foreach (var i in frontier)
+                {
+                    var c = plan.Cells[i];
+                    if (c.HasSwitch || i == LayoutPlan.StartIndex) return true;
+                    foreach (var d in DirectionUtil.All)
+                    {
+                        if (!c.IsOpen(d)) continue;
+                        var n = plan.IndexOf(c.Pos + d.Offset());
+                        if (n >= 0 && seen.Add(n)) next.Add(n);
+                    }
+                }
+                frontier = next;
+            }
+            return false;
         }
 
         /// <summary>Breadth-first walk through openings from the stairwell.</summary>

@@ -17,7 +17,7 @@ namespace Vchod.World
 
         public void Interact(GameObject interactor)
         {
-            if (_timer != null) _timer.Press();
+            if (_timer != null) _timer.Press(transform.position);
         }
     }
 }

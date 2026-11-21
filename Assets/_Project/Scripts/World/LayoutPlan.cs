@@ -10,6 +10,16 @@ namespace Vchod.World
         ApartmentDoor = 2,
         Window = 3,
         PlayerDoor = 4,
+        /// <summary>Lift door, always in the first corridor cell. Out of service (firefighters).</summary>
+        Elevator = 5,
+    }
+
+    /// <summary>Furniture the player can hide in (GDD: wardrobes and tables).</summary>
+    public enum HidingKind
+    {
+        None = 0,
+        Wardrobe = 1,
+        Table = 2,
     }
 
     /// <summary>One corridor module slot. Pure data so layouts can be tested without a scene.</summary>
@@ -26,6 +36,10 @@ namespace Vchod.World
         public CellFeature Feature;
         public Direction FeatureSide;
         public bool IsCoSource;
+        public HidingKind Hiding;
+        public Direction HidingSide;
+        public bool HasSwitch;
+        public Direction SwitchSide;
 
         public bool IsOpen(Direction d) => (Openings & (1 << (int)d)) != 0;
         public void Open(Direction d) => Openings |= (byte)(1 << (int)d);
@@ -49,6 +63,8 @@ namespace Vchod.World
         private readonly Dictionary<GridPos, int> _index = new();
 
         public int Seed { get; internal set; }
+        /// <summary>Only the player's floor has their door and the CO source (the neighbour's flat).</summary>
+        public bool IsPlayerFloor { get; internal set; } = true;
         public List<LayoutCell> Cells { get; } = new();
         /// <summary>Cell indices from the stairwell to the player's door.</summary>
         public List<int> MainPath { get; } = new();
@@ -98,6 +114,9 @@ namespace Vchod.World
                     h = Mix(h, (int)c.Feature);
                     h = Mix(h, (int)c.FeatureSide);
                     h = Mix(h, c.IsCoSource ? 1 : 0);
+                    h = Mix(h, (int)c.Hiding);
+                    h = Mix(h, (int)c.HidingSide);
+                    h = Mix(h, c.HasSwitch ? 1 + (int)c.SwitchSide : 0);
                 }
                 return h;
             }

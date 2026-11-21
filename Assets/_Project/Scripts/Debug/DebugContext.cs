@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vchod.Core;
+using Vchod.Enemy;
 using Vchod.Player;
 using Vchod.Systems;
 using Vchod.World;
@@ -50,6 +51,7 @@ namespace Vchod.DebugTools
         public ModuleLayoutBuilder House { get; private set; }
         public LightTimer LightTimer { get; private set; }
         public CoSystem Co { get; private set; }
+        public FirefighterController Firefighter { get; private set; }
 
         private void Refresh()
         {
@@ -57,6 +59,7 @@ namespace Vchod.DebugTools
             House = FindFirstObjectByType<ModuleLayoutBuilder>();
             LightTimer = FindFirstObjectByType<LightTimer>();
             Co = FindFirstObjectByType<CoSystem>();
+            Firefighter = FindFirstObjectByType<FirefighterController>();
         }
 
         private float _worstThisWindow;
@@ -92,6 +95,7 @@ namespace Vchod.DebugTools
         private void ApplyGodMode()
         {
             if (Co != null && Co.Model != null) Co.Model.Frozen = GodMode;
+            if (Firefighter != null && Firefighter.Brain != null) Firefighter.Brain.CanCatch = !GodMode;
         }
 
         public void SetInputBlocked(object owner, bool blocked)
@@ -144,12 +148,19 @@ namespace Vchod.DebugTools
             {
                 snapshot.layoutHash = House.LayoutHash.ToString("X8");
                 snapshot.reshuffleIndex = House.ReshuffleIndex;
+                snapshot.floor = House.Floor;
             }
             if (LightTimer != null) snapshot.lightOn = LightTimer.IsOn;
             if (Co != null && Co.Model != null)
             {
                 snapshot.coLevel = Co.Level;
                 snapshot.coStage = Co.Stage;
+            }
+
+            if (Firefighter != null && Firefighter.Brain != null)
+            {
+                var b = Firefighter.Brain;
+                snapshot.enemyState = $"{b.State}{(Firefighter.SeesPlayer ? " (sees)" : "")}{(b.HasCaughtPlayer ? " CAUGHT" : "")} @{Firefighter.transform.position:F1}";
             }
 
             var player = PlayerTransform;

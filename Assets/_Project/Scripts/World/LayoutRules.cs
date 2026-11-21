@@ -17,6 +17,10 @@ namespace Vchod.World
         [Min(2)] public int gridRadius = 5;
         [Range(0f, 1f)] public float apartmentDoorChance = 0.55f;
         [Min(1)] public int minApartmentDoors = 2;
+        [Tooltip("Hiding spots (wardrobe or table) per floor, against walls that carry nothing else.")]
+        [Min(0)] public int minHidingSpots = 2;
+        [Min(0)] public int maxHidingSpots = 3;
+        [Range(0f, 1f)] public float wardrobeChance = 0.6f;
         [Min(1)] public int maxAttempts = 50;
     }
 }

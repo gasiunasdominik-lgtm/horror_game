@@ -34,6 +34,12 @@ namespace Vchod.Player
         public float CameraRoll { get; set; }
 
         public bool IsSprinting { get; private set; }
+
+        /// <summary>The hiding spot the player is in, or null. Movement is off while hidden.</summary>
+        public IInteractable HiddenIn { get; private set; }
+        public bool IsHidden => HiddenIn != null;
+        private float _hideYaw;
+        private float _hideYawLimit;
         public float PlanarSpeed => _planarVelocity.magnitude;
 
         /// <summary>False while anything holds an input lock (collapse, debug UI, later menus).</summary>
@@ -89,10 +95,24 @@ namespace Vchod.Player
 
             transform.Rotate(0f, look.x, 0f, Space.Self);
             _pitch = Mathf.Clamp(_pitch - look.y, -config.maxPitch, config.maxPitch);
+            if (IsHidden)
+            {
+                // Peek out, but no turning around inside a wardrobe.
+                var yaw = _hideYaw + Mathf.Clamp(Mathf.DeltaAngle(_hideYaw, transform.eulerAngles.y), -_hideYawLimit, _hideYawLimit);
+                transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                _pitch = Mathf.Clamp(_pitch, -35f, 35f);
+            }
         }
 
         private void UpdateMove(float dt)
         {
+            if (IsHidden)
+            {
+                IsSprinting = false;
+                _planarVelocity = Vector3.zero;
+                return;
+            }
+
             var move = InputEnabled ? Vector2.ClampMagnitude(_input.Move.ReadValue<Vector2>(), 1f) : Vector2.zero;
             IsSprinting = InputEnabled && _input.Sprint.IsPressed() && move.y > 0.1f;
             var speed = (IsSprinting ? config.sprintSpeed : config.walkSpeed) * SpeedMultiplier;
@@ -104,9 +124,31 @@ namespace Vchod.Player
             _body.Move((_planarVelocity + Vector3.up * _verticalSpeed) * dt);
         }
 
+        /// <summary>Puts the camera at <paramref name="viewPoint"/>, facing out of the spot.</summary>
+        public void EnterHiding(IInteractable spot, Vector3 viewPoint, float yaw, float yawLimit)
+        {
+            if (IsHidden) return;
+            HiddenIn = spot;
+            _hideYaw = yaw;
+            _hideYawLimit = yawLimit;
+            _body.enabled = false; // nothing can bump or raycast the body while inside
+            transform.SetPositionAndRotation(viewPoint - Vector3.up * cameraPivot.localPosition.y, Quaternion.Euler(0f, yaw, 0f));
+            _pitch = 0f;
+            _planarVelocity = Vector3.zero;
+            _verticalSpeed = 0f;
+        }
+
+        public void ExitHiding(Vector3 position, float yaw)
+        {
+            if (!IsHidden) return;
+            HiddenIn = null;
+            Teleport(position, yaw);
+        }
+
         /// <summary>Moves the player instantly (reshuffle, debug teleport). Keeps pitch.</summary>
         public void Teleport(Vector3 position, float yaw)
         {
+            HiddenIn = null;
             _body.enabled = false;
             transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
             _body.enabled = true;

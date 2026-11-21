@@ -47,7 +47,7 @@ namespace Vchod.DebugTools
             while (t < duration)
             {
                 var house = ctx.House;
-                if (ctx.LightTimer != null && !ctx.LightTimer.IsOn) ctx.LightTimer.Press();
+                if (ctx.LightTimer != null && !ctx.LightTimer.IsOn) ctx.LightTimer.Press(ctx.Player.transform.position);
                 if (house != null && house.Plan != null && t >= nextCell)
                 {
                     cell = (cell + 1) % house.Plan.Count;

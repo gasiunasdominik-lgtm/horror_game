@@ -30,12 +30,24 @@ namespace Vchod.Systems
             {
                 DistanceToSource = DistanceToSource,
                 InStairwell = house.IsInStairwell(position),
-                AtOpenWindow = false, // windows open in T-023 (M1)
+                AtOpenWindow = VentWindow.FreshAirAt(position),
             };
 
             var previous = Model.Stage;
             if (!Model.Tick(Time.deltaTime, exposure)) return;
+            Announce(previous);
+        }
 
+        /// <summary>Walking into the flat at the source: the air there is lethal at once (ending 1).</summary>
+        public void ForceCollapse()
+        {
+            if (Model.IsCollapsed) return;
+            var previous = Model.Stage;
+            if (Model.SetLevel(100f)) Announce(previous);
+        }
+
+        private void Announce(int previous)
+        {
             EventBus.Publish(new CoStageChanged { PreviousStage = previous, Stage = Model.Stage, Level = Model.Level });
             if (Model.IsCollapsed)
             {

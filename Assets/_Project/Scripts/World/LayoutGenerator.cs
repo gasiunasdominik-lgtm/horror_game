@@ -12,12 +12,12 @@ namespace Vchod.World
         private const int StraightWeight = 3;
         private const int TurnWeight = 1;
 
-        public static LayoutPlan Generate(int seed, LayoutRules rules)
+        public static LayoutPlan Generate(int seed, LayoutRules rules, bool playerFloor = true)
         {
             var rng = new Random(seed);
             for (var attempt = 0; attempt < rules.maxAttempts; attempt++)
             {
-                var plan = TryGenerate(rng, rules);
+                var plan = TryGenerate(rng, rules, playerFloor);
                 if (plan == null) continue;
                 plan.Seed = seed;
                 if (LayoutValidator.Validate(plan, rules).Count == 0) return plan;
@@ -25,9 +25,9 @@ namespace Vchod.World
             throw new InvalidOperationException($"No valid layout for seed {seed} in {rules.maxAttempts} attempts");
         }
 
-        private static LayoutPlan TryGenerate(Random rng, LayoutRules rules)
+        private static LayoutPlan TryGenerate(Random rng, LayoutRules rules, bool playerFloor)
         {
-            var plan = new LayoutPlan();
+            var plan = new LayoutPlan { IsPlayerFloor = playerFloor };
             plan.Add(new LayoutCell
             {
                 Pos = new GridPos(0, 0),
@@ -50,8 +50,12 @@ namespace Vchod.World
             }
 
             var door = plan.Cells[current];
-            door.Feature = CellFeature.PlayerDoor;
+            // Other floors end in a neighbour's door: same dead end, different door.
+            door.Feature = playerFloor ? CellFeature.PlayerDoor : CellFeature.ApartmentDoor;
             door.FeatureSide = door.InDirection; // dead end: the wall straight ahead
+
+            // The lift faces the stairs, in the first corridor cell; branches must not open its wall.
+            AssignFeature(rng, plan.Cells[plan.MainPath[1]], CellFeature.Elevator);
 
             // Side branches off the main path (never from the stairwell or the door cell).
             var branchEnds = new List<int>();
@@ -96,11 +100,16 @@ namespace Vchod.World
             if (doors.Count < rules.minApartmentDoors) return null;
             foreach (var i in doors) AssignFeature(rng, plan.Cells[i], CellFeature.ApartmentDoor);
 
-            // The CO source is one neighbour's flat; avoid the cell right next to the stairs if possible.
-            var candidates = doors.FindAll(i => plan.Cells[i].Depth >= 2);
-            if (candidates.Count == 0) candidates = doors;
-            plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
+            // The CO source is one neighbour's flat on the player's floor; avoid the cell right next to the stairs if possible.
+            if (playerFloor)
+            {
+                var candidates = doors.FindAll(i => plan.Cells[i].Depth >= 2);
+                if (candidates.Count == 0) candidates = doors;
+                plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
+            }
 
+            PlaceHidingSpots(rng, plan, rules);
+            PlaceLightSwitches(rng, plan);
             return plan;
         }
 
@@ -133,6 +142,7 @@ namespace Vchod.World
             {
                 if (d == cell.InDirection.Opposite() || cell.IsOpen(d) || !CanPlace(plan, rules, cell.Pos + d.Offset()))
                     continue;
+                if (cell.Feature != CellFeature.None && d == cell.FeatureSide) continue;
                 // A cell must keep one closed wall for a door or window, so never open the 4th side.
                 if (cell.OpenCount >= 3) continue;
                 var w = d == cell.InDirection ? StraightWeight : TurnWeight;
@@ -163,6 +173,59 @@ namespace Vchod.World
             foreach (var d in DirectionUtil.All)
                 if (!cell.IsOpen(d)) closed.Add(d);
             cell.FeatureSide = closed[rng.Next(closed.Count)];
+        }
+
+        /// <summary>
+        /// Wardrobes and tables on free walls. At least one on the main path, so a hiding
+        /// spot is always on the way, never only in a side corridor.
+        /// </summary>
+        private static void PlaceHidingSpots(Random rng, LayoutPlan plan, LayoutRules rules)
+        {
+            var free = new List<int>();
+            for (var i = 1; i < plan.Count; i++)
+                if (plan.Cells[i].Feature != CellFeature.PlayerDoor && FreeSides(plan.Cells[i]).Count > 0) free.Add(i);
+            Shuffle(rng, free);
+            var main = free.FindIndex(i => plan.Cells[i].MainPath);
+            if (main > 0) (free[0], free[main]) = (free[main], free[0]);
+
+            var count = Math.Min(free.Count, rng.Next(rules.minHidingSpots, rules.maxHidingSpots + 1));
+            for (var k = 0; k < count; k++)
+            {
+                var cell = plan.Cells[free[k]];
+                var sides = FreeSides(cell);
+                cell.HidingSide = sides[rng.Next(sides.Count)];
+                cell.Hiding = rng.NextDouble() < rules.wardrobeChance ? HidingKind.Wardrobe : HidingKind.Table;
+            }
+        }
+
+        /// <summary>
+        /// Playtest #1: one switch at the stairs was too far. Walking outward by depth, a cell gets a
+        /// switch unless it or a neighbour already has one, so a switch is never more than 2 cells away.
+        /// </summary>
+        private static void PlaceLightSwitches(Random rng, LayoutPlan plan)
+        {
+            var order = new List<int>();
+            for (var i = 1; i < plan.Count; i++) order.Add(i);
+            order.Sort((a, b) => plan.Cells[a].Depth.CompareTo(plan.Cells[b].Depth));
+            foreach (var i in order)
+            {
+                if (LayoutValidator.SwitchDistance(plan, i, 1)) continue;
+                var cell = plan.Cells[i];
+                var sides = FreeSides(cell);
+                if (cell.Hiding != HidingKind.None) sides.Remove(cell.HidingSide);
+                if (sides.Count == 0) continue;
+                cell.HasSwitch = true;
+                cell.SwitchSide = sides[rng.Next(sides.Count)];
+            }
+        }
+
+        /// <summary>Closed walls not used by the cell's door or window.</summary>
+        internal static List<Direction> FreeSides(LayoutCell cell)
+        {
+            var sides = new List<Direction>(3);
+            foreach (var d in DirectionUtil.All)
+                if (!cell.IsOpen(d) && (cell.Feature == CellFeature.None || d != cell.FeatureSide)) sides.Add(d);
+            return sides;
         }
 
         private static int PickCellWithClosedSide(Random rng, LayoutPlan plan, List<int> candidates)

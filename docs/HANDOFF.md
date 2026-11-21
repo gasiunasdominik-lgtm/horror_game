@@ -3,34 +3,33 @@
 Přepisuje `/end`. Krátké. Historie je v gitu.
 
 ## Stav
-M0 hotový a ověřený (21. 11. 2026): tag `m0`, playtest #1 proběhl, B-001 a B-002 opraveny a ověřeny. `main` a `m0` jsou na GitHubu.
+M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 EditMode testů zelených. Výkon na Zenbooku 1080p: 134 FPS (1 % low 81). Nic nepushnuto.
 
 ## Hotovo v této session
-- T-005: `Vchod.Debug` (jen Editor + Development build): F1 overlay (3 režimy, ve 3. zadání seedu), F2 god mode, F3 teleport (schody → okno → zdroj CO → dveře), F4 přeskládání / Shift+F4 nový seed, F6 time scale, F7 mlha+post, F8 bug report (`BugReports/<čas>/` se screenshot, log, state, note), F9 restart stejný seed. F5 a F10 hlásí „až M1“. `PlaytestLogger` → `PlaytestLogs/session_*.csv`. `-seed N` funguje (ověřeno v buildu).
-- T-006: FPS controller (CharacterController, nový Input System v kódu, klávesnice+myš i gamepad), bez skoku, sprint Shift. Interakce E + výzva a zaměřovač (uGUI).
-- T-007: greybox moduly generované z kódu (menu `Vchod/Rebuild Greybox Modules`), panelákové dvoubarevné zdi, světlo na spínač 20 s.
-- T-008: `LayoutGenerator` + `LayoutValidator`, přeskládání při zhasnutí, hráč zůstává ve stejné hloubce chodby. Sweep 200 seedů × 5 přeskládání zelený.
-- T-009: `CoModel`, `SymptomEffects` (prahy 20/40/60/80/100 dle GDD), pípání detektoru podle vzdálenosti (3D zvuk ze zdroje).
-- T-011: 49 EditMode testů zelených.
-- T-012: Zenbook, 1080p: 66 FPS (studený start) / 98 FPS (teplý), viz `TESTING.md`.
-- Rozhodnutí D-017 až D-026 v `DECISIONS.md`.
+- T-020–T-023: hasič (stavy, smysly, hledání skrýší), zvuk, skrýše skříň/stůl, okna s čerstvým vzduchem, víc spínačů.
+- T-024: 3 patra, dvouramenné schodiště, výměna patra na mezipodestě, hasič následuje. Výtah mimo provoz, vchod v přízemí.
+- T-025: sousedka s dortem (zkratka, nebo past u zdroje CO).
+- T-026: konce 1/2/3, obrazovka konce (Enter nový dům, R stejný dům), F10 náhled, `round_end` v logu.
+- T-027: kolo začíná ze tmy s větou o cíli, restart se stejným/novým seedem.
+- T-030: SSAO a nepoužívané kopie textur vypnuty (D-048), 50 → 134 FPS.
+- Rozhodnutí D-032 až D-048.
 
 ## Rozpracováno
 - nic
 
 ## Další krok
-1. Claude: M1 od T-020 (hasič), tempo 2/5 z playtestu #1 má zvednout hlavně on.
-2. T-024 zahrnuje víc spínačů světla (D-030).
-
-## Dominik: otestuj
-Viz seznam „Otestuj“ v poslední zprávě session (5 bodů).
+1. Dominik: playtest #2 (T-028) a FEEL hodnocení, brána G1.
+2. Dominik: T-029 video.
+3. Claude: po playtestu zpracovat nálezy, pak M2.
 
 ## Otevřené otázky (s výchozími odpověďmi)
-- Q: Aktualizovat Unity CLI 1.0.0 → 1.0.1? Výchozí: ano, při příští session (`unity self-update`).
+- Q: Hasič startuje v nejhlubší buňce patra hráče. Když hráč hned rozsvítí, může ho chytit do ~10 s. Výchozí: nechat a rozhodnout podle playtestu #2.
+- Q: Pushnout `main` + tag `m1` na GitHub? Výchozí: ne, dokud neřekneš.
+- Q: Aktualizovat Unity CLI? Výchozí: ano, při příští session.
 
 ## Poznámky
-- Scéna: `Assets/_Project/Scenes/Game.unity`. Zapojení scény se generuje z `Vchod/Rebuild Game Scene Wiring` (spouštět mimo Play Mode). Ruční úpravy scény se při dalším spuštění přepíšou jen u objektů, které builder spravuje.
-- Ladění bez kódu: `Assets/_Project/Data/` (`PlayerConfig`, `LightTimerConfig`, `HouseConfig`, `CoConfig`).
-- Benchmark: `Builds/Dev/VchodC.exe -seed 4242 -perf 30 -screen-width 1920 -screen-height 1080 -screen-fullscreen 1`.
-- Testování přes CLI: simulované klávesy se do hry nedostanou, když Game view nemá fokus; logika cheatů ověřena přímým voláním. Skutečné klávesy F1–F10 potvrdí playtest.
+- Scéna: `Assets/_Project/Scenes/Game.unity`. Zapojení generuje `GameSceneBuilder.BuildAll()` (mimo Play Mode).
+- Ladění bez kódu: `Assets/_Project/Data/`.
+- Benchmark: `Builds/Dev/VchodC.exe -seed 4242 -perf 30 -screen-width 1920 -screen-height 1080 -screen-fullscreen 1`. Před měřením ověř, že stroj není přiškrcený (CPU výkon > 100 %).
+- Profiler přes CLI: `diagnostics profiler_record` → `profiler_session` → `profiler_summary`/`profiler_markers`. Záznamy v `Profiling/` (ignorováno gitem).
 - Prostředí: Claude ve WSL, Unity CLI = `unity.exe`, cesty `C:\...`.

@@ -9,6 +9,8 @@ using Vchod.Player;
 using Vchod.Systems;
 using Vchod.World;
 using Vchod.Audio;
+using Vchod.Enemy;
+using Unity.AI.Navigation;
 using Vchod.UI;
 using static Vchod.EditorTools.SceneBuildUtil;
 
@@ -39,6 +41,7 @@ namespace Vchod.EditorTools
             var lightTimer = SetupLightTimer(systems);
             var house = SetupHouse(player, lightTimer);
             SetupCo(systems, player, house);
+            SetupFirefighter(player, house, lightTimer);
             SetupEnvironment();
 
             EditorSceneManager.MarkSceneDirty(scene);
@@ -101,6 +104,10 @@ namespace Vchod.EditorTools
             SetRef(co, "player", player);
             SetRef(co, "house", house);
 
+            var endings = GetOrAdd<EndingsManager>(systems);
+            SetRef(endings, "player", player);
+            SetRef(endings, "co", co);
+
             var cam = player.CameraPivot.GetComponentInChildren<Camera>().gameObject;
             var lowPass = GetOrAdd<AudioLowPassFilter>(cam);
             lowPass.cutoffFrequency = SymptomState.OpenCutoff;
@@ -123,6 +130,24 @@ namespace Vchod.EditorTools
             SetRef(detector, "house", house);
         }
 
+        private static void SetupFirefighter(PlayerController player, ModuleLayoutBuilder house, LightTimer lightTimer)
+        {
+            var config = LoadOrCreateAsset<FirefighterConfig>($"{DataFolder}/FirefighterConfig.asset");
+            var prefab = FirefighterAssetBuilder.Build();
+
+            var existing = GameObject.Find("/Firefighter");
+            if (existing != null) Object.DestroyImmediate(existing);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instance.transform.position = new Vector3(0f, 0f, 20f);
+
+            var controller = instance.GetComponent<FirefighterController>();
+            SetRef(controller, "config", config);
+            SetRef(controller, "player", player);
+            SetRef(controller, "house", house);
+            SetRef(controller, "lightTimer", lightTimer);
+            SetRef(controller, "eyes", instance.transform.Find("Eyes"));
+        }
+
         private static ModuleLayoutBuilder SetupHouse(PlayerController player, LightTimer lightTimer)
         {
             var houseConfig = GreyboxAssetBuilder.BuildAll();
@@ -132,6 +157,14 @@ namespace Vchod.EditorTools
             SetRef(builder, "config", houseConfig);
             SetRef(builder, "lightTimer", lightTimer);
             SetRef(builder, "player", player);
+
+            var surface = GetOrAdd<NavMeshSurface>(house);
+            surface.collectObjects = CollectObjects.Children;
+            surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
+            SetRef(builder, "navMeshSurface", surface);
+
+            var noise = GetOrAdd<PlayerNoise>(player.gameObject);
+            SetRef(noise, "controller", player);
             return builder;
         }
 
@@ -196,6 +229,65 @@ namespace Vchod.EditorTools
             SetRef(view, "interactor", player.GetComponent<PlayerInteractor>());
             SetRef(view, "promptText", text);
             SetRef(view, "crosshair", group);
+
+            var subGo = FindOrCreateChild(canvas.transform, "Subtitle");
+            var subRect = GetOrAdd<RectTransform>(subGo);
+            subRect.anchorMin = subRect.anchorMax = new Vector2(0.5f, 0f);
+            subRect.sizeDelta = new Vector2(1400f, 120f);
+            subRect.anchoredPosition = new Vector2(0f, 110f);
+            var sub = GetOrAdd<TextMeshProUGUI>(subGo);
+            sub.text = string.Empty;
+            sub.fontSize = 34f;
+            sub.alignment = TextAlignmentOptions.Center;
+            sub.color = new Color(0.95f, 0.92f, 0.82f, 1f);
+            sub.outlineWidth = 0.2f;
+            sub.outlineColor = new Color32(0, 0, 0, 220);
+            sub.raycastTarget = false;
+            sub.enabled = false;
+            var subView = GetOrAdd<SubtitleView>(canvas);
+            SetRef(subView, "text", sub);
+
+            // Ending screen: last child, so it covers everything else.
+            var endGo = FindOrCreateChild(canvas.transform, "Ending");
+            endGo.transform.SetAsLastSibling();
+            var endRect = GetOrAdd<RectTransform>(endGo);
+            endRect.anchorMin = Vector2.zero;
+            endRect.anchorMax = Vector2.one;
+            endRect.offsetMin = endRect.offsetMax = Vector2.zero;
+            var black = GetOrAdd<Image>(endGo);
+            black.color = Color.black;
+            black.raycastTarget = false;
+            var endGroup = GetOrAdd<CanvasGroup>(endGo);
+            endGroup.alpha = 0f;
+            endGroup.interactable = false;
+            endGroup.blocksRaycasts = false;
+
+            TextMeshProUGUI Line(string name, float y, float size, float width, float height)
+            {
+                var go = FindOrCreateChild(endGo.transform, name);
+                var rect = GetOrAdd<RectTransform>(go);
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(width, height);
+                rect.anchoredPosition = new Vector2(0f, y);
+                var t = GetOrAdd<TextMeshProUGUI>(go);
+                t.fontSize = size;
+                t.alignment = TextAlignmentOptions.Center;
+                t.color = new Color(0.92f, 0.9f, 0.85f, 1f);
+                t.raycastTarget = false;
+                t.textWrappingMode = TextWrappingModes.Normal;
+                return t;
+            }
+
+            var endTitle = Line("Title", 150f, 56f, 1400f, 90f);
+            var endBody = Line("Body", -20f, 30f, 1200f, 260f);
+            var endHint = Line("Hint", -260f, 24f, 1200f, 50f);
+            endHint.text = "Enter  Nové kolo (jiný dům)      R  Stejný dům";
+            endHint.color = new Color(0.7f, 0.68f, 0.64f, 1f);
+            var endView = GetOrAdd<EndingView>(canvas);
+            SetRef(endView, "group", endGroup);
+            SetRef(endView, "title", endTitle);
+            SetRef(endView, "body", endBody);
+            SetRef(endView, "hint", endHint);
         }
     }
 }

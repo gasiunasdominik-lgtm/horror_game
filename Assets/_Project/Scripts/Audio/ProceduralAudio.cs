@@ -46,5 +46,140 @@ namespace Vchod.Audio
             clip.SetData(data, 0);
             return clip;
         }
+
+        /// <summary>
+        /// Breathing through a full-face mask, one 4 s cycle (loop): slow filtered inhale,
+        /// demand-valve click, harsher exhale. Fixed noise seed: same sound every run.
+        /// </summary>
+        public static AudioClip CreateMaskBreath()
+        {
+            const float length = 4f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(11);
+            float low = 0f, band = 0f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                low += 0.08f * (noise - low);           // dull hiss
+                band += 0.35f * (noise - band);         // brighter hiss
+                float v = 0f;
+                if (t < 1.5f) v = low * Mathf.Sin(Mathf.PI * t / 1.5f) * 2.2f;                      // inhale
+                else if (t < 1.56f) v = Mathf.Sin(2f * Mathf.PI * 900f * t) * (1.56f - t) * 12f;    // valve click
+                else if (t < 3.1f) v = band * Mathf.Sin(Mathf.PI * (t - 1.6f) / 1.5f) * 1.1f;       // exhale
+                data[i] = Mathf.Clamp(v, -1f, 1f) * 0.8f;
+            }
+            return Make("MaskBreath", data);
+        }
+
+        /// <summary>Heavy boot plus a clink of gear (carabiner, cylinder strap).</summary>
+        public static AudioClip CreateGearStep(int variant)
+        {
+            const float length = 0.35f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(100 + variant);
+            var detune = 1f + variant * 0.07f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var thud = Mathf.Sin(2f * Mathf.PI * 65f * t) * Mathf.Exp(-t * 35f)
+                           + (float)(rng.NextDouble() * 2 - 1) * Mathf.Exp(-t * 60f) * 0.4f;
+                var ct = t - 0.04f;
+                var clink = ct < 0f ? 0f : (Mathf.Sin(2f * Mathf.PI * 2100f * detune * ct)
+                                            + 0.7f * Mathf.Sin(2f * Mathf.PI * 3170f * detune * ct)
+                                            + 0.5f * Mathf.Sin(2f * Mathf.PI * 4890f * detune * ct)) * Mathf.Exp(-ct * 18f) * 0.18f;
+                data[i] = Mathf.Clamp(thud * 0.8f + clink, -1f, 1f);
+            }
+            return Make("GearStep", data);
+        }
+
+        /// <summary>
+        /// A call through the mask's speech diaphragm: two buzzing syllables ("ha-lo"),
+        /// muffled and clipped. Unintelligible on purpose: the player hears a threat, not words.
+        /// </summary>
+        public static AudioClip CreateMaskedCall()
+        {
+            const float length = 1.3f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            float phase = 0f, lp = 0f, hp = 0f, prev = 0f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var syllable = t < 0.35f ? Mathf.Sin(Mathf.PI * t / 0.35f)
+                    : t > 0.45f && t < 1.15f ? Mathf.Sin(Mathf.PI * (t - 0.45f) / 0.7f) : 0f;
+                var f0 = t < 0.4f ? 135f : Mathf.Lerp(150f, 105f, (t - 0.45f) / 0.7f);
+                phase += f0 / SampleRate;
+                var saw = 2f * (phase - Mathf.Floor(phase)) - 1f;
+                lp += 0.12f * (saw - lp);           // muffled by the mask
+                hp = 0.9f * (hp + lp - prev);       // thin, radio-like
+                prev = lp;
+                data[i] = Mathf.Clamp(hp * syllable * 4f, -0.9f, 0.9f);
+            }
+            return Make("MaskedCall", data);
+        }
+
+        /// <summary>
+        /// Night wind through an open window, 6 s seamless loop: low rumble plus a whistle
+        /// that swells. Modulations complete whole cycles, so the loop point is inaudible.
+        /// </summary>
+        public static AudioClip CreateWind()
+        {
+            const float length = 6f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(23);
+            float low = 0f, band = 0f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                low += 0.02f * (noise - low);
+                band += 0.2f * (noise - band);
+                var gust = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * t / length);
+                var whistle = 0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * 2f * t / length + 1f);
+                data[i] = Mathf.Clamp(low * 6f * gust + band * 0.25f * whistle * gust, -1f, 1f) * 0.7f;
+            }
+            // Cross-fade the last 0.2 s into the start so the noise filters do not click at the loop.
+            var fade = (int)(SampleRate * 0.2f);
+            for (var i = 0; i < fade; i++)
+            {
+                var k = (float)i / fade;
+                data[samples - fade + i] = Mathf.Lerp(data[samples - fade + i], data[i], k);
+            }
+            return Make("Wind", data);
+        }
+
+        /// <summary>Three knuckle knocks on a wooden flat door.</summary>
+        public static AudioClip CreateKnock()
+        {
+            const float length = 0.9f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(31);
+            foreach (var start in new[] { 0f, 0.24f, 0.5f })
+            {
+                var from = (int)(start * SampleRate);
+                for (var i = from; i < samples; i++)
+                {
+                    var t = (float)(i - from) / SampleRate;
+                    if (t > 0.15f) break;
+                    var body = Mathf.Sin(2f * Mathf.PI * 180f * t) * Mathf.Exp(-t * 45f);
+                    var click = (float)(rng.NextDouble() * 2 - 1) * Mathf.Exp(-t * 300f) * 0.6f;
+                    data[i] += body * 0.8f + click;
+                }
+            }
+            for (var i = 0; i < samples; i++) data[i] = Mathf.Clamp(data[i], -1f, 1f);
+            return Make("Knock", data);
+        }
+
+        private static AudioClip Make(string name, float[] data)
+        {
+            var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
     }
 }
