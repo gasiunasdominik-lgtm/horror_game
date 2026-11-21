@@ -87,6 +87,7 @@ Každá opravená chyba, kterou nejde pokrýt testem, dostane bod sem. Dominik h
 | M1 | 21. 11. 2026 | Game, seed 4242, 3 patra, hasič | ~~5 / 3~~ **neplatné** | avg 189–247 ms | Stroj přiškrcený: CPU 21 % výkonu (1,7 GHz) při 25 % zátěži, na síti. V Editoru i scéna bez domu 15 FPS, takže jde o stav stroje, ne o obsah hry. Profiler: čekání na GPU ~54 ms/snímek. Zopakovat (T-030) |
 | M1 | 21. 11. 2026 | Game, seed 4242, 3 patra, hasič | 56 / 32 (1 % low) | avg 18,0 ms, p99 29,6 ms, max 36 ms | Opakování, stroj nepřiškrcený (CPU 133–138 % výkonu), na síti, plán Rovnováha. 1. běh |
 | M1 | 21. 11. 2026 | totéž | 50 / 28 (1 % low) | avg 20,0 ms, p99 34,2 ms, max 39 ms | 2. běh. **Pod cílem 60 / 45.** Profil z Editoru: GPU-bound |
+| M1 | 21. 11. 2026 | totéž | **134 / 81** (1 % low) | avg 7,4 ms, p99 10,2 ms, max 75 ms (1. snímky) | Po D-048: vypnuté SSAO (plné rozlišení + prepass normál) a nepoužívané kopie opaque/depth textury. 2 běhy 134,9 a 134,1 FPS |
 
 Postup měření: `Builds/Dev/VchodC.exe -seed 4242 -perf 30 -screen-width 1920 -screen-height 1080 -screen-fullscreen 1`. Výsledek v `Builds/Dev/PlaytestLogs/perf_*.txt` a v logu (`[Perf]`). Hráč obchází všechny buňky a otáčí se, světlo trvale zapnuté (nejhorší případ: všechna světla).
 
