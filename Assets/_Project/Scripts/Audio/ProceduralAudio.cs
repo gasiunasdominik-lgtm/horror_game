@@ -73,26 +73,70 @@ namespace Vchod.Audio
             return Make("MaskBreath", data);
         }
 
-        /// <summary>Heavy boot plus a clink of gear (carabiner, cylinder strap).</summary>
-        public static AudioClip CreateGearStep(int variant)
+        /// <summary>
+        /// Firefighter's heavy rubber boot on concrete: a deep, long thud with a gritty scuff.
+        /// Clearly heavier than the player's shoes, so you can tell whose steps you hear.
+        /// </summary>
+        public static AudioClip CreateBootStep(int variant)
         {
-            const float length = 0.35f;
+            const float length = 0.32f;
             var samples = (int)(SampleRate * length);
             var data = new float[samples];
-            var rng = new System.Random(100 + variant);
+            var rng = new System.Random(300 + variant);
+            var f = 52f + variant * 4f;
+            float lp = 0f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var thud = Mathf.Sin(2f * Mathf.PI * f * t) * Mathf.Exp(-t * 22f);
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                lp += 0.25f * (noise - lp);
+                var scuff = lp * Mathf.Exp(-Mathf.Abs(t - 0.05f) * 40f) * 0.9f;
+                data[i] = Mathf.Clamp((thud + scuff) * 0.95f, -1f, 1f);
+            }
+            return Make("BootStep", data);
+        }
+
+        /// <summary>A quiet clink of gear (carabiner, cylinder strap), played on some steps only.</summary>
+        public static AudioClip CreateGearClink(int variant)
+        {
+            const float length = 0.3f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
             var detune = 1f + variant * 0.07f;
             for (var i = 0; i < samples; i++)
             {
                 var t = (float)i / SampleRate;
-                var thud = Mathf.Sin(2f * Mathf.PI * 65f * t) * Mathf.Exp(-t * 35f)
-                           + (float)(rng.NextDouble() * 2 - 1) * Mathf.Exp(-t * 60f) * 0.4f;
-                var ct = t - 0.04f;
-                var clink = ct < 0f ? 0f : (Mathf.Sin(2f * Mathf.PI * 2100f * detune * ct)
-                                            + 0.7f * Mathf.Sin(2f * Mathf.PI * 3170f * detune * ct)
-                                            + 0.5f * Mathf.Sin(2f * Mathf.PI * 4890f * detune * ct)) * Mathf.Exp(-ct * 18f) * 0.18f;
-                data[i] = Mathf.Clamp(thud * 0.8f + clink, -1f, 1f);
+                data[i] = (Mathf.Sin(2f * Mathf.PI * 2100f * detune * t)
+                           + 0.7f * Mathf.Sin(2f * Mathf.PI * 3170f * detune * t)
+                           + 0.5f * Mathf.Sin(2f * Mathf.PI * 4890f * detune * t)) * Mathf.Exp(-t * 18f) * 0.3f;
             }
-            return Make("GearStep", data);
+            return Make("GearClink", data);
+        }
+
+        /// <summary>
+        /// The player's own shoes on worn linoleum: a short soft tap walking, a sharper slap running.
+        /// </summary>
+        public static AudioClip CreateShoeStep(int variant, bool running)
+        {
+            var length = running ? 0.16f : 0.12f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(500 + variant + (running ? 50 : 0));
+            float lp = 0f, hp = 0f, prev = 0f;
+            var cutoff = running ? 0.55f : 0.3f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                lp += cutoff * (noise - lp);
+                hp = 0.9f * (hp + lp - prev);
+                prev = lp;
+                var body = Mathf.Sin(2f * Mathf.PI * (running ? 140f : 120f) * t) * Mathf.Exp(-t * 45f) * 0.5f;
+                var env = Mathf.Exp(-t * (running ? 38f : 55f));
+                data[i] = Mathf.Clamp((hp * 1.4f + body) * env * (running ? 0.9f : 0.55f), -1f, 1f);
+            }
+            return Make(running ? "ShoeRun" : "ShoeWalk", data);
         }
 
         /// <summary>

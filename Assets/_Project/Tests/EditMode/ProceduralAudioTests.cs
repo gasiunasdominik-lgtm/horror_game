@@ -18,7 +18,10 @@ namespace Vchod.Tests
         }
 
         [Test] public void MaskBreath_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateMaskBreath()), Is.InRange(0.1f, 1f));
-        [Test] public void GearStep_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateGearStep(1)), Is.InRange(0.1f, 1f));
+        [Test] public void BootStep_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateBootStep(1)), Is.InRange(0.1f, 1f));
+        [Test] public void GearClink_IsQuieterThanBoot() => Assert.Less(Peak(ProceduralAudio.CreateGearClink(1)), Peak(ProceduralAudio.CreateBootStep(1)));
+        [Test] public void PlayerRun_IsLouderThanWalk() =>
+            Assert.Greater(Peak(ProceduralAudio.CreateShoeStep(0, running: true)), Peak(ProceduralAudio.CreateShoeStep(0, running: false)));
         [Test] public void MaskedCall_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateMaskedCall()), Is.InRange(0.1f, 1f));
         [Test] public void Wind_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateWind()), Is.InRange(0.05f, 1f));
         [Test] public void Beep_IsAudible() => Assert.That(Peak(ProceduralAudio.CreateBeep(3100f, 0.09f)), Is.InRange(0.1f, 1f));
