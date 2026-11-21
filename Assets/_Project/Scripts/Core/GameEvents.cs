@@ -40,6 +40,15 @@ namespace Vchod.Core
     {
         public int From;
         public int To;
+        /// <summary>False for a shortcut through a flat: nobody saw which way the player went.</summary>
+        public bool ViaStairs;
+    }
+
+    /// <summary>A line of speech shown at the bottom of the screen.</summary>
+    public struct SubtitleRequested
+    {
+        public string Text;
+        public float Duration;
     }
 
     public struct CoStageChanged

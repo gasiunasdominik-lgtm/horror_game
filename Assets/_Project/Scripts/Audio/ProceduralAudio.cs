@@ -152,6 +152,29 @@ namespace Vchod.Audio
             return Make("Wind", data);
         }
 
+        /// <summary>Three knuckle knocks on a wooden flat door.</summary>
+        public static AudioClip CreateKnock()
+        {
+            const float length = 0.9f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(31);
+            foreach (var start in new[] { 0f, 0.24f, 0.5f })
+            {
+                var from = (int)(start * SampleRate);
+                for (var i = from; i < samples; i++)
+                {
+                    var t = (float)(i - from) / SampleRate;
+                    if (t > 0.15f) break;
+                    var body = Mathf.Sin(2f * Mathf.PI * 180f * t) * Mathf.Exp(-t * 45f);
+                    var click = (float)(rng.NextDouble() * 2 - 1) * Mathf.Exp(-t * 300f) * 0.6f;
+                    data[i] += body * 0.8f + click;
+                }
+            }
+            for (var i = 0; i < samples; i++) data[i] = Mathf.Clamp(data[i], -1f, 1f);
+            return Make("Knock", data);
+        }
+
         private static AudioClip Make(string name, float[] data)
         {
             var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);

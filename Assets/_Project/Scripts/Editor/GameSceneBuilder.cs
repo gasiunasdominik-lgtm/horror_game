@@ -103,6 +103,7 @@ namespace Vchod.EditorTools
             SetRef(co, "config", config);
             SetRef(co, "player", player);
             SetRef(co, "house", house);
+            SetRef(house, "co", co);
 
             var cam = player.CameraPivot.GetComponentInChildren<Camera>().gameObject;
             var lowPass = GetOrAdd<AudioLowPassFilter>(cam);
@@ -225,6 +226,23 @@ namespace Vchod.EditorTools
             SetRef(view, "interactor", player.GetComponent<PlayerInteractor>());
             SetRef(view, "promptText", text);
             SetRef(view, "crosshair", group);
+
+            var subGo = FindOrCreateChild(canvas.transform, "Subtitle");
+            var subRect = GetOrAdd<RectTransform>(subGo);
+            subRect.anchorMin = subRect.anchorMax = new Vector2(0.5f, 0f);
+            subRect.sizeDelta = new Vector2(1400f, 120f);
+            subRect.anchoredPosition = new Vector2(0f, 110f);
+            var sub = GetOrAdd<TextMeshProUGUI>(subGo);
+            sub.text = string.Empty;
+            sub.fontSize = 34f;
+            sub.alignment = TextAlignmentOptions.Center;
+            sub.color = new Color(0.95f, 0.92f, 0.82f, 1f);
+            sub.outlineWidth = 0.2f;
+            sub.outlineColor = new Color32(0, 0, 0, 220);
+            sub.raycastTarget = false;
+            sub.enabled = false;
+            var subView = GetOrAdd<SubtitleView>(canvas);
+            SetRef(subView, "text", sub);
         }
     }
 }

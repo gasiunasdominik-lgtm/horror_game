@@ -79,7 +79,7 @@ namespace Vchod.DebugTools
         private void OnCollapsed(CoCollapsed e) => Log("co_collapse", $"level={F(e.Level)}");
         private void OnFirefighterState(FirefighterStateChanged e) => Log("firefighter", $"from={e.Previous};to={e.State}");
         private void OnCaught(PlayerCaught e) => Log("caught", $"pos={V(e.Position)}");
-        private void OnFloor(FloorChanged e) => Log("floor", $"from={e.From};to={e.To}");
+        private void OnFloor(FloorChanged e) => Log("floor", $"from={e.From};to={e.To};stairs={e.ViaStairs}");
         private void OnQuit() => Log("quit", string.Empty);
 
         private static string V(Vector3 v) => $"{F(v.x)} {F(v.y)} {F(v.z)}";

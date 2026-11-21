@@ -84,7 +84,7 @@ namespace Vchod.Enemy
         private void OnFloorChanged(FloorChanged e)
         {
             _floorChanged = true;
-            _following = Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
+            _following = e.ViaStairs && Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
         }
 
         private void ArriveByStairs()

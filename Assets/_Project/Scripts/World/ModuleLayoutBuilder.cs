@@ -19,7 +19,13 @@ namespace Vchod.World
         [SerializeField] private LightTimer lightTimer;
         [SerializeField] private PlayerController player;
         [SerializeField] private NavMeshSurface navMeshSurface;
+        [SerializeField] private CoSystem co;
         [SerializeField] private bool reshuffleOnLightOff = true;
+
+        private int _neighbourFloor = -1;
+        private int _neighbourCell = -1;
+        private bool _neighbourTrap;
+        private bool _neighbourDone;
 
         private Transform _floorRoot;
         private bool _reshufflePending;
@@ -52,6 +58,7 @@ namespace Vchod.World
         private void Start()
         {
             Floor = 0;
+            _neighbourFloor = NeighbourPlacement.FloorFor(SeedService.Seed, config.playerFloor, config.neighbourTrapChance);
             Build(0);
             player.Teleport(StartPoint, Direction.North.Yaw());
         }
@@ -96,7 +103,9 @@ namespace Vchod.World
             world.z - (GetCellCenter(LayoutPlan.StartIndex).z - config.cellSize * 0.5f + config.wallThickness);
 
         /// <summary>Swaps to another floor, keeping the player's spot on the stairs.</summary>
-        public void GoToFloor(int floor)
+        public void GoToFloor(int floor) => GoToFloor(floor, viaStairs: true);
+
+        public void GoToFloor(int floor, bool viaStairs)
         {
             floor = Mathf.Clamp(floor, 0, config.floorCount - 1);
             if (floor == Floor) return;
@@ -108,7 +117,7 @@ namespace Vchod.World
 
             Floor = floor;
             _landingArmed = false;
-            EventBus.Publish(new FloorChanged { From = from, To = floor });
+            EventBus.Publish(new FloorChanged { From = from, To = floor, ViaStairs = viaStairs });
             Build(ReshuffleIndex);
             player.Teleport(pos, yaw);
         }
@@ -126,6 +135,8 @@ namespace Vchod.World
             ReshuffleIndex = reshuffleIndex;
             var layoutSeed = SeedService.DeriveSeed(SeedService.Seed, $"{LayoutStream}/f{Floor}", reshuffleIndex);
             Plan = LayoutGenerator.Generate(layoutSeed, config.rules, IsPlayerFloor);
+            _neighbourCell = Floor == _neighbourFloor ? NeighbourPlacement.DoorCell(Plan, SeedService.Seed, Floor, reshuffleIndex) : -1;
+            _neighbourTrap = Floor == config.playerFloor;
             HasCoSource = false;
             CoSourcePosition = new Vector3(0f, -1000f, 0f); // other floors: far away, detector silent
             LayoutHash = Plan.ComputeHash();
@@ -186,7 +197,15 @@ namespace Vchod.World
                 CellFeature.Elevator => config.elevatorPrefab,
                 _ => null,
             };
-            if (feature != null) Spawn(feature, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+            if (index == _neighbourCell && config.neighbourDoorPrefab != null)
+            {
+                var go = Instantiate(config.neighbourDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+                go.GetComponent<Neighbour>().Setup(this, co, player, _neighbourTrap, _neighbourDone);
+            }
+            else if (feature != null)
+            {
+                Spawn(feature, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+            }
 
             var hiding = cell.Hiding switch
             {
@@ -216,6 +235,19 @@ namespace Vchod.World
                 CoSourcePosition = center + ToVector(cell.FeatureSide) * (config.cellSize * 0.5f + config.coSourceDepth)
                                    + Vector3.up * 1.2f;
             }
+        }
+
+        /// <summary>
+        /// The neighbour's fire door: straight to the floor above, arriving in its first corridor
+        /// cell. Not via the stairs, so the firefighter does not follow.
+        /// </summary>
+        public void TakeShortcut()
+        {
+            _neighbourDone = true;
+            if (IsTopFloor) return;
+            GoToFloor(Floor + 1, viaStairs: false);
+            var cell = Plan.Cells[Plan.MainPath[1]];
+            player.Teleport(StartPoint, cell.InDirection.Yaw());
         }
 
         /// <summary>

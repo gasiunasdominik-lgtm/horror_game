@@ -45,6 +45,10 @@ namespace Vchod.World
         public GameObject playerDoorPrefab;
         public GameObject windowPrefab;
         public GameObject elevatorPrefab;
+        [Tooltip("Neighbour 1 (the cake lady): replaces one apartment door on her floor.")]
+        public GameObject neighbourDoorPrefab;
+        [Tooltip("Chance she lives at the CO source on the player's floor (trap) instead of lower down (shortcut).")]
+        [Range(0f, 1f)] public float neighbourTrapChance = 0.4f;
         [Tooltip("Ground floor: the house entrance, on the stairwell's east wall beside the round start.")]
         public GameObject entrancePrefab;
 
