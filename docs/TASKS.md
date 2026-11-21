@@ -79,6 +79,9 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 - (D, 21. 11.) Zvuky interakcí: cvaknutí spínače, dveře, skříň, okno; hlasitost podle síly zvuku (audio pass T-043, M2).
 - (D, 21. 11.) Okno: zvuk ulice města místo větru (auta v dálce, tramvaj, pes) a přesvědčivější výhled (protější panelák, světla oken, lampy). Art/audio pass M2 (T-042/T-043).
 - (D, 21. 11.) Hasič otevře okno na chvíli (větrá, sedí s kánonem). Mění CO u okna → po T-037, M2.
+- (D, 21. 11., FEEL #3) Při rozsvíceném světle strach výrazně klesá. Návrh (C): světlo má být kompromis, ne bezpečí; např. bzučení a blikání zářivky, hasič slyší cvaknutí spínače dál, kratší světlo na vyšších patrech. Rozhodnout po G1.
+- (D, 21. 11., FEEL #3) Namluvený hlas. GDD má voice acting v Out of scope → změna pilíře/rozsahu, jen s výslovným ano. Levnější varianta: zkreslené hlasy z balíčků (GDD to povoluje) v audio passu T-043.
+- (D, 21. 11., FEEL #3) Intuitivnější ovládání a náplň: krátký nenásilný úvod (výzvy u prvního spínače, skříně, okna), jasnější cíl. Patří do M2 pod G2 (srozumitelnost), navázat na T-044 menu.
 
 ## Blokace
 - (zatím prázdné)

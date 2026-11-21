@@ -66,6 +66,7 @@ Playtest log (vyplňuje `/playtest`):
 |---|---|---|---|---|---|---|
 | 21. 11. 2026 | m0 (Editor) | – | – | – | 2 | Dominik: „menší napětí s lehkou úzkostí, rozumím nastavení; docela nefér, že CO roste i daleko od zdroje; při 60 obraz nevypadá, že by mi bylo špatně.“ Čísla os kromě tempa nezadal. Nálezy: B-001, B-002 |
 | 21. 11. 2026 | m1 (Editor) | ↓ | dobrá | nízká | příliš rychlé | Dominik: „ztratilo to na strašidelnosti, tempo je příliš rychlé, sotva se rozkoukám a už po mě běží, neměl jsem ani pomalejší úvod; férovost skoro není, pravděpodobnost kontroly skrýše je vysoká, je vždy na stejném patře, jediná cesta nahoru, nemám jak utéct; neměl by se spawnovat blízko mě a hned na začátku; srozumitelnost dobrá, ale titulky nestíhám přečíst a nemají efekt.“ Čísla nezadal. G1: honička zatím ne → ladit jádro (T-031–T-035) před obsahem M2 |
+| 21. 11. 2026 | main 01b6e19 (Editor) | ↑ (při světle ↓) | dobrá | výrazně lepší, „jak bych si to představoval“ | rychlé, málo náplně | Dominik: „strach je o něco větší, ale během světla mnohem menší; největší strach, když slyším blížit se nepřítele, točí se mi hlava, nebo když nevím, kde jsem; tempo docela rychlé, jen tam zatím není moc co dělat a vidět; férovost mnohem lepší; srozumitelnost dobrá, ale do budoucna namluvený hlas a intuitivnější pochopení ovládání a náplně hry.“ Čísla nezadal. Funguje: zvuk blížícího se hasiče, příznaky CO, dezorientace. Chybí: obsah (M2), onboarding (G2) |
 
 ## 7. Severity chyb
 
