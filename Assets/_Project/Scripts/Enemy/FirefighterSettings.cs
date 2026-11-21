@@ -60,6 +60,17 @@ namespace Vchod.Enemy
         [Tooltip("If every entry is too close, he tries again after this many seconds.")]
         public float arrivalRetry = 5f;
 
+        [Header("Roaming the house")]
+        [Tooltip("Away from the player's floor he moves one floor up or down every this many seconds (random in range).")]
+        public float roamIntervalMin = 35f;
+        public float roamIntervalMax = 60f;
+        [Tooltip("Chance each move goes toward the player's floor rather than away.")]
+        [Range(0f, 1f)] public float roamTowardPlayer = 0.6f;
+        [Tooltip("A staircase light this many floors away still draws him (light shows through the stairwell).")]
+        public int lightHeardFloors = 1;
+        [Tooltip("Seconds he needs to come to a floor where the light went on.")]
+        public float lightResponseDelay = 12f;
+
         [Header("Hiding spots")]
         [Tooltip("Chance he checks a nearby hiding spot when picking the next search point.")]
         [Range(0f, 1f)] public float hidingCheckChance = 0.2f;

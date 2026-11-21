@@ -160,7 +160,9 @@ namespace Vchod.DebugTools
             if (Firefighter != null && Firefighter.Brain != null)
             {
                 var b = Firefighter.Brain;
-                snapshot.enemyState = $"{b.State}{(Firefighter.SeesPlayer ? " (sees)" : "")}{(b.HasCaughtPlayer ? " CAUGHT" : "")} @{Firefighter.transform.position:F1}";
+                snapshot.enemyState = Firefighter.IsOffstage
+                    ? $"away on floor {Firefighter.CurrentFloor}"
+                    : $"{b.State}{(Firefighter.SeesPlayer ? " (sees)" : "")}{(b.HasCaughtPlayer ? " CAUGHT" : "")} @{Firefighter.transform.position:F1}";
             }
 
             var player = PlayerTransform;

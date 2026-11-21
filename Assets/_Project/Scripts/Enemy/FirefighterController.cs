@@ -72,36 +72,61 @@ namespace Vchod.Enemy
             EventBus.Unsubscribe<FloorChanged>(OnFloorChanged);
         }
 
-        // Floor changes: one firefighter, always on the player's floor. Calm, he is simply
-        // elsewhere on it; hunting, he follows up or down the stairs a few seconds later.
+        // Floors: only the player's floor exists, so when he is elsewhere he is "offstage" with
+        // an abstract floor number. He walks the house a floor at a time and comes onto the
+        // player's floor when he gets there, when a light goes on nearby, or right behind a
+        // player who fled up/down the stairs while he was hunting.
         private bool _floorChanged;
         private bool _following;
+        private int _leftFloor;
+        private bool _offstage;
+        private int _myFloor;
         private float _arriveAt = -1f;
+        private float _roamFrom;
+        private float _nextRoam;
+        private bool _pendingLight;
+        private Vector3 _lightPosition;
         private static readonly Vector3 Offstage = new(0f, -500f, 0f);
 
-        public bool IsOffstage => _arriveAt >= 0f;
+        public bool IsOffstage => _offstage;
+        /// <summary>The floor he is on (the player's floor when he is on stage).</summary>
+        public int CurrentFloor => _offstage ? _myFloor : house.Floor;
 
         private void OnFloorChanged(FloorChanged e)
         {
             _floorChanged = true;
-            _following = e.ViaStairs && Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
+            _leftFloor = e.From;
+            _following = e.ViaStairs && !(_offstage && !_arrivalHunting) &&
+                         Brain.State is FirefighterState.Chase or FirefighterState.Call or FirefighterState.Search;
+        }
+
+        private void ScheduleRoam()
+        {
+            var s = config.settings;
+            var wait = s.roamIntervalMin + (float)_rng.NextDouble() * Mathf.Max(0f, s.roamIntervalMax - s.roamIntervalMin);
+            _nextRoam = Mathf.Max(_roamFrom, Time.time) + wait;
         }
 
         private bool _arrivalHunting;
         private readonly List<Vector3> _entries = new();
 
+        /// <summary>Leave the player's floor. delay &lt; 0: no fixed arrival, he roams.</summary>
         private void GoOffstage(float delay, bool hunting)
         {
             _agent.enabled = false;
             transform.position = Offstage;
-            _arriveAt = Time.time + delay;
+            _offstage = true;
+            _arriveAt = delay < 0f ? -1f : Time.time + delay;
             _arrivalHunting = hunting;
+            _pendingLight = false;
         }
 
-        /// <summary>Debug: skip the wait and walk onto the floor now.</summary>
+        /// <summary>Debug: skip the wait and walk onto the player's floor now.</summary>
         public void ArriveNow()
         {
-            if (IsOffstage) _arriveAt = Time.time;
+            if (!_offstage) return;
+            _myFloor = house.Floor;
+            _arriveAt = Time.time;
         }
 
         private Vector3 StairsEntry()
@@ -131,11 +156,14 @@ namespace Vchod.Enemy
                 }
             }
             _arriveAt = -1f;
+            _offstage = false;
             transform.position = target;
             _agent.enabled = true;
             _agent.Warp(target);
             if (_arrivalHunting) Brain.Force(FirefighterState.Search, player.transform.position);
+            else if (_pendingLight) Brain.Force(FirefighterState.Investigate, _lightPosition);
             else Brain.Force(FirefighterState.Patrol, target);
+            _pendingLight = false;
         }
 
         private void OnNoise(NoiseMade e)
@@ -144,7 +172,22 @@ namespace Vchod.Enemy
         }
 
         // The whole floor lights up: he knows where the switch was pressed.
-        private void OnLightOn(LightTurnedOn e) => Notice(e.Position);
+        // Offstage, a light one floor away shows through the stairwell: he comes to look.
+        private void OnLightOn(LightTurnedOn e)
+        {
+            if (!_offstage)
+            {
+                Notice(e.Position);
+                return;
+            }
+            if (_arrivalHunting || Time.time < _roamFrom) return;
+            if (Mathf.Abs(_myFloor - house.Floor) > config.settings.lightHeardFloors) return;
+            var delay = _myFloor == house.Floor ? 2f : config.settings.lightResponseDelay;
+            _myFloor = house.Floor;
+            _pendingLight = true;
+            _lightPosition = e.Position;
+            _arriveAt = _arriveAt >= 0f ? Mathf.Min(_arriveAt, Time.time + delay) : Time.time + delay;
+        }
 
         private void Notice(Vector3 position)
         {
@@ -157,28 +200,37 @@ namespace Vchod.Enemy
             if (_floorChanged)
             {
                 _floorChanged = false;
-                if (IsOffstage && !_arrivalHunting && !_following) return; // still on his way in
                 _checking = null;
                 _sawHide = null;
                 if (_following)
                 {
+                    _myFloor = house.Floor;
                     GoOffstage(config.settings.followDelay, hunting: true);
                     return;
                 }
-                _arriveAt = -1f;
-                var spawn = SpawnPoint();
-                transform.position = spawn;
-                _agent.enabled = true;
-                _agent.Warp(spawn);
-                Brain.Force(FirefighterState.Patrol, spawn);
+                if (_offstage)
+                {
+                    // He is elsewhere in the house. If the player walked onto his floor, he is there.
+                    if (!_arrivalHunting && _myFloor == house.Floor && Time.time >= _roamFrom) _arriveAt = Time.time + 2f;
+                    else if (!_arrivalHunting) _arriveAt = -1f;
+                    return;
+                }
+                // Calm, on stage: he stays on the floor the player left.
+                _myFloor = _leftFloor;
+                GoOffstage(-1f, hunting: false);
+                ScheduleRoam();
                 return;
             }
-            if (IsOffstage) return;
+            if (_offstage) return;
             if (!_placed)
             {
-                // Round start: a calm minute or so before he enters the floor.
+                // Round start: he is up at the CO source (the emergency call came from there) and
+                // starts walking the house after a calm minute or so. Never on the player's floor at once.
                 _placed = true;
-                GoOffstage(config.settings.introGrace, hunting: false);
+                _myFloor = house.HomeFloor != house.Floor ? house.HomeFloor : house.FloorCount - 1 - house.Floor;
+                _roamFrom = Time.time + config.settings.introGrace;
+                GoOffstage(-1f, hunting: false);
+                ScheduleRoam();
                 return;
             }
 
@@ -219,11 +271,22 @@ namespace Vchod.Enemy
         private void Update()
         {
             if (!_placed || Brain.HasCaughtPlayer) return;
-            if (IsOffstage)
+            if (_offstage)
             {
                 SeesPlayer = false;
                 _hasStimulus = false;
-                if (Time.time >= _arriveAt) ArriveByStairs();
+                if (_arriveAt >= 0f)
+                {
+                    if (Time.time >= _arriveAt) ArriveByStairs();
+                    return;
+                }
+                if (Time.time >= _nextRoam)
+                {
+                    var s = config.settings;
+                    _myFloor = FloorRoam.Step(_myFloor, house.Floor, house.FloorCount, _rng.NextDouble(), s.roamTowardPlayer);
+                    ScheduleRoam();
+                    if (_myFloor == house.Floor) _arriveAt = Time.time;
+                }
                 return;
             }
 
