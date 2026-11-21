@@ -1399,7 +1399,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Vchod.Gameplay::Vchod.Player.PlayerNoise
   controller: {fileID: 1359410194}
---- !u!1001 &1837393607
+--- !u!1001 &1407921748
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -1410,7 +1410,7 @@ PrefabInstance:
     - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
       propertyPath: eyes
       value: 
-      objectReference: {fileID: 1837393608}
+      objectReference: {fileID: 1407921749}
     - target: {fileID: 4755797776292120649, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
       propertyPath: house
       value: 
@@ -1476,10 +1476,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
---- !u!4 &1837393608 stripped
+--- !u!4 &1407921749 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5922709406779430679, guid: e06a22cfb8ca95f48b88e96bfa08cf8e, type: 3}
-  m_PrefabInstance: {fileID: 1837393607}
+  m_PrefabInstance: {fileID: 1407921748}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2024635458
 GameObject:
@@ -1525,4 +1525,4 @@ SceneRoots:
   - {fileID: 1359410196}
   - {fileID: 737851963}
   - {fileID: 1040000080}
-  - {fileID: 1837393607}
+  - {fileID: 1407921748}

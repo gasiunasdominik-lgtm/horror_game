@@ -103,10 +103,43 @@ namespace Vchod.EditorTools
                 Box(root, "Doormat", new Vector3(0, 0.01f, 0.45f), new Vector3(0.8f, 0.02f, 0.5f), door, collider: false);
             });
 
+            var night = Mat("M_NightOutside", new Color(0.01f, 0.012f, 0.03f), emission: new Color(0.03f, 0.05f, 0.12f));
+            var farLight = Mat("M_FarWindowLight", new Color(1f, 0.8f, 0.5f), emission: new Color(1.2f, 0.9f, 0.5f));
             config.windowPrefab = Save("Window", root =>
             {
                 const float sill = 0.9f, w = 1.2f, wh = 1.2f;
-                Box(root, "Glass", new Vector3(0, sill + wh * 0.5f, 0.005f), new Vector3(w, wh, 0.01f), glass, collider: false);
+                // Behind the glass: the night and a few lit windows of the panelák across the street.
+                Box(root, "Outside", new Vector3(0, sill + wh * 0.5f, 0.002f), new Vector3(w, wh, 0.002f), night, collider: false);
+                foreach (var (x, y) in new[] { (-0.42f, 0.35f), (-0.18f, 0.35f), (0.3f, 0.6f), (-0.3f, 0.85f), (0.12f, 0.85f) })
+                    Box(root, "FarWindow", new Vector3(x, sill + y, 0.0035f), new Vector3(0.07f, 0.05f, 0.001f), farLight, collider: false);
+
+                // Fixed right pane, left sash on a hinge at the left frame.
+                Box(root, "GlassRight", new Vector3(w * 0.25f, sill + wh * 0.5f, 0.005f), new Vector3(w * 0.5f, wh, 0.01f), glass, collider: false);
+                var sash = new GameObject("Sash");
+                sash.transform.SetParent(root.transform, false);
+                sash.transform.localPosition = new Vector3(-w * 0.5f, sill, 0.01f);
+                var sashGlass = Box(sash, "Glass", new Vector3(w * 0.25f, wh * 0.5f, 0f), new Vector3(w * 0.5f, wh, 0.01f), glass, collider: false);
+                Box(sash, "Frame", new Vector3(w * 0.25f, wh * 0.5f, 0.02f), new Vector3(w * 0.5f, 0.04f, 0.03f), windowFrame, collider: false);
+                Box(sash, "Handle", new Vector3(w * 0.5f - 0.05f, wh * 0.5f, 0.04f), new Vector3(0.03f, 0.12f, 0.03f), metal, collider: false);
+
+                var col = root.AddComponent<BoxCollider>();
+                col.center = new Vector3(0, sill + wh * 0.5f, 0.05f);
+                col.size = new Vector3(w, wh, 0.1f);
+
+                var windGo = new GameObject("Wind");
+                windGo.transform.SetParent(root.transform, false);
+                windGo.transform.localPosition = new Vector3(0, sill + wh * 0.5f, 0.1f);
+                var windSrc = windGo.AddComponent<AudioSource>();
+                windSrc.playOnAwake = false;
+                windSrc.loop = true;
+                windSrc.spatialBlend = 1f;
+                windSrc.minDistance = 1.5f;
+                windSrc.maxDistance = 14f;
+                windSrc.volume = 0.8f;
+
+                var vent = root.AddComponent<VentWindow>();
+                SetRef(vent, "sash", sash.transform);
+                SetRef(vent, "wind", windSrc);
                 Box(root, "FrameTop", new Vector3(0, sill + wh, 0.03f), new Vector3(w + 0.1f, 0.06f, 0.06f), windowFrame, collider: false);
                 Box(root, "FrameBottom", new Vector3(0, sill, 0.06f), new Vector3(w + 0.2f, 0.05f, 0.12f), windowFrame, collider: false);
                 Box(root, "FrameLeft", new Vector3(-w * 0.5f, sill + wh * 0.5f, 0.03f), new Vector3(0.06f, wh, 0.06f), windowFrame, collider: false);

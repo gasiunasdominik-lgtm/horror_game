@@ -121,6 +121,37 @@ namespace Vchod.Audio
             return Make("MaskedCall", data);
         }
 
+        /// <summary>
+        /// Night wind through an open window, 6 s seamless loop: low rumble plus a whistle
+        /// that swells. Modulations complete whole cycles, so the loop point is inaudible.
+        /// </summary>
+        public static AudioClip CreateWind()
+        {
+            const float length = 6f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(23);
+            float low = 0f, band = 0f;
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                low += 0.02f * (noise - low);
+                band += 0.2f * (noise - band);
+                var gust = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * t / length);
+                var whistle = 0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * 2f * t / length + 1f);
+                data[i] = Mathf.Clamp(low * 6f * gust + band * 0.25f * whistle * gust, -1f, 1f) * 0.7f;
+            }
+            // Cross-fade the last 0.2 s into the start so the noise filters do not click at the loop.
+            var fade = (int)(SampleRate * 0.2f);
+            for (var i = 0; i < fade; i++)
+            {
+                var k = (float)i / fade;
+                data[samples - fade + i] = Mathf.Lerp(data[samples - fade + i], data[i], k);
+            }
+            return Make("Wind", data);
+        }
+
         private static AudioClip Make(string name, float[] data)
         {
             var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);

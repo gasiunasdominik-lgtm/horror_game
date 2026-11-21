@@ -30,7 +30,7 @@ namespace Vchod.Systems
             {
                 DistanceToSource = DistanceToSource,
                 InStairwell = house.IsInStairwell(position),
-                AtOpenWindow = false, // windows open in T-023 (M1)
+                AtOpenWindow = VentWindow.FreshAirAt(position),
             };
 
             var previous = Model.Stage;
