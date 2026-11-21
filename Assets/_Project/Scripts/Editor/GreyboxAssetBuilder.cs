@@ -192,6 +192,44 @@ namespace Vchod.EditorTools
                 Hiding(root, HidingKind.Table, view: new Vector3(0, 0.36f, 0.3f), exit: 1.2f, check: 1.05f, noise: 0f, yawLimit: 60f);
             });
 
+            var liftMetal = Mat("M_LiftDoor", new Color(0.45f, 0.46f, 0.45f), smoothness: 0.45f);
+            var liftLightOff = Mat("M_LiftLightOff", new Color(0.25f, 0.06f, 0.05f));
+            var liftLightOn = Mat("M_LiftLightOn", new Color(1f, 0.2f, 0.1f), emission: new Color(4f, 0.6f, 0.3f));
+            var paper = Mat("M_Paper", new Color(0.85f, 0.84f, 0.78f));
+            config.elevatorPrefab = Save("Elevator", root =>
+            {
+                // Old two-leaf lift door with a call button and a handwritten "out of order" note.
+                const float w = 1.0f, dh = 2.0f;
+                Box(root, "LeafL", new Vector3(-w * 0.25f, dh * 0.5f, 0.03f), new Vector3(w * 0.5f - 0.01f, dh, 0.04f), liftMetal, collider: false);
+                Box(root, "LeafR", new Vector3(w * 0.25f, dh * 0.5f, 0.03f), new Vector3(w * 0.5f - 0.01f, dh, 0.04f), liftMetal, collider: false);
+                Box(root, "FrameTop", new Vector3(0, dh + 0.06f, 0.03f), new Vector3(w + 0.2f, 0.12f, 0.06f), frame, collider: false);
+                Box(root, "FrameL", new Vector3(-w * 0.5f - 0.05f, dh * 0.5f, 0.03f), new Vector3(0.1f, dh, 0.06f), frame, collider: false);
+                Box(root, "FrameR", new Vector3(w * 0.5f + 0.05f, dh * 0.5f, 0.03f), new Vector3(0.1f, dh, 0.06f), frame, collider: false);
+                Box(root, "Panel", new Vector3(w * 0.5f + 0.3f, 1.2f, 0.01f), new Vector3(0.12f, 0.22f, 0.02f), frame, collider: false);
+                var light = Box(root, "CallLight", new Vector3(w * 0.5f + 0.3f, 1.2f, 0.025f), new Vector3(0.05f, 0.05f, 0.02f), liftLightOff, collider: false);
+                Box(root, "Note", new Vector3(-0.1f, 1.45f, 0.055f), new Vector3(0.3f, 0.21f, 0.005f), paper, collider: false);
+                var col = root.AddComponent<BoxCollider>();
+                col.center = new Vector3(0.15f, dh * 0.5f, 0.05f);
+                col.size = new Vector3(w + 0.5f, dh, 0.1f);
+                var door = root.AddComponent<ElevatorDoor>();
+                SetRef(door, "callLight", light.GetComponent<Renderer>());
+                SetRef(door, "lightOff", liftLightOff);
+                SetRef(door, "lightOn", liftLightOn);
+            });
+
+            var street = Mat("M_StreetGlass", new Color(0.03f, 0.04f, 0.06f), emission: new Color(0.12f, 0.12f, 0.16f));
+            config.entrancePrefab = Save("Entrance", root =>
+            {
+                // The house door you just came in through: metal frame, wired glass, street light behind.
+                const float w = 0.95f, dh = 2.05f;
+                Box(root, "Glass", new Vector3(0, 0.3f + (dh - 0.3f) * 0.5f, 0.02f), new Vector3(w, dh - 0.3f, 0.02f), street, collider: true);
+                Box(root, "KickPlate", new Vector3(0, 0.15f, 0.03f), new Vector3(w, 0.3f, 0.04f), metal, collider: true);
+                Box(root, "FrameTop", new Vector3(0, dh + 0.04f, 0.04f), new Vector3(w + 0.16f, 0.08f, 0.08f), frame, collider: false);
+                Box(root, "FrameL", new Vector3(-w * 0.5f - 0.04f, dh * 0.5f, 0.04f), new Vector3(0.08f, dh, 0.08f), frame, collider: false);
+                Box(root, "FrameR", new Vector3(w * 0.5f + 0.04f, dh * 0.5f, 0.04f), new Vector3(0.08f, dh, 0.08f), frame, collider: false);
+                Box(root, "Bar", new Vector3(0, 1.0f, 0.07f), new Vector3(w - 0.2f, 0.04f, 0.04f), metal, collider: false);
+            });
+
             // Two-flight stairwell, authored from the south wall's inner face (+Z north).
             // Up: west flight to the half-landing. Down: east flight to the half-landing below.
             const int steps = 8;

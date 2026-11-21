@@ -44,6 +44,9 @@ namespace Vchod.World
         public GameObject apartmentDoorPrefab;
         public GameObject playerDoorPrefab;
         public GameObject windowPrefab;
+        public GameObject elevatorPrefab;
+        [Tooltip("Ground floor: the house entrance, on the stairwell's east wall beside the round start.")]
+        public GameObject entrancePrefab;
 
         [Header("Hiding spot prefabs (pivot: wall face, +Z into the cell)")]
         public GameObject wardrobePrefab;

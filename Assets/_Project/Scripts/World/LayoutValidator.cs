@@ -22,6 +22,7 @@ namespace Vchod.World
             if (start.Pos != new GridPos(0, 0)) errors.Add($"stairwell not at origin: {start.Pos}");
             if (start.Feature != CellFeature.Stairwell) errors.Add("cell 0 is not the stairwell");
 
+            var elevators = 0;
             int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0, hiding = 0, hidingOnMain = 0;
             var seen = new HashSet<GridPos>();
             for (var i = 0; i < plan.Count; i++)
@@ -44,6 +45,10 @@ namespace Vchod.World
                 switch (c.Feature)
                 {
                     case CellFeature.PlayerDoor: playerDoors++; break;
+                    case CellFeature.Elevator:
+                        elevators++;
+                        if (plan.MainPath.Count < 2 || i != plan.MainPath[1]) errors.Add($"elevator at {c.Pos} is not in the first corridor cell");
+                        break;
                     case CellFeature.Window: windows++; break;
                     case CellFeature.ApartmentDoor: apartmentDoors++; break;
                     case CellFeature.Stairwell when i != LayoutPlan.StartIndex: errors.Add($"extra stairwell at {c.Pos}"); break;
@@ -63,6 +68,7 @@ namespace Vchod.World
                 }
             }
 
+            if (elevators != 1) errors.Add($"expected 1 elevator, found {elevators}");
             var expected = plan.IsPlayerFloor ? 1 : 0;
             if (playerDoors != expected) errors.Add($"expected {expected} player door, found {playerDoors}");
             if (windows < 1) errors.Add("no window");

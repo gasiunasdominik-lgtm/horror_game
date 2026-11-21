@@ -27,5 +27,18 @@ namespace Vchod.Tests
             Assert.GreaterOrEqual(plan.FindFeature(CellFeature.PlayerDoor), 0);
             Assert.GreaterOrEqual(plan.CoSourceIndex, 0);
         }
+
+        [Test]
+        public void EveryFloor_HasTheLiftInTheFirstCorridorCell_OnAClosedWall()
+        {
+            foreach (var playerFloor in new[] { true, false })
+            for (var seed = 1; seed <= 200; seed++)
+            {
+                var plan = LayoutGenerator.Generate(seed, new LayoutRules(), playerFloor);
+                var lift = plan.Cells[plan.MainPath[1]];
+                Assert.AreEqual(CellFeature.Elevator, lift.Feature, $"seed {seed}");
+                Assert.IsFalse(lift.IsOpen(lift.FeatureSide), $"seed {seed}");
+            }
+        }
     }
 }

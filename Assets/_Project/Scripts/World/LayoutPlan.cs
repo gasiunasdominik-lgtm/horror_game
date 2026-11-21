@@ -10,6 +10,8 @@ namespace Vchod.World
         ApartmentDoor = 2,
         Window = 3,
         PlayerDoor = 4,
+        /// <summary>Lift door, always in the first corridor cell. Out of service (firefighters).</summary>
+        Elevator = 5,
     }
 
     /// <summary>Furniture the player can hide in (GDD: wardrobes and tables).</summary>

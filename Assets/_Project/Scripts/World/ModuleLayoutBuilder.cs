@@ -183,6 +183,7 @@ namespace Vchod.World
                 CellFeature.ApartmentDoor => config.apartmentDoorPrefab,
                 CellFeature.PlayerDoor => config.playerDoorPrefab,
                 CellFeature.Window => config.windowPrefab,
+                CellFeature.Elevator => config.elevatorPrefab,
                 _ => null,
             };
             if (feature != null) Spawn(feature, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
@@ -231,7 +232,11 @@ namespace Vchod.World
             Spawn(config.lampPrefab, center + ToVector(Direction.North) * 0.9f + Vector3.up * config.wallHeight, Quaternion.identity, root);
             if (IsTopFloor) Spawn(config.stairwellTopRailPrefab, origin, frame, root);
             else Spawn(config.stairwellPrefab, origin, frame, root);
-            if (Floor == 0) Spawn(config.stairwellGroundPrefab, origin, frame, root);
+            if (Floor == 0)
+            {
+                Spawn(config.stairwellGroundPrefab, origin, frame, root);
+                Spawn(config.entrancePrefab, WallPoint(center, Direction.East) + ToVector(Direction.North) * 0.95f, Inward(Direction.East), root);
+            }
             else Spawn(config.stairsDownPrefab, origin, frame, root);
 
             var storey = Vector3.up * config.floorHeight;

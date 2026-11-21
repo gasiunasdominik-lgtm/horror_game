@@ -28,7 +28,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-021 | Senzory hasiče (sluch, zrak, světlo) + audio (dech, výstroj, baterka) | C | DONE | P1 | Hráč pozná polohu podle zvuku |
 | T-022 | Skrýše (skříň, stůl) a interakce | C | DONE | P1 | Hráč se schová a hasič ho přejde nebo najde |
 | T-023 | Okna s čerstvým vzduchem a pokles CO | C | DONE | P1 | U okna CO klesá |
-| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | TODO | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
+| T-024 | 3 patra z kostek, výtah, schodiště, dveře pokoje; spínač světla v každé 2.–3. buňce chodby (playtest #1) | C | DONE | P1 | Dá se dojít od vchodu ke dveřím, spínač je vždy blízko |
 | T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | TODO | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
 | T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | TODO | P1 | Všechny tři konce dosažitelné |
 | T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | TODO | P1 | Po konci lze začít nové kolo |

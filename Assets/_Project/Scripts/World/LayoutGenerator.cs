@@ -54,6 +54,9 @@ namespace Vchod.World
             door.Feature = playerFloor ? CellFeature.PlayerDoor : CellFeature.ApartmentDoor;
             door.FeatureSide = door.InDirection; // dead end: the wall straight ahead
 
+            // The lift faces the stairs, in the first corridor cell; branches must not open its wall.
+            AssignFeature(rng, plan.Cells[plan.MainPath[1]], CellFeature.Elevator);
+
             // Side branches off the main path (never from the stairwell or the door cell).
             var branchEnds = new List<int>();
             for (var b = 0; b < rules.branchCount; b++)
@@ -139,6 +142,7 @@ namespace Vchod.World
             {
                 if (d == cell.InDirection.Opposite() || cell.IsOpen(d) || !CanPlace(plan, rules, cell.Pos + d.Offset()))
                     continue;
+                if (cell.Feature != CellFeature.None && d == cell.FeatureSide) continue;
                 // A cell must keep one closed wall for a door or window, so never open the 4th side.
                 if (cell.OpenCount >= 3) continue;
                 var w = d == cell.InDirection ? StraightWeight : TurnWeight;
