@@ -43,6 +43,8 @@ namespace Vchod.World
         public int Floor { get; private set; }
         public bool IsPlayerFloor => Floor == config.playerFloor;
         public bool IsTopFloor => Floor == config.floorCount - 1;
+        public int FloorCount => config.floorCount;
+        public int HomeFloor => config.playerFloor;
         /// <summary>
         /// Safe arrival point: on the ground floor beside the stairs (round start); upper floors have
         /// the down flight there, so the first corridor cell instead.

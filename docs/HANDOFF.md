@@ -3,7 +3,7 @@
 Přepisuje `/end`. Krátké. Historie je v gitu.
 
 ## Stav
-M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 EditMode testů zelených. Výkon na Zenbooku 1080p: 134 FPS (1 % low 81). Nic nepushnuto.
+M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 EditMode testů zelených. Výkon na Zenbooku 1080p: 134 FPS (1 % low 81). `main` a `m1` pushnuty.
 
 ## Hotovo v této session
 - T-020–T-023: hasič (stavy, smysly, hledání skrýší), zvuk, skrýše skříň/stůl, okna s čerstvým vzduchem, víc spínačů.
@@ -15,7 +15,7 @@ M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 
 - Rozhodnutí D-032 až D-048.
 
 ## Rozpracováno
-- nic
+- Větev `feat/t031-pacing` (nemergnuto): po FEEL #2 hotové T-031 (90 s klid, příchod ≥ 10 m), T-032 (hasič prochází patra), T-033 (skrýše 20 %), T-035 (titulky + hlas). Čeká T-034 (druhá cesta mezi patry, otázka níže). 97 testů zelených.
 
 ## Další krok
 1. Dominik: playtest #2 (T-028) a FEEL hodnocení, brána G1.
@@ -23,8 +23,8 @@ M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 
 3. Claude: po playtestu zpracovat nálezy, pak M2.
 
 ## Otevřené otázky (s výchozími odpověďmi)
+- Q: T-034 druhá cesta mezi patry? Výchozí: požární dveře na konci chodby na každém patře (dnes je má jen byt sousedky), vedou na nouzové schodiště o patro výš/níž.
 - Q: Hasič startuje v nejhlubší buňce patra hráče. Když hráč hned rozsvítí, může ho chytit do ~10 s. Výchozí: nechat a rozhodnout podle playtestu #2.
-- Q: Pushnout `main` + tag `m1` na GitHub? Výchozí: ne, dokud neřekneš.
 - Q: Aktualizovat Unity CLI? Výchozí: ano, při příští session.
 
 ## Poznámky

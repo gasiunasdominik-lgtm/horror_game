@@ -68,6 +68,12 @@ namespace Vchod.DebugTools
                 Report("Firefighter: not in scene");
                 return;
             }
+            if (ctx.Firefighter.IsOffstage)
+            {
+                ctx.Firefighter.ArriveNow();
+                Report("Firefighter: arriving now (skipped the wait)");
+                return;
+            }
             _forcedIndex = (_forcedIndex + 1) % ForcedStates.Length;
             var state = ForcedStates[_forcedIndex];
             ctx.Firefighter.Brain.Force(state, ctx.Player.transform.position);

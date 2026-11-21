@@ -35,6 +35,11 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
 | T-030 | Měření výkonu, tag `m1` | C | DONE | P2 | Tag existuje |
+| T-031 | Klidný úvod: hasič se v kole objeví až po prodlevě (~90 s) a přichází zdola po schodech, nikdy ne blízko hráče | C | DONE | P1 | FEEL #2: „sotva se rozkoukám, už běží“ |
+| T-032 | Hasič má vlastní patro a prochází dům; na patro hráče jde jen za stopou (světlo, hluk) | C | DONE | P1 | Ne vždy na stejném patře |
+| T-033 | Férovější skrýše: kontrola náhodné skrýše 50 % → 20 %, jistá jen když tě viděl zalézt | C | DONE | P1 | FEEL #2: „kontrola skrýše vysoká“ |
+| T-034 | Druhá cesta mezi patry (požární dveře na konci chodby, viz Q v HANDOFF), možnost utéct | C | TODO | P1 | Hráč má kudy uniknout |
+| T-035 | Titulky: délka podle textu, zkreslený zvukový podkres pod řečí (hlas „z balíčku“, ne dabing) | C | DONE | P2 | Stihne se přečíst, má efekt |
 
 ## M2 Obsah (21. 12. 2026 – 31. 1. 2027)
 
@@ -65,6 +70,10 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 - (C) Zvuk cvaknutí spínače a relé při zhasnutí (audio pass M2).
 - (C) PlayMode smoke test (načíst scénu, 60 s bot, kontrola výjimek) podle TESTING.md, vrstva 2; zatím nezařazeno do milníku.
 - (D, 21. 11.) Zapomenuté klíče: hráč dojde ke svým dveřím a zjistí, že nemá klíč. Náhradní má jeden konkrétní soused, kterého musí najít v přeskládávaném patře. Mění cíl kola (GDD: dojít ke dveřím) → změna designu, rozhodnout na bráně G1 po playtestu #2. Navazuje na T-025 (soused) a T-040; dá se postavit nad dveřmi bytů a dialogem souseda bez nového systému.
+- (D, 21. 11.) Plížení za hasičem: když jdu za ním (i 0,5 m), nevšimne si mě. Dnes ho ruší „blízký smysl“ 2 m (`nearSenseRadius`). Malá změna, ale mění férovost honičky → kandidát pro ladění po playtestu #3.
+- (D, 21. 11.) Hluk podle rychlosti a překážek: sprint zvyšuje dosah hluku (už je: chůze 4 m, sprint 12 m); nově útlum hluku vzdáleností a zdmi/dveřmi (raycast nebo průchod NavMesh). Střední úkol, M2.
+- (D, 21. 11.) Detektor CO tišší, v pozadí, „pokud vůbec bude“. Hlasitost lze snížit hned; odstranění detektoru je změna pilíře 1 (detektor = fér signál) → jen s výslovným ano.
+- (D, 21. 11.) Realistický layout: za dveřmi skutečný byt, ne zeď. Velký rozsah (moduly bytů, výkon, art) → navázat na T-042 art pass a 5 bytů z GDD; rozhodnout na G2/G3.
 
 ## Blokace
 - (zatím prázdné)

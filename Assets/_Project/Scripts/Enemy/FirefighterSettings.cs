@@ -52,9 +52,28 @@ namespace Vchod.Enemy
         [Tooltip("If he was after the player when they changed floors, he comes up/down the stairs after this many seconds.")]
         public float followDelay = 6f;
 
+        [Header("Arrival")]
+        [Tooltip("Seconds of calm at the start of a round before he enters the floor.")]
+        public float introGrace = 90f;
+        [Tooltip("He never walks onto the floor closer to the player than this.")]
+        public float minArrivalDistance = 10f;
+        [Tooltip("If every entry is too close, he tries again after this many seconds.")]
+        public float arrivalRetry = 5f;
+
+        [Header("Roaming the house")]
+        [Tooltip("Away from the player's floor he moves one floor up or down every this many seconds (random in range).")]
+        public float roamIntervalMin = 35f;
+        public float roamIntervalMax = 60f;
+        [Tooltip("Chance each move goes toward the player's floor rather than away.")]
+        [Range(0f, 1f)] public float roamTowardPlayer = 0.6f;
+        [Tooltip("A staircase light this many floors away still draws him (light shows through the stairwell).")]
+        public int lightHeardFloors = 1;
+        [Tooltip("Seconds he needs to come to a floor where the light went on.")]
+        public float lightResponseDelay = 12f;
+
         [Header("Hiding spots")]
         [Tooltip("Chance he checks a nearby hiding spot when picking the next search point.")]
-        [Range(0f, 1f)] public float hidingCheckChance = 0.5f;
+        [Range(0f, 1f)] public float hidingCheckChance = 0.2f;
         [Tooltip("Seconds he stands at a wardrobe or table before opening it / looking under.")]
         public float checkDuration = 1.5f;
         [Tooltip("A spot this close to a noise he investigates gets checked.")]
