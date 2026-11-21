@@ -23,6 +23,9 @@ MonoBehaviour:
     gridRadius: 5
     apartmentDoorChance: 0.55
     minApartmentDoors: 2
+    minHidingSpots: 2
+    maxHidingSpots: 3
+    wardrobeChance: 0.6
     maxAttempts: 50
   floorPrefab: {fileID: 5217190660564949241, guid: 1e32ef9b44307b942b168976144d105d, type: 3}
   ceilingPrefab: {fileID: 4017603281853836371, guid: 2d0fa598b3f93e54db0001a445cbe7f2, type: 3}
@@ -33,5 +36,7 @@ MonoBehaviour:
   apartmentDoorPrefab: {fileID: 7883225035112388346, guid: db9744eeb83c60b4a91e9ea5bd65ae01, type: 3}
   playerDoorPrefab: {fileID: 8825444291744159223, guid: b2ed8e8886b520846bd680d1a215e4c5, type: 3}
   windowPrefab: {fileID: 6560105005496745587, guid: 899bc5825ed47624d883620e38d3aac6, type: 3}
+  wardrobePrefab: {fileID: 720545066654749649, guid: 8cbe0125336daa64aac280d4484f65b3, type: 3}
+  tablePrefab: {fileID: 5241402717398831005, guid: f5e9710ddcdee9e449b233619838e6a9, type: 3}
   safeHalfExtent: 1.3
   coSourceDepth: 1.5

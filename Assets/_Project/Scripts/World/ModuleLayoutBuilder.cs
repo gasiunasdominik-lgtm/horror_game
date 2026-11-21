@@ -22,6 +22,7 @@ namespace Vchod.World
         [SerializeField] private bool reshuffleOnLightOff = true;
 
         private Transform _floorRoot;
+        private bool _reshufflePending;
 
         public HouseConfig Config => config;
         public LayoutPlan Plan { get; private set; }
@@ -41,7 +42,17 @@ namespace Vchod.World
 
         private void OnLightOff(LightTurnedOff e)
         {
-            if (reshuffleOnLightOff) Reshuffle();
+            if (!reshuffleOnLightOff) return;
+            // Never rebuild around a hidden player: the wardrobe would vanish with them inside.
+            if (player.IsHidden) _reshufflePending = true;
+            else Reshuffle();
+        }
+
+        private void Update()
+        {
+            if (!_reshufflePending || player.IsHidden) return;
+            _reshufflePending = false;
+            if (lightTimer == null || !lightTimer.IsOn) Reshuffle();
         }
 
         /// <summary>Next layout of the same seed. The player keeps their depth along the corridor.</summary>
@@ -108,6 +119,14 @@ namespace Vchod.World
                 _ => null,
             };
             if (feature != null) Spawn(feature, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+
+            var hiding = cell.Hiding switch
+            {
+                HidingKind.Wardrobe => config.wardrobePrefab,
+                HidingKind.Table => config.tablePrefab,
+                _ => null,
+            };
+            if (hiding != null) Spawn(hiding, WallPoint(center, cell.HidingSide), Inward(cell.HidingSide), root);
 
             if (index == LayoutPlan.StartIndex)
             {

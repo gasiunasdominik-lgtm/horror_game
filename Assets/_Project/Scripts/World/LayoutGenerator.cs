@@ -101,6 +101,7 @@ namespace Vchod.World
             if (candidates.Count == 0) candidates = doors;
             plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
 
+            PlaceHidingSpots(rng, plan, rules);
             return plan;
         }
 
@@ -163,6 +164,38 @@ namespace Vchod.World
             foreach (var d in DirectionUtil.All)
                 if (!cell.IsOpen(d)) closed.Add(d);
             cell.FeatureSide = closed[rng.Next(closed.Count)];
+        }
+
+        /// <summary>
+        /// Wardrobes and tables on free walls. At least one on the main path, so a hiding
+        /// spot is always on the way, never only in a side corridor.
+        /// </summary>
+        private static void PlaceHidingSpots(Random rng, LayoutPlan plan, LayoutRules rules)
+        {
+            var free = new List<int>();
+            for (var i = 1; i < plan.Count; i++)
+                if (plan.Cells[i].Feature != CellFeature.PlayerDoor && FreeSides(plan.Cells[i]).Count > 0) free.Add(i);
+            Shuffle(rng, free);
+            var main = free.FindIndex(i => plan.Cells[i].MainPath);
+            if (main > 0) (free[0], free[main]) = (free[main], free[0]);
+
+            var count = Math.Min(free.Count, rng.Next(rules.minHidingSpots, rules.maxHidingSpots + 1));
+            for (var k = 0; k < count; k++)
+            {
+                var cell = plan.Cells[free[k]];
+                var sides = FreeSides(cell);
+                cell.HidingSide = sides[rng.Next(sides.Count)];
+                cell.Hiding = rng.NextDouble() < rules.wardrobeChance ? HidingKind.Wardrobe : HidingKind.Table;
+            }
+        }
+
+        /// <summary>Closed walls not used by the cell's door or window.</summary>
+        internal static List<Direction> FreeSides(LayoutCell cell)
+        {
+            var sides = new List<Direction>(3);
+            foreach (var d in DirectionUtil.All)
+                if (!cell.IsOpen(d) && (cell.Feature == CellFeature.None || d != cell.FeatureSide)) sides.Add(d);
+            return sides;
         }
 
         private static int PickCellWithClosedSide(Random rng, LayoutPlan plan, List<int> candidates)

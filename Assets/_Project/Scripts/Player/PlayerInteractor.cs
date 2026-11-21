@@ -14,6 +14,14 @@ namespace Vchod.Player
             Current = null;
             if (!controller.InputEnabled) return;
 
+            if (controller.IsHidden)
+            {
+                // Inside a hiding spot the only action is getting out.
+                Current = controller.HiddenIn;
+                if (controller.Input.Interact.WasPressedThisFrame()) Current.Interact(gameObject);
+                return;
+            }
+
             var config = controller.Config;
             var eye = controller.CameraPivot;
             if (Physics.Raycast(eye.position, eye.forward, out var hit, config.interactDistance,

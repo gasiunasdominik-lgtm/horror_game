@@ -22,7 +22,7 @@ namespace Vchod.World
             if (start.Pos != new GridPos(0, 0)) errors.Add($"stairwell not at origin: {start.Pos}");
             if (start.Feature != CellFeature.Stairwell) errors.Add("cell 0 is not the stairwell");
 
-            int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0;
+            int playerDoors = 0, windows = 0, apartmentDoors = 0, coSources = 0, hiding = 0, hidingOnMain = 0;
             var seen = new HashSet<GridPos>();
             for (var i = 0; i < plan.Count; i++)
             {
@@ -48,6 +48,14 @@ namespace Vchod.World
                     case CellFeature.ApartmentDoor: apartmentDoors++; break;
                     case CellFeature.Stairwell when i != LayoutPlan.StartIndex: errors.Add($"extra stairwell at {c.Pos}"); break;
                 }
+                if (c.Hiding != HidingKind.None)
+                {
+                    hiding++;
+                    if (c.MainPath) hidingOnMain++;
+                    if (c.IsOpen(c.HidingSide)) errors.Add($"hiding spot at {c.Pos} on an open side");
+                    if (c.Feature != CellFeature.None && c.FeatureSide == c.HidingSide) errors.Add($"hiding spot at {c.Pos} blocks its {c.Feature}");
+                    if (i == LayoutPlan.StartIndex || c.Feature == CellFeature.PlayerDoor) errors.Add($"hiding spot in {c.Feature} cell");
+                }
                 if (c.IsCoSource)
                 {
                     coSources++;
@@ -59,6 +67,8 @@ namespace Vchod.World
             if (windows < 1) errors.Add("no window");
             if (apartmentDoors < rules.minApartmentDoors) errors.Add($"only {apartmentDoors} apartment doors");
             if (coSources != 1) errors.Add($"expected 1 CO source, found {coSources}");
+            if (hiding < rules.minHidingSpots) errors.Add($"only {hiding} hiding spots");
+            if (rules.minHidingSpots > 0 && hidingOnMain == 0) errors.Add("no hiding spot on the main path");
 
             var mainLength = plan.MainPath.Count - 1;
             if (mainLength < rules.mainPathMin || mainLength > rules.mainPathMax)

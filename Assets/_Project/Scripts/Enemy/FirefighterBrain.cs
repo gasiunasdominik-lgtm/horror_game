@@ -125,6 +125,15 @@ namespace Vchod.Enemy
             return State != before;
         }
 
+        /// <summary>He opened the spot the player hides in. False in god mode.</summary>
+        public bool CatchHidden()
+        {
+            if (HasCaughtPlayer || !CanCatch) return false;
+            HasCaughtPlayer = true;
+            Goal = FirefighterGoal.Hold;
+            return true;
+        }
+
         private void Investigate(Vector3 where)
         {
             if (State != FirefighterState.Investigate) Enter(FirefighterState.Investigate);

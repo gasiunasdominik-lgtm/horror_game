@@ -114,6 +114,51 @@ namespace Vchod.EditorTools
                 Box(root, "FrameMid", new Vector3(0, sill + wh * 0.5f, 0.03f), new Vector3(0.05f, wh, 0.05f), windowFrame, collider: false);
             });
 
+            var wood = Mat("M_WardrobeWood", new Color(0.42f, 0.30f, 0.19f));
+            var tableTop = Mat("M_TableTop", new Color(0.36f, 0.27f, 0.20f));
+            var cloth = Mat("M_TableCloth", new Color(0.45f, 0.18f, 0.16f));
+
+            config.wardrobePrefab = Save("Wardrobe", root =>
+            {
+                // Old hallway wardrobe; the upper door halves are slatted so you can watch the corridor.
+                const float w = 1.0f, d = 0.6f, h = 2.0f;
+                Box(root, "Back", new Vector3(0, h * 0.5f, 0.02f), new Vector3(w, h, 0.04f), wood, collider: false);
+                Box(root, "SideL", new Vector3(-w * 0.5f + 0.02f, h * 0.5f, d * 0.5f), new Vector3(0.04f, h, d), wood, collider: false);
+                Box(root, "SideR", new Vector3(w * 0.5f - 0.02f, h * 0.5f, d * 0.5f), new Vector3(0.04f, h, d), wood, collider: false);
+                Box(root, "Top", new Vector3(0, h - 0.02f, d * 0.5f), new Vector3(w, 0.04f, d), wood, collider: false);
+                Box(root, "Plinth", new Vector3(0, 0.05f, d * 0.5f), new Vector3(w, 0.1f, d), wood, collider: false);
+                foreach (var side in new[] { -1f, 1f })
+                {
+                    var x = side * 0.245f;
+                    var name = side < 0 ? "L" : "R";
+                    Box(root, $"Door{name}Panel", new Vector3(x, 0.7f, d - 0.02f), new Vector3(0.47f, 1.2f, 0.03f), wood, collider: false);
+                    for (var i = 0; i < 5; i++)
+                        Box(root, $"Door{name}Slat{i}", new Vector3(x, 1.33f + i * 0.1f, d - 0.02f), new Vector3(0.47f, 0.06f, 0.03f), wood, collider: false);
+                    Box(root, $"Door{name}Rail", new Vector3(x, 1.88f, d - 0.02f), new Vector3(0.47f, 0.16f, 0.03f), wood, collider: false);
+                    Box(root, $"Door{name}Knob", new Vector3(side * 0.05f, 1.05f, d + 0.01f), new Vector3(0.03f, 0.08f, 0.03f), metal, collider: false);
+                }
+                var col = root.AddComponent<BoxCollider>();
+                col.center = new Vector3(0, h * 0.5f, d * 0.5f);
+                col.size = new Vector3(w, h, d);
+                Hiding(root, HidingKind.Wardrobe, view: new Vector3(0, 1.55f, 0.32f), exit: 1.1f, check: 1.0f, noise: 6f, yawLimit: 35f);
+            });
+
+            config.tablePrefab = Save("Table", root =>
+            {
+                // A table someone pushed into the corridor, with a cloth hanging over the front.
+                const float w = 1.2f, d = 0.7f, h = 0.75f;
+                Box(root, "Top", new Vector3(0, h - 0.02f, d * 0.5f), new Vector3(w, 0.04f, d), tableTop, collider: false);
+                foreach (var x in new[] { -w * 0.5f + 0.05f, w * 0.5f - 0.05f })
+                foreach (var z in new[] { 0.05f, d - 0.05f })
+                    Box(root, "Leg", new Vector3(x, (h - 0.04f) * 0.5f, z), new Vector3(0.05f, h - 0.04f, 0.05f), tableTop, collider: false);
+                Box(root, "Cloth", new Vector3(0, h - 0.15f, d + 0.01f), new Vector3(w + 0.02f, 0.28f, 0.01f), cloth, collider: false);
+                Box(root, "ClothTop", new Vector3(0, h + 0.005f, d * 0.5f), new Vector3(w + 0.02f, 0.01f, d + 0.02f), cloth, collider: false);
+                var col = root.AddComponent<BoxCollider>();
+                col.center = new Vector3(0, h * 0.5f, d * 0.5f);
+                col.size = new Vector3(w, h, d);
+                Hiding(root, HidingKind.Table, view: new Vector3(0, 0.36f, 0.3f), exit: 1.2f, check: 1.05f, noise: 0f, yawLimit: 60f);
+            });
+
             config.stairwellPrefab = Save("Stairwell", root =>
             {
                 // A flight going up against the back wall, left side; the landing stays clear.
@@ -133,6 +178,27 @@ namespace Vchod.EditorTools
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
             return config;
+        }
+
+        private static void Hiding(GameObject root, HidingKind kind, Vector3 view, float exit, float check, float noise, float yawLimit)
+        {
+            Transform Point(string name, Vector3 pos)
+            {
+                var t = new GameObject(name).transform;
+                t.SetParent(root.transform, false);
+                t.localPosition = pos;
+                return t; // local +Z faces out of the spot, into the corridor
+            }
+
+            var spot = root.AddComponent<HidingSpot>();
+            var so = new SerializedObject(spot);
+            so.FindProperty("kind").enumValueIndex = (int)kind;
+            so.FindProperty("viewPoint").objectReferenceValue = Point("View", view);
+            so.FindProperty("exitPoint").objectReferenceValue = Point("Exit", new Vector3(0, 0, exit));
+            so.FindProperty("checkPoint").objectReferenceValue = Point("Check", new Vector3(0, 0, check));
+            so.FindProperty("enterNoiseRadius").floatValue = noise;
+            so.FindProperty("yawLimit").floatValue = yawLimit;
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void DoorPiece(GameObject root, Material leaf, Material frame, Material metal)

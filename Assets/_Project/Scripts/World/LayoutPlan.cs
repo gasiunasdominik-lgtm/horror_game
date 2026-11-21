@@ -12,6 +12,14 @@ namespace Vchod.World
         PlayerDoor = 4,
     }
 
+    /// <summary>Furniture the player can hide in (GDD: wardrobes and tables).</summary>
+    public enum HidingKind
+    {
+        None = 0,
+        Wardrobe = 1,
+        Table = 2,
+    }
+
     /// <summary>One corridor module slot. Pure data so layouts can be tested without a scene.</summary>
     public sealed class LayoutCell
     {
@@ -26,6 +34,8 @@ namespace Vchod.World
         public CellFeature Feature;
         public Direction FeatureSide;
         public bool IsCoSource;
+        public HidingKind Hiding;
+        public Direction HidingSide;
 
         public bool IsOpen(Direction d) => (Openings & (1 << (int)d)) != 0;
         public void Open(Direction d) => Openings |= (byte)(1 << (int)d);
@@ -98,6 +108,8 @@ namespace Vchod.World
                     h = Mix(h, (int)c.Feature);
                     h = Mix(h, (int)c.FeatureSide);
                     h = Mix(h, c.IsCoSource ? 1 : 0);
+                    h = Mix(h, (int)c.Hiding);
+                    h = Mix(h, (int)c.HidingSide);
                 }
                 return h;
             }

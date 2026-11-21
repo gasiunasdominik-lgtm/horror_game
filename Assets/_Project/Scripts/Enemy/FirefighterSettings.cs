@@ -49,6 +49,17 @@ namespace Vchod.Enemy
         [Tooltip("Search points are picked within this many metres of the last known position.")]
         public float searchRadius = 8f;
 
+        [Header("Hiding spots")]
+        [Tooltip("Chance he checks a nearby hiding spot when picking the next search point.")]
+        [Range(0f, 1f)] public float hidingCheckChance = 0.5f;
+        [Tooltip("Seconds he stands at a wardrobe or table before opening it / looking under.")]
+        public float checkDuration = 1.5f;
+        [Tooltip("A spot this close to a noise he investigates gets checked.")]
+        public float checkNearNoise = 2.5f;
+        [Tooltip("Under a table he spots you within this range: light on / torch only.")]
+        public float tableRevealLit = 4f;
+        public float tableRevealDark = 2.5f;
+
         /// <summary>Sight range and cone for the current staircase light.</summary>
         public void SightFor(bool lightOn, out float range, out float angle)
         {

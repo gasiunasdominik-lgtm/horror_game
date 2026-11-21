@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Vchod.Core;
@@ -31,6 +32,17 @@ namespace Vchod.Enemy
         private bool _hasStimulus;
         private Vector3 _stimulus;
         private bool _caughtReported;
+
+        // Hiding spots: the one being checked, those already checked in this search,
+        // and the one he saw the player climb into.
+        private HidingSpot _checking;
+        private float _checkTimer;
+        private readonly HashSet<HidingSpot> _checked = new();
+        private HidingSpot _sawHide;
+        private bool _playerWasHidden;
+        private Vector3? _noiseChecked;
+        private readonly List<Vector3> _spotPoints = new();
+        private readonly List<int> _checkedIdx = new();
 
         public FirefighterBrain Brain { get; private set; }
         public FirefighterState State => Brain.State;
@@ -112,6 +124,10 @@ namespace Vchod.Enemy
         {
             if (!_placed || Brain.HasCaughtPlayer) return;
 
+            var hiddenNow = player.IsHidden;
+            if (hiddenNow && !_playerWasHidden && SeesPlayer) _sawHide = player.HiddenIn as HidingSpot;
+            _playerWasHidden = hiddenNow;
+
             SeesPlayer = CanSeePlayer(out var distance);
             var perception = new FirefighterPerception
             {
@@ -141,6 +157,10 @@ namespace Vchod.Enemy
         private void OnStateChanged(FirefighterState previous)
         {
             _executedState = Brain.State;
+            _checking = null;
+            _noiseChecked = null;
+            if (Brain.State is FirefighterState.Search or FirefighterState.Investigate) _checked.Clear();
+            if (Brain.State == FirefighterState.Patrol) _sawHide = null;
             // Drop the old route: a new state picks its own first waypoint.
             if (_agent.isOnNavMesh) _agent.ResetPath();
             EventBus.Publish(new FirefighterStateChanged { Previous = previous, State = Brain.State });
@@ -155,9 +175,65 @@ namespace Vchod.Enemy
             EventBus.Publish(new PlayerCaught { Position = player.transform.position });
         }
 
+        private bool CheckingAllowed => Brain.State is FirefighterState.Search or FirefighterState.Investigate;
+
+        /// <summary>Walk to the spot, wait, open it. Returns false when there is nothing to check.</summary>
+        private bool UpdateCheck()
+        {
+            if (_checking == null || !CheckingAllowed || !_checking.isActiveAndEnabled)
+            {
+                _checking = null;
+                return false;
+            }
+            var target = _checking.CheckPoint;
+            var flat = target - transform.position;
+            flat.y = 0f;
+            if (flat.magnitude > _agent.stoppingDistance + 0.5f)
+            {
+                _checkTimer = 0f;
+                MoveTo(target, force: false);
+                return true;
+            }
+
+            _agent.isStopped = true;
+            FaceTowards(_checking.transform.position);
+            _checkTimer += Time.deltaTime;
+            if (_checkTimer < config.settings.checkDuration) return true;
+
+            var spot = _checking;
+            _checked.Add(spot);
+            _checking = null;
+            if (spot == _sawHide) _sawHide = null;
+            if (spot.IsOccupied && Brain.CatchHidden())
+            {
+                spot.Expose();
+                ReportCaught();
+            }
+            return true;
+        }
+
+        private HidingSpot PickSpot(Vector3 center, float radius, bool alwaysCheck)
+        {
+            var spots = HidingSpot.All;
+            _spotPoints.Clear();
+            _checkedIdx.Clear();
+            var saw = -1;
+            for (var i = 0; i < spots.Count; i++)
+            {
+                _spotPoints.Add(spots[i].CheckPoint);
+                if (_checked.Contains(spots[i])) _checkedIdx.Add(i);
+                if (spots[i] == _sawHide) saw = i;
+            }
+            var chance = alwaysCheck ? 1f : config.settings.hidingCheckChance;
+            var pick = HidingSearch.Pick(_spotPoints, center, radius, _checkedIdx, saw, _rng.NextDouble(), chance, out var considered);
+            if (pick < 0 && considered >= 0) _checked.Add(spots[considered]); // walked past it this search
+            return pick < 0 ? null : spots[pick];
+        }
+
         private void Execute(bool arrived)
         {
             _agent.speed = Brain.Speed;
+            if (UpdateCheck()) return;
             switch (Brain.Goal)
             {
                 case FirefighterGoal.Hold when Brain.State == FirefighterState.Call:
@@ -165,6 +241,13 @@ namespace Vchod.Enemy
                     FaceTowards(Brain.LastKnownPlayerPosition);
                     break;
                 case FirefighterGoal.Hold:
+                    // A creaking wardrobe right where the noise was gets opened, once per noise.
+                    if (Brain.State == FirefighterState.Investigate && _noiseChecked != Brain.Destination)
+                    {
+                        _noiseChecked = Brain.Destination;
+                        _checking = PickSpot(Brain.Destination, config.settings.checkNearNoise, alwaysCheck: true);
+                        if (_checking != null) break;
+                    }
                     // Looking around where the noise or light was: a slow turn, torch sweeping.
                     _agent.isStopped = true;
                     transform.Rotate(0f, config.settings.lookAroundSpeed * Time.deltaTime, 0f);
@@ -176,7 +259,9 @@ namespace Vchod.Enemy
                     if (arrived || !_agent.hasPath) MoveTo(RandomCellPoint(), force: true);
                     break;
                 case FirefighterGoal.SearchAround:
-                    if (arrived || !_agent.hasPath) MoveTo(RandomPointAround(Brain.Destination), force: true);
+                    if (!arrived && _agent.hasPath) break;
+                    _checking = PickSpot(Brain.Destination, config.settings.searchRadius, alwaysCheck: false);
+                    if (_checking == null) MoveTo(RandomPointAround(Brain.Destination), force: true);
                     break;
             }
         }
@@ -219,12 +304,28 @@ namespace Vchod.Enemy
 
         private static readonly float[] SightHeights = { 1.2f, 1.45f }; // chest, head (inside the player's capsule)
 
+        /// <summary>A wardrobe hides completely. Under a table the light or a close torch gives you away.</summary>
+        private bool CanSeeHidden(HidingSpot spot, float distance)
+        {
+            if (spot.Kind != HidingKind.Table) return false;
+            var s = config.settings;
+            var lightOn = lightTimer != null && lightTimer.IsOn;
+            if (distance > (lightOn ? s.tableRevealLit : s.tableRevealDark)) return false;
+            s.SightFor(lightOn, out _, out var angle);
+            var to = player.CameraPivot.position - eyes.position;
+            if (Vector3.Angle(eyes.forward, to) > angle * 0.5f) return false;
+            if (!Physics.Raycast(eyes.position, to.normalized, out var hit, to.magnitude + 0.5f, ~0, QueryTriggerInteraction.Ignore))
+                return true;
+            return hit.collider.transform.IsChildOf(spot.transform);
+        }
+
         private bool CanSeePlayer(out float distance)
         {
             var s = config.settings;
             var origin = eyes.position;
             var playerPos = player.transform.position;
             distance = Vector3.Distance(transform.position, playerPos);
+            if (player.HiddenIn is HidingSpot spot) return CanSeeHidden(spot, distance);
 
             s.SightFor(lightTimer != null && lightTimer.IsOn, out var range, out var angle);
             var toPlayer = playerPos + Vector3.up * SightHeights[0] - origin;

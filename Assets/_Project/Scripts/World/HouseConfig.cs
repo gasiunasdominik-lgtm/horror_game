@@ -27,6 +27,10 @@ namespace Vchod.World
         public GameObject playerDoorPrefab;
         public GameObject windowPrefab;
 
+        [Header("Hiding spot prefabs (pivot: wall face, +Z into the cell)")]
+        public GameObject wardrobePrefab;
+        public GameObject tablePrefab;
+
         [Header("Spawn")]
         [Tooltip("How far inside the cell the player can be placed after a reshuffle, from the centre.")]
         public float safeHalfExtent = 1.3f;
