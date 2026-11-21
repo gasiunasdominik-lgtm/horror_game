@@ -38,5 +38,6 @@ MonoBehaviour:
   windowPrefab: {fileID: 6560105005496745587, guid: 899bc5825ed47624d883620e38d3aac6, type: 3}
   wardrobePrefab: {fileID: 720545066654749649, guid: 8cbe0125336daa64aac280d4484f65b3, type: 3}
   tablePrefab: {fileID: 5241402717398831005, guid: f5e9710ddcdee9e449b233619838e6a9, type: 3}
+  switchOffset: 1.2
   safeHalfExtent: 1.3
   coSourceDepth: 1.5

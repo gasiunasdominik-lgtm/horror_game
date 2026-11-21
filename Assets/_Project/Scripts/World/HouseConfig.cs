@@ -31,6 +31,9 @@ namespace Vchod.World
         public GameObject wardrobePrefab;
         public GameObject tablePrefab;
 
+        [Tooltip("Corridor light switches sit this far from the wall centre (m).")]
+        public float switchOffset = 1.2f;
+
         [Header("Spawn")]
         [Tooltip("How far inside the cell the player can be placed after a reshuffle, from the centre.")]
         public float safeHalfExtent = 1.3f;

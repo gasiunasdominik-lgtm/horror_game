@@ -102,6 +102,7 @@ namespace Vchod.World
             plan.Cells[candidates[rng.Next(candidates.Count)]].IsCoSource = true;
 
             PlaceHidingSpots(rng, plan, rules);
+            PlaceLightSwitches(rng, plan);
             return plan;
         }
 
@@ -186,6 +187,27 @@ namespace Vchod.World
                 var sides = FreeSides(cell);
                 cell.HidingSide = sides[rng.Next(sides.Count)];
                 cell.Hiding = rng.NextDouble() < rules.wardrobeChance ? HidingKind.Wardrobe : HidingKind.Table;
+            }
+        }
+
+        /// <summary>
+        /// Playtest #1: one switch at the stairs was too far. Walking outward by depth, a cell gets a
+        /// switch unless it or a neighbour already has one, so a switch is never more than 2 cells away.
+        /// </summary>
+        private static void PlaceLightSwitches(Random rng, LayoutPlan plan)
+        {
+            var order = new List<int>();
+            for (var i = 1; i < plan.Count; i++) order.Add(i);
+            order.Sort((a, b) => plan.Cells[a].Depth.CompareTo(plan.Cells[b].Depth));
+            foreach (var i in order)
+            {
+                if (LayoutValidator.SwitchDistance(plan, i, 1)) continue;
+                var cell = plan.Cells[i];
+                var sides = FreeSides(cell);
+                if (cell.Hiding != HidingKind.None) sides.Remove(cell.HidingSide);
+                if (sides.Count == 0) continue;
+                cell.HasSwitch = true;
+                cell.SwitchSide = sides[rng.Next(sides.Count)];
             }
         }
 

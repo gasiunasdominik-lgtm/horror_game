@@ -36,6 +36,8 @@ namespace Vchod.World
         public bool IsCoSource;
         public HidingKind Hiding;
         public Direction HidingSide;
+        public bool HasSwitch;
+        public Direction SwitchSide;
 
         public bool IsOpen(Direction d) => (Openings & (1 << (int)d)) != 0;
         public void Open(Direction d) => Openings |= (byte)(1 << (int)d);
@@ -110,6 +112,7 @@ namespace Vchod.World
                     h = Mix(h, c.IsCoSource ? 1 : 0);
                     h = Mix(h, (int)c.Hiding);
                     h = Mix(h, (int)c.HidingSide);
+                    h = Mix(h, c.HasSwitch ? 1 + (int)c.SwitchSide : 0);
                 }
                 return h;
             }

@@ -128,6 +128,13 @@ namespace Vchod.World
             };
             if (hiding != null) Spawn(hiding, WallPoint(center, cell.HidingSide), Inward(cell.HidingSide), root);
 
+            if (cell.HasSwitch)
+            {
+                // Off-centre, so it never sits behind a door, window or wardrobe on the next wall.
+                var rot = Inward(cell.SwitchSide);
+                Spawn(config.lightButtonPrefab, WallPoint(center, cell.SwitchSide) + rot * Vector3.right * config.switchOffset, rot, root);
+            }
+
             if (index == LayoutPlan.StartIndex)
             {
                 // The switch is on the stairwell's east wall, beside the corridor opening.
