@@ -84,6 +84,7 @@ Každá opravená chyba, kterou nejde pokrýt testem, dostane bod sem. Dominik h
 |---|---|---|---|---|---|
 | M0 | 20. 11. 2026 | Game, seed 4242, greybox 1 patro | 66 / 24 (1 % low) | avg 15,2 ms, p99 22,5 ms, max 123 ms | Dev build, 1920×1080 borderless, VSync off, světlo zapnuté. **1. spuštění po buildu** (studená cache shaderů) |
 | M0 | 21. 11. 2026 | Game, seed 4242, greybox 1 patro | 98 / 77 (1 % low) | avg 10,2 ms, p99 12,7 ms, max 14 ms | Totéž, 2. spuštění (teplá cache). Rozptyl mezi běhy: napájení/teplota neznámé |
+| M1 | 21. 11. 2026 | Game, seed 4242, 3 patra, hasič | ~~5 / 3~~ **neplatné** | avg 189–247 ms | Stroj přiškrcený: CPU 21 % výkonu (1,7 GHz) při 25 % zátěži, na síti. V Editoru i scéna bez domu 15 FPS, takže jde o stav stroje, ne o obsah hry. Profiler: čekání na GPU ~54 ms/snímek. Zopakovat (T-030) |
 
 Postup měření: `Builds/Dev/VchodC.exe -seed 4242 -perf 30 -screen-width 1920 -screen-height 1080 -screen-fullscreen 1`. Výsledek v `Builds/Dev/PlaytestLogs/perf_*.txt` a v logu (`[Perf]`). Hráč obchází všechny buňky a otáčí se, světlo trvale zapnuté (nejhorší případ: všechna světla).
 
