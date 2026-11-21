@@ -25,9 +25,11 @@ namespace Vchod.Enemy
         [Header("Sight")]
         [Tooltip("Sight range with the staircase light on (m).")]
         public float sightRangeLit = 14f;
-        [Tooltip("Sight range in the dark, only his torch (m).")]
-        public float sightRangeDark = 6f;
         [Range(10f, 180f)] public float sightAngle = 110f;
+        [Tooltip("In the dark he sees only what his torch lights: its range (m)...")]
+        public float sightRangeDark = 9f;
+        [Tooltip("...and its cone (deg). The visible beam tells the player exactly where he looks.")]
+        [Range(10f, 120f)] public float torchAngle = 50f;
         [Tooltip("Within this distance he notices the player in any direction (breathing, rustle).")]
         public float nearSenseRadius = 2f;
         [Tooltip("How fast he turns while looking around (deg/s).")]
@@ -46,5 +48,12 @@ namespace Vchod.Enemy
         public float catchRadius = 1.1f;
         [Tooltip("Search points are picked within this many metres of the last known position.")]
         public float searchRadius = 8f;
+
+        /// <summary>Sight range and cone for the current staircase light.</summary>
+        public void SightFor(bool lightOn, out float range, out float angle)
+        {
+            range = lightOn ? sightRangeLit : sightRangeDark;
+            angle = lightOn ? sightAngle : torchAngle;
+        }
     }
 }

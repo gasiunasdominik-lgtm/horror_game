@@ -124,9 +124,9 @@ namespace Vchod.Enemy
             };
             _hasStimulus = false;
 
+            if (Brain.State != _executedState) OnStateChanged(_executedState); // forced (debug, reshuffle)
             var previous = Brain.State;
             if (Brain.Tick(Time.deltaTime, perception)) OnStateChanged(previous);
-            else if (Brain.State != _executedState) OnStateChanged(_executedState); // forced (debug, reshuffle)
 
             if (Brain.HasCaughtPlayer)
             {
@@ -226,11 +226,11 @@ namespace Vchod.Enemy
             var playerPos = player.transform.position;
             distance = Vector3.Distance(transform.position, playerPos);
 
-            var range = lightTimer != null && lightTimer.IsOn ? s.sightRangeLit : s.sightRangeDark;
+            s.SightFor(lightTimer != null && lightTimer.IsOn, out var range, out var angle);
             var toPlayer = playerPos + Vector3.up * SightHeights[0] - origin;
             if (toPlayer.magnitude > range) return false;
             var near = distance <= s.nearSenseRadius;
-            if (!near && Vector3.Angle(transform.forward, toPlayer) > s.sightAngle * 0.5f) return false;
+            if (!near && Vector3.Angle(eyes.forward, toPlayer) > angle * 0.5f) return false;
 
             foreach (var h in SightHeights)
             {
