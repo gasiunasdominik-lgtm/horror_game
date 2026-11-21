@@ -103,7 +103,10 @@ namespace Vchod.EditorTools
             SetRef(co, "config", config);
             SetRef(co, "player", player);
             SetRef(co, "house", house);
-            SetRef(house, "co", co);
+
+            var endings = GetOrAdd<EndingsManager>(systems);
+            SetRef(endings, "player", player);
+            SetRef(endings, "co", co);
 
             var cam = player.CameraPivot.GetComponentInChildren<Camera>().gameObject;
             var lowPass = GetOrAdd<AudioLowPassFilter>(cam);
@@ -243,6 +246,48 @@ namespace Vchod.EditorTools
             sub.enabled = false;
             var subView = GetOrAdd<SubtitleView>(canvas);
             SetRef(subView, "text", sub);
+
+            // Ending screen: last child, so it covers everything else.
+            var endGo = FindOrCreateChild(canvas.transform, "Ending");
+            endGo.transform.SetAsLastSibling();
+            var endRect = GetOrAdd<RectTransform>(endGo);
+            endRect.anchorMin = Vector2.zero;
+            endRect.anchorMax = Vector2.one;
+            endRect.offsetMin = endRect.offsetMax = Vector2.zero;
+            var black = GetOrAdd<Image>(endGo);
+            black.color = Color.black;
+            black.raycastTarget = false;
+            var endGroup = GetOrAdd<CanvasGroup>(endGo);
+            endGroup.alpha = 0f;
+            endGroup.interactable = false;
+            endGroup.blocksRaycasts = false;
+
+            TextMeshProUGUI Line(string name, float y, float size, float width, float height)
+            {
+                var go = FindOrCreateChild(endGo.transform, name);
+                var rect = GetOrAdd<RectTransform>(go);
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(width, height);
+                rect.anchoredPosition = new Vector2(0f, y);
+                var t = GetOrAdd<TextMeshProUGUI>(go);
+                t.fontSize = size;
+                t.alignment = TextAlignmentOptions.Center;
+                t.color = new Color(0.92f, 0.9f, 0.85f, 1f);
+                t.raycastTarget = false;
+                t.textWrappingMode = TextWrappingModes.Normal;
+                return t;
+            }
+
+            var endTitle = Line("Title", 150f, 56f, 1400f, 90f);
+            var endBody = Line("Body", -20f, 30f, 1200f, 260f);
+            var endHint = Line("Hint", -260f, 24f, 1200f, 50f);
+            endHint.text = "Enter  Nové kolo (jiný dům)      R  Stejný dům";
+            endHint.color = new Color(0.7f, 0.68f, 0.64f, 1f);
+            var endView = GetOrAdd<EndingView>(canvas);
+            SetRef(endView, "group", endGroup);
+            SetRef(endView, "title", endTitle);
+            SetRef(endView, "body", endBody);
+            SetRef(endView, "hint", endHint);
         }
     }
 }

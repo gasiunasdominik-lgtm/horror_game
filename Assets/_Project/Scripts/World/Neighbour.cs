@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using Vchod.Core;
 using Vchod.Player;
-using Vchod.Systems;
 
 namespace Vchod.World
 {
@@ -43,7 +42,6 @@ namespace Vchod.World
         private const string NobodyHome = "Nikdo neotvírá.";
 
         private ModuleLayoutBuilder _house;
-        private CoSystem _co;
         private PlayerController _player;
         private bool _trap;
         private bool _metBefore;
@@ -60,10 +58,9 @@ namespace Vchod.World
             _ => null,
         };
 
-        public void Setup(ModuleLayoutBuilder house, CoSystem co, PlayerController player, bool trap, bool alreadyHelped)
+        public void Setup(ModuleLayoutBuilder house, PlayerController player, bool trap, bool alreadyHelped)
         {
             _house = house;
-            _co = co;
             _player = player;
             _trap = trap;
             _phase = alreadyHelped ? Phase.Gone : Phase.Closed;
@@ -123,7 +120,7 @@ namespace Vchod.World
         private void Enter()
         {
             Close(Phase.Gone);
-            if (_trap) _co.ForceCollapse();
+            if (_trap) EventBus.Publish(new EnteredFlat { Home = false });
             else _house.TakeShortcut();
         }
 

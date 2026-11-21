@@ -151,6 +151,7 @@ namespace Vchod.EditorTools
             config.playerDoorPrefab = Save("PlayerDoor", root =>
             {
                 DoorPiece(root, playerDoor, frame, metal);
+                root.AddComponent<HomeDoor>();
                 // Doormat: the one thing that says "home" in the dark.
                 Box(root, "Doormat", new Vector3(0, 0.01f, 0.45f), new Vector3(0.8f, 0.02f, 0.5f), door, collider: false);
             });

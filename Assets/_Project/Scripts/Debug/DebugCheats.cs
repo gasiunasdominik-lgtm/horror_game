@@ -47,7 +47,7 @@ namespace Vchod.DebugTools
                 Report($"Restart round, seed {SeedService.Seed}");
                 GameBootstrap.RestartRound();
             }
-            if (k.f10Key.wasPressedThisFrame) Report("Endings: not implemented until M1 (T-026)");
+            if (k.f10Key.wasPressedThisFrame) PreviewNextEnding();
         }
 
         private static void Report(string message)
@@ -112,6 +112,17 @@ namespace Vchod.DebugTools
             house.GoToFloor((house.Floor + 1) % house.Config.floorCount);
             ctx.Player.Teleport(house.StartPoint, Direction.North.Yaw());
             Report($"Floor {house.Floor}{(house.IsPlayerFloor ? " (player's floor)" : "")}");
+        }
+
+        private int _previewEnding;
+
+        /// <summary>F10: show the next ending screen (1 → 2 → 3). Restart with Enter/R on it.</summary>
+        private void PreviewNextEnding()
+        {
+            _previewEnding = _previewEnding % 3 + 1;
+            var ending = (EndingId)_previewEnding;
+            EventBus.Publish(new RoundEnded { Ending = ending, Cause = CollapseCause.Home });
+            Report($"Ending preview: {ending}");
         }
 
         private void AddZone(int index)

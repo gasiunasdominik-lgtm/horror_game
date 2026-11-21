@@ -62,4 +62,31 @@ namespace Vchod.Core
     {
         public float Level;
     }
+
+    public enum EndingId
+    {
+        None = 0,
+        Collapse = 1,
+        Evacuation = 2,
+        FreshAir = 3,
+    }
+
+    public enum CollapseCause
+    {
+        Corridor = 0,
+        Neighbour = 1,
+        Home = 2,
+    }
+
+    /// <summary>The player walked into a flat: their own (home) or the neighbour's at the source.</summary>
+    public struct EnteredFlat
+    {
+        public bool Home;
+    }
+
+    public struct RoundEnded
+    {
+        public EndingId Ending;
+        public CollapseCause Cause;
+    }
 }

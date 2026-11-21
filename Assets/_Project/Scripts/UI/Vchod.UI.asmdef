@@ -5,7 +5,8 @@
         "Vchod.Core",
         "Vchod.Gameplay",
         "Unity.TextMeshPro",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

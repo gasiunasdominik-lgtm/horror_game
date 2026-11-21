@@ -77,7 +77,7 @@ namespace Vchod.DebugTools
             if (s.godMode) _text.Append("  GOD");
             _text.Append('\n');
             _text.Append("F1 overlay  F2 god  F3 teleport (Shift: floor)  F4 reshuffle (Shift: new seed)\n");
-            _text.Append("F5 enemy  F6 time  F7 fog/post  F8 bug report  F9 restart  F10 ending");
+            _text.Append("F5 enemy  F6 time  F7 fog/post  F8 bug report  F9 restart  F10 ending preview");
             return _text.ToString();
         }
 

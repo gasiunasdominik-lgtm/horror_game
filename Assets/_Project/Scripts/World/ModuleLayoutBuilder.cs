@@ -19,7 +19,6 @@ namespace Vchod.World
         [SerializeField] private LightTimer lightTimer;
         [SerializeField] private PlayerController player;
         [SerializeField] private NavMeshSurface navMeshSurface;
-        [SerializeField] private CoSystem co;
         [SerializeField] private bool reshuffleOnLightOff = true;
 
         private int _neighbourFloor = -1;
@@ -200,7 +199,7 @@ namespace Vchod.World
             if (index == _neighbourCell && config.neighbourDoorPrefab != null)
             {
                 var go = Instantiate(config.neighbourDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
-                go.GetComponent<Neighbour>().Setup(this, co, player, _neighbourTrap, _neighbourDone);
+                go.GetComponent<Neighbour>().Setup(this, player, _neighbourTrap, _neighbourDone);
             }
             else if (feature != null)
             {
