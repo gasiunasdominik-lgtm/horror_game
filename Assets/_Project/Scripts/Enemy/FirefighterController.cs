@@ -305,7 +305,27 @@ namespace Vchod.Enemy
             }
             if (_arrivalHunting || Time.time < _roamFrom) return;
             if (Mathf.Abs(_myFloor - house.Floor) > config.settings.lightHeardFloors) return;
-            var delay = _myFloor == house.Floor ? 2f : config.settings.lightResponseDelay;
+            var s = config.settings;
+            float delay;
+            if (_myFloor == house.Floor) delay = 2f;
+            else
+            {
+                switch (LightResponse.Pick(_rng.NextDouble(), s.lightComeChance, s.lightFalseAlarmChance))
+                {
+                    case LightReaction.FalseAlarm:
+                        // You hear him on the stairs between the floors... and he goes away.
+                        var between = house.GetCellCenter(LayoutPlan.StartIndex) +
+                                      Vector3.up * (_myFloor > house.Floor ? 1.6f : -1.2f);
+                        EventBus.Publish(new FirefighterOnStairs { Position = between, GoingAway = true });
+                        return;
+                    case LightReaction.Late:
+                        delay = s.lightLateDelayMin + (float)_rng.NextDouble() * Mathf.Max(0f, s.lightLateDelayMax - s.lightLateDelayMin);
+                        break;
+                    default:
+                        delay = s.lightResponseDelay;
+                        break;
+                }
+            }
             _myFloor = house.Floor;
             _pendingLight = true;
             _lightPosition = e.Position;

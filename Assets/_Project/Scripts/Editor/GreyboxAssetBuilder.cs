@@ -82,6 +82,15 @@ namespace Vchod.EditorTools
                 SetRef(lamp, "bulb", bulb.GetComponent<Renderer>());
                 SetRef(lamp, "onMaterial", lampOn);
                 SetRef(lamp, "offMaterial", lampOff);
+                var hum = lightGo.AddComponent<AudioSource>();
+                hum.playOnAwake = false;
+                hum.loop = true;
+                hum.spatialBlend = 1f;
+                hum.minDistance = 0.8f;
+                hum.maxDistance = 6f;
+                hum.volume = 0.12f;
+                hum.rolloffMode = AudioRolloffMode.Linear;
+                SetRef(lamp, "hum", hum);
             });
 
             config.lightButtonPrefab = Save("LightButton", root =>

@@ -70,6 +70,11 @@ namespace Vchod.Enemy
         public int lightHeardFloors = 1;
         [Tooltip("Seconds he needs to come to a floor where the light went on.")]
         public float lightResponseDelay = 12f;
+        [Tooltip("Light one floor away: chance he comes; chance it is only steps on the stairs that go away; else he comes later.")]
+        [Range(0f, 1f)] public float lightComeChance = 0.6f;
+        [Range(0f, 1f)] public float lightFalseAlarmChance = 0.2f;
+        public float lightLateDelayMin = 20f;
+        public float lightLateDelayMax = 40f;
 
         [Header("Patrol behaviour")]
         [Tooltip("After a search or light check that found nobody, chance he goes off to another floor.")]

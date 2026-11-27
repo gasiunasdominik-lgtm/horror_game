@@ -47,7 +47,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 
 | ID | Úkol | Vl. | Stav | P | Hotovo, když |
 |---|---|---|---|---|---|
-| T-039 | Světlo jako kompromis: zářivka bliká a bzučí, cvaknutí spínače je hluk, hasič na rozsvícení o patro vedle přijde jen někdy (~60 %), jindy kroky na schodech odejdou nebo přijde později | C | TODO | P1 | FEEL #3 + IDEA 21. 11.: při světle méně strachu |
+| T-039 | Světlo jako kompromis: zářivka bliká a bzučí, cvaknutí spínače je hluk, hasič na rozsvícení o patro vedle přijde jen někdy (~60 %), jindy kroky na schodech odejdou nebo přijde později | C | DONE | P1 | FEEL #3 + IDEA 21. 11.: při světle méně strachu |
 | T-040 | Sousedé 2–3 (pán s rádiem, hádka za dveřmi) | C | TODO | P1 | Funkční, odlišné chování |
 | T-041 | Kousky příběhu (15–20) a jejich rozmístění podle seedu | C | TODO | P1 | Sbíratelné, odhalují příběh při opakování |
 | T-042 | Low-poly art pass (moduly, rekvizity), jednotný retro filtr | C | TODO | P1 | Hra vypadá jednotně, drží výkon |

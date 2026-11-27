@@ -260,6 +260,41 @@ namespace Vchod.Audio
             return Make("Mumble", data);
         }
 
+        /// <summary>Fluorescent tube hum: 100 Hz mains buzz with harmonics, 1 s seamless loop.</summary>
+        public static AudioClip CreateTubeHum()
+        {
+            var samples = SampleRate;
+            var data = new float[samples];
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var v = Mathf.Sin(2f * Mathf.PI * 100f * t) * 0.5f
+                        + Mathf.Sin(2f * Mathf.PI * 200f * t) * 0.25f
+                        + Mathf.Sin(2f * Mathf.PI * 300f * t) * 0.15f
+                        + Mathf.Sin(2f * Mathf.PI * 1200f * t) * 0.04f * (0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * 3f * t));
+                data[i] = v * 0.35f;
+            }
+            return Make("TubeHum", data);
+        }
+
+        /// <summary>Old bakelite staircase switch: a hard click (press = true) or the relay clack when the timer ends.</summary>
+        public static AudioClip CreateSwitchClick(bool press)
+        {
+            var length = press ? 0.08f : 0.14f;
+            var samples = (int)(SampleRate * length);
+            var data = new float[samples];
+            var rng = new System.Random(press ? 7 : 8);
+            for (var i = 0; i < samples; i++)
+            {
+                var t = (float)i / SampleRate;
+                var noise = (float)(rng.NextDouble() * 2 - 1);
+                var tone = Mathf.Sin(2f * Mathf.PI * (press ? 1800f : 420f) * t);
+                var env = Mathf.Exp(-t * (press ? 90f : 45f));
+                data[i] = Mathf.Clamp((noise * 0.7f + tone * 0.5f) * env * (press ? 0.9f : 0.6f), -1f, 1f);
+            }
+            return Make(press ? "SwitchClick" : "RelayClack", data);
+        }
+
         private static AudioClip Make(string name, float[] data)
         {
             var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);

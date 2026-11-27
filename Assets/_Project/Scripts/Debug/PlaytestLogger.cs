@@ -47,6 +47,7 @@ namespace Vchod.DebugTools
             EventBus.Subscribe<CoCollapsed>(OnCollapsed);
             EventBus.Subscribe<FirefighterStateChanged>(OnFirefighterState);
             EventBus.Subscribe<FirefighterKnocked>(OnKnocked);
+            EventBus.Subscribe<FirefighterOnStairs>(OnStairsAlarm);
             EventBus.Subscribe<FirefighterLeftFloor>(OnLeftFloor);
             EventBus.Subscribe<PlayerCaught>(OnCaught);
             EventBus.Subscribe<FloorChanged>(OnFloor);
@@ -64,6 +65,7 @@ namespace Vchod.DebugTools
             EventBus.Unsubscribe<CoCollapsed>(OnCollapsed);
             EventBus.Unsubscribe<FirefighterStateChanged>(OnFirefighterState);
             EventBus.Unsubscribe<FirefighterKnocked>(OnKnocked);
+            EventBus.Unsubscribe<FirefighterOnStairs>(OnStairsAlarm);
             EventBus.Unsubscribe<FirefighterLeftFloor>(OnLeftFloor);
             EventBus.Unsubscribe<PlayerCaught>(OnCaught);
             EventBus.Unsubscribe<FloorChanged>(OnFloor);
@@ -83,6 +85,7 @@ namespace Vchod.DebugTools
         private void OnLayoutRebuilt(LayoutRebuilt e) => Log("layout", $"index={e.ReshuffleIndex};hash={e.LayoutHash:X8}");
         private void OnCoStage(CoStageChanged e) => Log("co_stage", $"from={e.PreviousStage};to={e.Stage};level={F(e.Level)}");
         private void OnCollapsed(CoCollapsed e) => Log("co_collapse", $"level={F(e.Level)}");
+        private void OnStairsAlarm(FirefighterOnStairs e) => Log("firefighter_false_alarm", $"pos={e.Position:F1}");
         private void OnKnocked(FirefighterKnocked e) => Log("firefighter_knock", $"pos={e.Position:F1};call={e.Call}");
         private void OnLeftFloor(FirefighterLeftFloor e) => Log("firefighter_left", $"from={e.From};to={e.To}");
         private void OnFirefighterState(FirefighterStateChanged e) => Log("firefighter", $"from={e.Previous};to={e.State}");

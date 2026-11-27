@@ -56,12 +56,28 @@ namespace Vchod.Audio
         {
             EventBus.Subscribe<FirefighterStateChanged>(OnState);
             EventBus.Subscribe<FirefighterKnocked>(OnKnock);
+            EventBus.Subscribe<FirefighterOnStairs>(OnStairs);
         }
 
         private void OnDisable()
         {
             EventBus.Unsubscribe<FirefighterStateChanged>(OnState);
             EventBus.Unsubscribe<FirefighterKnocked>(OnKnock);
+            EventBus.Unsubscribe<FirefighterOnStairs>(OnStairs);
+        }
+
+        // False alarm: heavy steps on the stairs come closer for a few steps, stop, then fade away.
+        private void OnStairs(FirefighterOnStairs e) => StartCoroutine(StairSteps(e.Position));
+
+        private System.Collections.IEnumerator StairSteps(Vector3 at)
+        {
+            for (var i = 0; i < 12; i++)
+            {
+                if (i == 5) yield return new WaitForSeconds(2.2f); // he stops and listens
+                var volume = i < 5 ? 0.45f + i * 0.08f : Mathf.Max(0.08f, 0.8f - (i - 5) * 0.11f);
+                AudioSource.PlayClipAtPoint(_steps[i % _steps.Length], at, volume);
+                yield return new WaitForSeconds(0.55f);
+            }
         }
 
         // Evacuating the house: a heavy-gloved knock, sometimes a muffled call through the mask.
