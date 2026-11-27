@@ -32,7 +32,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-025 | Soused 1 (paní s dortem) jako vzor: dveře, dialog, zkratka nebo past | C | DONE | P1 | Soused reaguje, nabízí zkratku, past je čitelná |
 | T-026 | EndingsManager: konec 1 (zhroucení), 2 (evakuace), 3 (čerstvý vzduch) v hrubé verzi | C | DONE | P1 | Všechny tři konce dosažitelné |
 | T-027 | Smyčka kola: start, konec, restart se stejným/novým seedem | C | DONE | P1 | Po konci lze začít nové kolo |
-| T-028 | Playtest #2 + FEEL, brána G1 | D | TODO | P1 | `FEEL:` odpověď a rozhodnutí G1 |
+| T-028 | Playtest #2 + FEEL, brána G1 | D | DONE | P1 | `FEEL:` odpověď a rozhodnutí G1 |
 | T-029 | První krátké video z vývoje | D | TODO | P2 | Video zveřejněné nebo připravené |
 | T-030 | Měření výkonu, tag `m1` | C | DONE | P2 | Tag existuje |
 | T-031 | Klidný úvod: hasič se v kole objeví až po prodlevě (~90 s) a přichází zdola po schodech, nikdy ne blízko hráče | C | DONE | P1 | FEEL #2: „sotva se rozkoukám, už běží“ |
@@ -47,6 +47,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 
 | ID | Úkol | Vl. | Stav | P | Hotovo, když |
 |---|---|---|---|---|---|
+| T-039 | Světlo jako kompromis: zářivka bliká a bzučí, cvaknutí spínače je hluk, hasič na rozsvícení o patro vedle přijde jen někdy (~60 %), jindy kroky na schodech odejdou nebo přijde později | C | TODO | P1 | FEEL #3 + IDEA 21. 11.: při světle méně strachu |
 | T-040 | Sousedé 2–3 (pán s rádiem, hádka za dveřmi) | C | TODO | P1 | Funkční, odlišné chování |
 | T-041 | Kousky příběhu (15–20) a jejich rozmístění podle seedu | C | TODO | P1 | Sbíratelné, odhalují příběh při opakování |
 | T-042 | Low-poly art pass (moduly, rekvizity), jednotný retro filtr | C | TODO | P1 | Hra vypadá jednotně, drží výkon |

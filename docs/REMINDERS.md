@@ -9,7 +9,7 @@ Splatnost = datum nebo spouštěč (milník, událost). Claude je ukazuje při `
 | R-003 | M0 konec | Ověřit v Unity, že zvolená verze LTS je aktuální a podporovaná (Unity 6.0 LTS má končící podporu, ověř konkrétní datum) | C | done 21. 11. 2026 (6000.3.29f1 je nejnovější LTS; datum konce podpory CLI neuvádí, ověřit na webu Unity u M2) |
 | R-004 | 6. 12. 2026 | Zjistit termíny zkouškového a zápočtů, upravit hodiny/týden a M2 | D | open |
 | R-005 | 20. 12. 2026 | První krátké video z vývoje | D | open |
-| R-006 | konec M1 | Brána G1: je honička a světlo zábava? | D | open |
+| R-006 | konec M1 | Brána G1: je honička a světlo zábava? | D | done 27. 11. 2026 (projde, D-055) |
 | R-007 | M2 | Cizí playtest se 3 lidmi bez vysvětlování | D | open |
 | R-008 | konec M2 | Brána G2 | D | open |
 | R-009 | M3 | Steam Direct (100 $, ověř aktuální cenu), store page, trailer | D | open |
