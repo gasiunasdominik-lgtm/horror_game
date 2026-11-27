@@ -20,7 +20,7 @@ Splatnost = datum nebo spouštěč (milník, událost). Claude je ukazuje při `
 | R-014 | každý týden, neděle | Týdenní review: `/status`, upomínky, plán 3 cílů | D+C | open |
 | R-015 | každý milník | Měření výkonu na Zenbooku do `TESTING.md` | C | open |
 | R-016 | každá session | Commit a `HANDOFF.md` na konci | C | open |
-| R-018 | M1 start | Měření výkonu zopakovat na síti i na baterii (M0 běhy se lišily 66 vs. 98 FPS) | C | open |
+| R-018 | M1 start | Měření výkonu zopakovat na síti i na baterii (M0 běhy se lišily 66 vs. 98 FPS) | C | done 27. 11. 2026 (síť 134 FPS, baterie 198–218 FPS; rozdíl M0 byl přiškrcení, ne napájení) |
 | R-017 | před vydáním | Age rating, content poznámky (téma CO, bez krve), anglické a české texty | D | open |
 
 ## Jak přidat upomínku
