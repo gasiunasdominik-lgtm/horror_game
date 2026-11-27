@@ -296,6 +296,21 @@ namespace Vchod.EditorTools
             SetRef(storyView, "counter", storyCounter);
             SetRef(storyView, "player", player);
 
+            // Pause (Esc / Start) and the shared settings panel, above the story reader.
+            var pauseRoot = FindOrCreateChild(canvas.transform, "Pause");
+            UiWidgets.Stretch(pauseRoot);
+            var pauseDim = GetOrAdd<Image>(pauseRoot);
+            pauseDim.color = new Color(0f, 0f, 0f, 0.8f);
+            pauseDim.raycastTarget = true;
+            UiWidgets.Label(pauseRoot.transform, "Title", "Pauza", 52f, new Vector2(0f, 200f), new Vector2(900f, 90f));
+            var resume = UiWidgets.Button(pauseRoot.transform, "Resume", "Pokračovat", new Vector2(0f, 40f));
+            var pauseSettings = UiWidgets.Button(pauseRoot.transform, "SettingsButton", "Nastavení", new Vector2(0f, -40f));
+            var toMenu = UiWidgets.Button(pauseRoot.transform, "MainMenu", "Hlavní menu", new Vector2(0f, -120f));
+            pauseRoot.transform.SetAsLastSibling();
+            var settingsPanel = UiWidgets.SettingsPanel(canvas);
+            canvas.transform.Find("Settings").SetAsLastSibling();
+            pauseRoot.SetActive(false);
+
             // Ending screen: last child, so it covers everything else.
             var endGo = FindOrCreateChild(canvas.transform, "Ending");
             endGo.transform.SetAsLastSibling();
@@ -337,6 +352,16 @@ namespace Vchod.EditorTools
             SetRef(endView, "title", endTitle);
             SetRef(endView, "body", endBody);
             SetRef(endView, "hint", endHint);
+
+            var pause = GetOrAdd<PauseMenu>(canvas);
+            SetRef(pause, "root", pauseRoot);
+            SetRef(pause, "resume", resume);
+            SetRef(pause, "settings", pauseSettings);
+            SetRef(pause, "mainMenu", toMenu);
+            SetRef(pause, "settingsPanel", settingsPanel);
+            SetRef(pause, "story", storyView);
+            SetRef(pause, "ending", endView);
+            SetRef(pause, "player", player);
         }
     }
 }

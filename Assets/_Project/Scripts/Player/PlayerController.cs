@@ -94,6 +94,7 @@ namespace Vchod.Player
             var look = _input.LookMouse.ReadValue<Vector2>() * config.mouseSensitivity
                        + _input.LookStick.ReadValue<Vector2>() * (config.gamepadLookSpeed * dt);
             look *= LookMultiplier;
+            look = Systems.GameSettings.ApplyLook(look, Systems.GameSettings.LookSensitivity, Systems.GameSettings.InvertY);
 
             transform.Rotate(0f, look.x, 0f, Space.Self);
             _pitch = Mathf.Clamp(_pitch - look.y, -config.maxPitch, config.maxPitch);
