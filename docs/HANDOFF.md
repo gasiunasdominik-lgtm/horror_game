@@ -3,7 +3,7 @@
 Přepisuje `/end`. Krátké. Historie je v gitu.
 
 ## Stav
-M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 EditMode testů zelených. Výkon na Zenbooku 1080p: 134 FPS (1 % low 81). `main` a `m1` pushnuty.
+M2 rozpracované (27. 11. 2026): G1 prošla (D-055). Hotovo T-039 (světlo jako kompromis), T-040 (sousedé 2–3), T-041 (18 kousků příběhu), T-044 (menu, pauza, nastavení). 118 EditMode testů zelených. Výkon na baterii 198–218 FPS. `main` pushnutý.
 
 ## Hotovo v této session
 - T-020–T-023: hasič (stavy, smysly, hledání skrýší), zvuk, skrýše skříň/stůl, okna s čerstvým vzduchem, víc spínačů.
@@ -15,12 +15,12 @@ M1 hotový (21. 11. 2026): tag `m1` na `main`. T-020 až T-027 a T-030 DONE, 88 
 - Rozhodnutí D-032 až D-048.
 
 ## Rozpracováno
-- Větev `feat/t034-escape` (nemergnuto): T-034 požární dveře, T-036 zvukový mix a vlastní kroky, T-037 hasič odchází po marném hledání, rozhlíží se, klepe na byty. 103 testů zelených. Čeká na Dominikův test.
+- nic
 
 ## Další krok
-1. Dominik: playtest #2 (T-028) a FEEL hodnocení, brána G1.
-2. Dominik: T-029 video.
-3. Claude: po playtestu zpracovat nálezy, pak M2.
+1. Dominik: zahrát přes menu (build `Builds/Dev/VchodC.exe` nebo scéna Menu v Editoru), FEEL.
+2. Claude: T-042 art pass (procedurálně, bez cizích assetů), pak T-043 audio pass (potřebuje souhlas s balíčky a licencemi).
+3. Rozhodnout skrytý konec (T-045).
 
 ## Otevřené otázky (s výchozími odpověďmi)
 - Q: Hasič startuje v nejhlubší buňce patra hráče. Když hráč hned rozsvítí, může ho chytit do ~10 s. Výchozí: nechat a rozhodnout podle playtestu #2.

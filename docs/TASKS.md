@@ -52,7 +52,7 @@ Max 3 aktivní cíle týdně. Nápady se neimplementují, dokud nejsou přeřaze
 | T-041 | Kousky příběhu (15–20) a jejich rozmístění podle seedu | C | DONE | P1 | Sbíratelné, odhalují příběh při opakování |
 | T-042 | Low-poly art pass (moduly, rekvizity), jednotný retro filtr | C | TODO | P1 | Hra vypadá jednotně, drží výkon |
 | T-043 | Audio pass (ambient, detektor, dech, hlasy sousedů ze zkreslených zvuků) | C | TODO | P1 | Zvuk nese atmosféru |
-| T-044 | Menu, pauza, nastavení, uložení nastavení | C | TODO | P2 | Hra se spustí z menu |
+| T-044 | Menu, pauza, nastavení, uložení nastavení | C | DONE | P2 | Hra se spustí z menu |
 | T-045 | Skrytý konec (rozhodnutí v DECISIONS) | C | TODO | P3 | Dosažitelný po sebrání kousků |
 | T-046 | Cizí playtest se 3 lidmi, G2 | D | TODO | P1 | 3 FEEL záznamy, rozhodnutí G2 |
 | T-047 | Měření výkonu, tag `m2` | C | TODO | P2 | Tag existuje |

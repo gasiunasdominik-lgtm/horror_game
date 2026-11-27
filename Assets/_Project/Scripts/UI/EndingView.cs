@@ -21,6 +21,9 @@ namespace Vchod.UI
         [SerializeField] private float introFade = 2f;
 
         private float _shownAt = -1f;
+
+        /// <summary>The round is over and the ending screen is up (pause is not allowed then).</summary>
+        public bool IsShowing => _shownAt >= 0f;
         private float _introStart;
 
         private void Awake()
@@ -31,7 +34,7 @@ namespace Vchod.UI
             _introStart = Time.unscaledTime;
             hint.enabled = false;
             AudioListener.pause = false;
-            AudioListener.volume = 1f;
+            GameSettings.ApplyAll();
         }
 
         private void OnEnable() => EventBus.Subscribe<RoundEnded>(OnEnded);
@@ -55,7 +58,7 @@ namespace Vchod.UI
             }
             var t = Time.unscaledTime - _shownAt;
             group.alpha = Mathf.Clamp01(t / fadeTime);
-            AudioListener.volume = 1f - group.alpha;
+            AudioListener.volume = GameSettings.MasterVolume * (1f - group.alpha);
             if (t < hintDelay) return;
             hint.enabled = true;
 
