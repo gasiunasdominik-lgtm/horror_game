@@ -20,7 +20,22 @@ namespace Vchod.Systems
 
         private void Update()
         {
-            if (_logic.Tick(Time.deltaTime)) EventBus.Publish(new LightTurnedOff());
+            if (_logic.Tick(Time.deltaTime))
+            {
+                PlayRelay();
+                EventBus.Publish(new LightTurnedOff());
+            }
+        }
+
+        private static AudioClip _relay;
+
+        // The timer relay in the stairwell box clacks off: you hear the dark coming.
+        private static void PlayRelay()
+        {
+            var cam = Camera.main;
+            if (cam == null) return;
+            if (_relay == null) _relay = Audio.ProceduralAudio.CreateSwitchClick(press: false);
+            AudioSource.PlayClipAtPoint(_relay, cam.transform.position + Vector3.up * 0.8f, 0.35f);
         }
 
         public void Press(Vector3 position)

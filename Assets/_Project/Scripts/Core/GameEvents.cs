@@ -78,6 +78,13 @@ namespace Vchod.Core
         Home = 2,
     }
 
+    /// <summary>The player picked up a story piece (id from StoryCatalog). New = first time ever.</summary>
+    public struct StoryPieceFound
+    {
+        public int Id;
+        public bool New;
+    }
+
     /// <summary>The player walked into a flat: their own (home) or the neighbour's at the source.</summary>
     public struct EnteredFlat
     {

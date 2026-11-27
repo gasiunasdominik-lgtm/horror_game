@@ -25,6 +25,12 @@ namespace Vchod.World
         private int _neighbourCell = -1;
         private bool _neighbourTrap;
         private bool _neighbourDone;
+        private int _radioFloor = -1, _radioCell = -1, _argumentFloor = -1, _argumentCell = -1;
+        // Story pieces this round: index = floor. Taken ones do not come back after a reshuffle.
+        private System.Collections.Generic.List<int> _storyIds = new();
+        private readonly System.Collections.Generic.HashSet<int> _storyTaken = new();
+
+        public void MarkStoryTaken(int id) => _storyTaken.Add(id);
 
         private Transform _floorRoot;
         private bool _reshufflePending;
@@ -67,6 +73,10 @@ namespace Vchod.World
         {
             Floor = 0;
             _neighbourFloor = NeighbourPlacement.FloorFor(SeedService.Seed, config.playerFloor, config.neighbourTrapChance);
+            _radioFloor = NeighbourPlacement.FloorForOther(SeedService.Seed, NeighbourPlacement.RadioStream, config.floorCount);
+            _argumentFloor = NeighbourPlacement.FloorForOther(SeedService.Seed, NeighbourPlacement.ArgumentStream, config.floorCount);
+            _storyIds = StorySelection.Pick(SeedService.Seed, StoryProgress.Collected, config.floorCount);
+            _storyTaken.Clear();
             Build(0);
             player.Teleport(StartPoint, Direction.North.Yaw());
         }
@@ -145,6 +155,10 @@ namespace Vchod.World
             Plan = LayoutGenerator.Generate(layoutSeed, config.rules, IsPlayerFloor);
             _neighbourCell = Floor == _neighbourFloor ? NeighbourPlacement.DoorCell(Plan, SeedService.Seed, Floor, reshuffleIndex) : -1;
             _neighbourTrap = Floor == config.playerFloor;
+            _radioCell = Floor == _radioFloor
+                ? NeighbourPlacement.OtherDoorCell(Plan, SeedService.Seed, NeighbourPlacement.RadioStream, Floor, reshuffleIndex, _neighbourCell) : -1;
+            _argumentCell = Floor == _argumentFloor
+                ? NeighbourPlacement.OtherDoorCell(Plan, SeedService.Seed, NeighbourPlacement.ArgumentStream, Floor, reshuffleIndex, _neighbourCell, _radioCell) : -1;
             HasCoSource = false;
             DoorFronts.Clear();
             DoorWalls.Clear();
@@ -163,6 +177,7 @@ namespace Vchod.World
             _floorRoot.SetParent(transform, false);
 
             for (var i = 0; i < Plan.Count; i++) BuildCell(i, Plan.Cells[i]);
+            PlaceStoryPiece(reshuffleIndex);
 
             var lightOn = lightTimer != null && lightTimer.IsOn;
             foreach (var lamp in _floorRoot.GetComponentsInChildren<StairLamp>()) lamp.SetOn(lightOn);
@@ -216,6 +231,15 @@ namespace Vchod.World
             {
                 var go = Instantiate(config.neighbourDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
                 go.GetComponent<Neighbour>().Setup(this, player, _neighbourTrap, _neighbourDone);
+            }
+            else if (index == _radioCell && config.radioDoorPrefab != null)
+            {
+                var go = Instantiate(config.radioDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+                go.GetComponent<RadioNeighbour>().Setup(player);
+            }
+            else if (index == _argumentCell && config.arguingDoorPrefab != null)
+            {
+                Instantiate(config.arguingDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
             }
             else if (feature != null)
             {
@@ -272,6 +296,28 @@ namespace Vchod.World
             GoToFloor(Floor + 1, viaStairs: false);
             var cell = Plan.Cells[Plan.MainPath[1]];
             player.Teleport(StartPoint, cell.InDirection.Yaw());
+        }
+
+        /// <summary>This floor's story piece on a free wall of a seeded cell (never over a switch, hiding spot or door).</summary>
+        private void PlaceStoryPiece(int reshuffleIndex)
+        {
+            if (config.storyPiecePrefab == null || Floor >= _storyIds.Count) return;
+            var id = _storyIds[Floor];
+            if (_storyTaken.Contains(id)) return;
+            var options = new System.Collections.Generic.List<(int cell, Direction side)>();
+            for (var i = 1; i < Plan.Count; i++)
+            {
+                var c = Plan.Cells[i];
+                var sides = LayoutGenerator.FreeSides(c);
+                if (c.Hiding != HidingKind.None) sides.Remove(c.HidingSide);
+                if (c.HasSwitch) sides.Remove(c.SwitchSide);
+                foreach (var d in sides) options.Add((i, d));
+            }
+            if (options.Count == 0) return;
+            var rng = new System.Random(SeedService.DeriveSeed(SeedService.Seed, $"story/f{Floor}", reshuffleIndex));
+            var (cellIndex, side) = options[rng.Next(options.Count)];
+            var go = Instantiate(config.storyPiecePrefab, WallPoint(GetCellCenter(cellIndex), side), Inward(side), _floorRoot);
+            go.GetComponent<StoryPickup>().Setup(id, this);
         }
 
         /// <summary>

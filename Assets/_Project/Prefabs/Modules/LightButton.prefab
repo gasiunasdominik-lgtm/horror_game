@@ -69,6 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Vchod.Gameplay::Vchod.World.LightButton
   prompt: "E  Rozsv\xEDtit"
+  clickNoiseRadius: 4
 --- !u!1 &4866318405800568869
 GameObject:
   m_ObjectHideFlags: 0

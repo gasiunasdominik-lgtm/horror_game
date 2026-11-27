@@ -43,6 +43,12 @@ namespace Vchod.World
         public GameObject lightButtonPrefab;
         public GameObject apartmentDoorPrefab;
         public GameObject playerDoorPrefab;
+        [Tooltip("A story piece (note / photo / device), one per floor per round.")]
+        public GameObject storyPiecePrefab;
+        [Tooltip("Neighbour 2: the man with the radio.")]
+        public GameObject radioDoorPrefab;
+        [Tooltip("Neighbour 3: the argument behind the door (a TV).")]
+        public GameObject arguingDoorPrefab;
         [Tooltip("Fire door to the emergency stairs, one per floor.")]
         public GameObject fireDoorPrefab;
         public GameObject windowPrefab;

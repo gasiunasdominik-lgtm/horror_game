@@ -21,6 +21,13 @@ namespace Vchod.Enemy
         public bool Call;
     }
 
+    /// <summary>Heard on the stairs below/above without coming (false alarm). Audio plays steps there.</summary>
+    public struct FirefighterOnStairs
+    {
+        public UnityEngine.Vector3 Position;
+        public bool GoingAway;
+    }
+
     /// <summary>He left the player's floor for another one.</summary>
     public struct FirefighterLeftFloor
     {
