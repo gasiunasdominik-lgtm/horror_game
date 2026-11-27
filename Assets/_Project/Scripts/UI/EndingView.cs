@@ -40,7 +40,8 @@ namespace Vchod.UI
         private void OnEnded(RoundEnded e)
         {
             title.text = EndingTexts.Title(e.Ending);
-            body.text = EndingTexts.Body(e.Ending, e.Cause);
+            body.text = EndingTexts.Body(e.Ending, e.Cause) +
+                        $"\n\n<size=70%>Kousky příběhu {StoryProgress.Collected.Count}/{StoryCatalog.All.Count}</size>";
             hint.enabled = false;
             _shownAt = Time.unscaledTime;
         }

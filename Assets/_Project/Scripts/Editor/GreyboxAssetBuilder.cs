@@ -136,6 +136,26 @@ namespace Vchod.EditorTools
                 SetRef(n, "knock", Source3D(root, "Knock", 15f, 1f, false));
             });
 
+            // Story pieces: faintly lit so they can be found in the dark, never glowing like a switch.
+            var storyPaper = Mat("M_StoryPaper", new Color(0.85f, 0.83f, 0.76f), emission: new Color(0.12f, 0.12f, 0.1f));
+            var photoMat = Mat("M_Photo", new Color(0.75f, 0.7f, 0.6f), emission: new Color(0.1f, 0.09f, 0.07f));
+            var device = Mat("M_Device", new Color(0.2f, 0.2f, 0.21f), smoothness: 0.4f);
+            var led = Mat("M_Led", new Color(1f, 0.1f, 0.05f), emission: new Color(3f, 0.2f, 0.1f));
+            config.storyPiecePrefab = Save("StoryPiece", root =>
+            {
+                var note = Box(root, "Note", new Vector3(0.35f, 1.45f, 0.01f), new Vector3(0.21f, 0.29f, 0.01f), storyPaper, collider: true);
+                var photo = Box(root, "Photo", new Vector3(0.3f, 0.012f, 0.3f), new Vector3(0.15f, 0.01f, 0.11f), photoMat, collider: true);
+                var dev = Box(root, "Device", new Vector3(0.35f, 1.25f, 0.035f), new Vector3(0.12f, 0.18f, 0.06f), device, collider: true);
+                Box(dev, "Led", new Vector3(0.3f, 0.35f, 0.55f), new Vector3(0.15f, 0.1f, 0.1f), led, collider: false);
+                // A photo on the floor is small: a bigger invisible trigger for the interaction ray.
+                var bc = photo.GetComponent<BoxCollider>();
+                bc.size = new Vector3(1.6f, 20f, 1.6f);
+                var pickup = root.AddComponent<StoryPickup>();
+                SetRef(pickup, "note", note);
+                SetRef(pickup, "photo", photo);
+                SetRef(pickup, "device", dev);
+            });
+
             config.playerDoorPrefab = Save("PlayerDoor", root =>
             {
                 DoorPiece(root, playerDoor, frame, metal);

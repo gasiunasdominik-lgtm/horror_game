@@ -252,6 +252,50 @@ namespace Vchod.EditorTools
             var subView = GetOrAdd<SubtitleView>(canvas);
             SetRef(subView, "text", sub);
 
+            // Story piece reader: dim panel over the game, under the ending screen.
+            var storyGo = FindOrCreateChild(canvas.transform, "Story");
+            var storyRect = GetOrAdd<RectTransform>(storyGo);
+            storyRect.anchorMin = Vector2.zero;
+            storyRect.anchorMax = Vector2.one;
+            storyRect.offsetMin = storyRect.offsetMax = Vector2.zero;
+            var dim = GetOrAdd<Image>(storyGo);
+            dim.color = new Color(0f, 0f, 0f, 0.82f);
+            dim.raycastTarget = false;
+            var storyGroup = GetOrAdd<CanvasGroup>(storyGo);
+            storyGroup.alpha = 0f;
+            storyGroup.blocksRaycasts = false;
+            storyGroup.interactable = false;
+
+            TextMeshProUGUI StoryLine(string name, float y, float size, float width, float height, TextAlignmentOptions align)
+            {
+                var go = FindOrCreateChild(storyGo.transform, name);
+                var rect = GetOrAdd<RectTransform>(go);
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(width, height);
+                rect.anchoredPosition = new Vector2(0f, y);
+                var t = GetOrAdd<TextMeshProUGUI>(go);
+                t.fontSize = size;
+                t.alignment = align;
+                t.color = new Color(0.92f, 0.9f, 0.85f, 1f);
+                t.raycastTarget = false;
+                t.textWrappingMode = TextWrappingModes.Normal;
+                return t;
+            }
+
+            var storyTitle = StoryLine("Title", 250f, 40f, 1000f, 70f, TextAlignmentOptions.Center);
+            var storyBody = StoryLine("Body", -10f, 28f, 900f, 420f, TextAlignmentOptions.TopLeft);
+            var storyCounter = StoryLine("Counter", -290f, 20f, 1000f, 40f, TextAlignmentOptions.Center);
+            storyCounter.color = new Color(0.7f, 0.68f, 0.64f, 1f);
+            var storyHint = StoryLine("Hint", -330f, 20f, 1000f, 40f, TextAlignmentOptions.Center);
+            storyHint.text = "E  Zavřít";
+            storyHint.color = new Color(0.7f, 0.68f, 0.64f, 1f);
+            var storyView = GetOrAdd<StoryView>(canvas);
+            SetRef(storyView, "group", storyGroup);
+            SetRef(storyView, "title", storyTitle);
+            SetRef(storyView, "body", storyBody);
+            SetRef(storyView, "counter", storyCounter);
+            SetRef(storyView, "player", player);
+
             // Ending screen: last child, so it covers everything else.
             var endGo = FindOrCreateChild(canvas.transform, "Ending");
             endGo.transform.SetAsLastSibling();

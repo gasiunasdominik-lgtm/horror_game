@@ -52,6 +52,7 @@ namespace Vchod.DebugTools
             EventBus.Subscribe<PlayerCaught>(OnCaught);
             EventBus.Subscribe<FloorChanged>(OnFloor);
             EventBus.Subscribe<RoundEnded>(OnEnded);
+            EventBus.Subscribe<StoryPieceFound>(OnStory);
             Application.quitting += OnQuit;
         }
 
@@ -70,6 +71,7 @@ namespace Vchod.DebugTools
             EventBus.Unsubscribe<PlayerCaught>(OnCaught);
             EventBus.Unsubscribe<FloorChanged>(OnFloor);
             EventBus.Unsubscribe<RoundEnded>(OnEnded);
+            EventBus.Unsubscribe<StoryPieceFound>(OnStory);
             Application.quitting -= OnQuit;
         }
 
@@ -91,6 +93,7 @@ namespace Vchod.DebugTools
         private void OnFirefighterState(FirefighterStateChanged e) => Log("firefighter", $"from={e.Previous};to={e.State}");
         private void OnCaught(PlayerCaught e) => Log("caught", $"pos={V(e.Position)}");
         private void OnFloor(FloorChanged e) => Log("floor", $"from={e.From};to={e.To};stairs={e.ViaStairs}");
+        private void OnStory(StoryPieceFound e) => Log("story", $"id={e.Id};new={e.New}");
         private void OnEnded(RoundEnded e) => Log("round_end", $"ending={e.Ending};cause={e.Cause}");
         private void OnQuit() => Log("quit", string.Empty);
 
