@@ -108,53 +108,32 @@ namespace Vchod.EditorTools
             var flat = Mat("M_FlatInterior", new Color(0.25f, 0.17f, 0.10f), emission: new Color(0.55f, 0.36f, 0.16f));
             config.neighbourDoorPrefab = Save("NeighbourDoor", root =>
             {
-                // Like a flat door, but the leaf hangs on a hinge and there is a lit hall behind it.
-                const float w = 0.9f, dh = 2.0f;
-                Box(root, "Hall", new Vector3(0, dh * 0.5f, 0.003f), new Vector3(w, dh, 0.002f), flat, collider: false);
-                var hinge = new GameObject("Hinge").transform;
-                hinge.SetParent(root.transform, false);
-                hinge.localPosition = new Vector3(-w * 0.5f, 0f, 0.02f);
-                Box(hinge.gameObject, "Leaf", new Vector3(w * 0.5f, dh * 0.5f, 0f), new Vector3(w, dh, 0.04f), door, collider: false);
-                Box(hinge.gameObject, "Handle", new Vector3(w - 0.1f, 1.0f, 0.04f), new Vector3(0.12f, 0.03f, 0.04f), metal, collider: false);
-                Box(hinge.gameObject, "Peephole", new Vector3(w * 0.5f, 1.55f, 0.025f), new Vector3(0.03f, 0.03f, 0.01f), metal, collider: false);
-                Box(root, "FrameTop", new Vector3(0, dh + 0.04f, 0.03f), new Vector3(w + 0.16f, 0.08f, 0.06f), frame, collider: false);
-                Box(root, "FrameLeft", new Vector3(-w * 0.5f - 0.04f, dh * 0.5f, 0.03f), new Vector3(0.08f, dh, 0.06f), frame, collider: false);
-                Box(root, "FrameRight", new Vector3(w * 0.5f + 0.04f, dh * 0.5f, 0.03f), new Vector3(0.08f, dh, 0.06f), frame, collider: false);
-                var col = root.AddComponent<BoxCollider>();
-                col.center = new Vector3(0, dh * 0.5f, 0.04f);
-                col.size = new Vector3(w, dh, 0.08f);
-
-                var spillGo = new GameObject("Spill");
-                spillGo.transform.SetParent(root.transform, false);
-                spillGo.transform.localPosition = new Vector3(0.15f, 1.1f, 0.35f);
-                var spill = spillGo.AddComponent<Light>();
-                spill.type = LightType.Point;
-                spill.color = new Color(1f, 0.75f, 0.45f);
-                spill.range = 3.5f;
-                spill.intensity = 2.2f;
-                spill.shadows = LightShadows.None;
-                spill.enabled = false;
-
-                AudioSource Source(string name, float max, float volume, bool loop)
-                {
-                    var go = new GameObject(name);
-                    go.transform.SetParent(root.transform, false);
-                    go.transform.localPosition = new Vector3(0, 1.2f, 0.1f);
-                    var src = go.AddComponent<AudioSource>();
-                    src.playOnAwake = false;
-                    src.loop = loop;
-                    src.spatialBlend = 1f;
-                    src.minDistance = 1f;
-                    src.maxDistance = max;
-                    src.volume = volume;
-                    return src;
-                }
-
+                HingedDoor(root, flat, door, frame, metal, out var hinge, out var spill);
                 var n = root.AddComponent<Neighbour>();
                 SetRef(n, "leaf", hinge);
                 SetRef(n, "spill", spill);
-                SetRef(n, "knock", Source("Knock", 15f, 1f, false));
-                SetRef(n, "draft", Source("Draft", 8f, 0.5f, true));
+                SetRef(n, "knock", Source3D(root, "Knock", 15f, 1f, false));
+                SetRef(n, "draft", Source3D(root, "Draft", 8f, 0.5f, true));
+            });
+
+            // Neighbour 2: the man with the radio. Same hinged door, radio murmuring behind it.
+            config.radioDoorPrefab = Save("RadioDoor", root =>
+            {
+                HingedDoor(root, flat, door, frame, metal, out var hinge, out var spill);
+                var n = root.AddComponent<RadioNeighbour>();
+                SetRef(n, "leaf", hinge);
+                SetRef(n, "spill", spill);
+                SetRef(n, "knock", Source3D(root, "Knock", 15f, 1f, false));
+                SetRef(n, "radio", Source3D(root, "Radio", 9f, 0.35f, true));
+            });
+
+            // Neighbour 3: the argument behind a closed door (a TV, GDD). Loud, and it covers your steps.
+            config.arguingDoorPrefab = Save("ArguingDoor", root =>
+            {
+                DoorPiece(root, door, frame, metal);
+                var n = root.AddComponent<ArguingFlat>();
+                SetRef(n, "voices", Source3D(root, "Voices", 11f, 0.6f, true));
+                SetRef(n, "knock", Source3D(root, "Knock", 15f, 1f, false));
             });
 
             config.playerDoorPrefab = Save("PlayerDoor", root =>
@@ -397,6 +376,52 @@ namespace Vchod.EditorTools
             so.FindProperty("enterNoiseRadius").floatValue = noise;
             so.FindProperty("yawLimit").floatValue = yawLimit;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>A flat door whose leaf swings on a hinge, with a lit hall and a warm light spill behind it.</summary>
+        private static void HingedDoor(GameObject root, Material flat, Material door, Material frame, Material metal,
+            out Transform hinge, out Light spill)
+        {
+            const float w = 0.9f, dh = 2.0f;
+            Box(root, "Hall", new Vector3(0, dh * 0.5f, 0.003f), new Vector3(w, dh, 0.002f), flat, collider: false);
+            hinge = new GameObject("Hinge").transform;
+            hinge.SetParent(root.transform, false);
+            hinge.localPosition = new Vector3(-w * 0.5f, 0f, 0.02f);
+            Box(hinge.gameObject, "Leaf", new Vector3(w * 0.5f, dh * 0.5f, 0f), new Vector3(w, dh, 0.04f), door, collider: false);
+            Box(hinge.gameObject, "Handle", new Vector3(w - 0.1f, 1.0f, 0.04f), new Vector3(0.12f, 0.03f, 0.04f), metal, collider: false);
+            Box(hinge.gameObject, "Peephole", new Vector3(w * 0.5f, 1.55f, 0.025f), new Vector3(0.03f, 0.03f, 0.01f), metal, collider: false);
+            Box(root, "FrameTop", new Vector3(0, dh + 0.04f, 0.03f), new Vector3(w + 0.16f, 0.08f, 0.06f), frame, collider: false);
+            Box(root, "FrameLeft", new Vector3(-w * 0.5f - 0.04f, dh * 0.5f, 0.03f), new Vector3(0.08f, dh, 0.06f), frame, collider: false);
+            Box(root, "FrameRight", new Vector3(w * 0.5f + 0.04f, dh * 0.5f, 0.03f), new Vector3(0.08f, dh, 0.06f), frame, collider: false);
+            var col = root.AddComponent<BoxCollider>();
+            col.center = new Vector3(0, dh * 0.5f, 0.04f);
+            col.size = new Vector3(w, dh, 0.08f);
+
+            var spillGo = new GameObject("Spill");
+            spillGo.transform.SetParent(root.transform, false);
+            spillGo.transform.localPosition = new Vector3(0.15f, 1.1f, 0.35f);
+            spill = spillGo.AddComponent<Light>();
+            spill.type = LightType.Point;
+            spill.color = new Color(1f, 0.75f, 0.45f);
+            spill.range = 3.5f;
+            spill.intensity = 2.2f;
+            spill.shadows = LightShadows.None;
+            spill.enabled = false;
+        }
+
+        private static AudioSource Source3D(GameObject root, string name, float max, float volume, bool loop)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(root.transform, false);
+            go.transform.localPosition = new Vector3(0, 1.2f, 0.1f);
+            var src = go.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            src.loop = loop;
+            src.spatialBlend = 1f;
+            src.minDistance = 1f;
+            src.maxDistance = max;
+            src.volume = volume;
+            return src;
         }
 
         private static void DoorPiece(GameObject root, Material leaf, Material frame, Material metal)

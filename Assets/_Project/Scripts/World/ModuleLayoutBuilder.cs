@@ -25,6 +25,7 @@ namespace Vchod.World
         private int _neighbourCell = -1;
         private bool _neighbourTrap;
         private bool _neighbourDone;
+        private int _radioFloor = -1, _radioCell = -1, _argumentFloor = -1, _argumentCell = -1;
 
         private Transform _floorRoot;
         private bool _reshufflePending;
@@ -67,6 +68,8 @@ namespace Vchod.World
         {
             Floor = 0;
             _neighbourFloor = NeighbourPlacement.FloorFor(SeedService.Seed, config.playerFloor, config.neighbourTrapChance);
+            _radioFloor = NeighbourPlacement.FloorForOther(SeedService.Seed, NeighbourPlacement.RadioStream, config.floorCount);
+            _argumentFloor = NeighbourPlacement.FloorForOther(SeedService.Seed, NeighbourPlacement.ArgumentStream, config.floorCount);
             Build(0);
             player.Teleport(StartPoint, Direction.North.Yaw());
         }
@@ -145,6 +148,10 @@ namespace Vchod.World
             Plan = LayoutGenerator.Generate(layoutSeed, config.rules, IsPlayerFloor);
             _neighbourCell = Floor == _neighbourFloor ? NeighbourPlacement.DoorCell(Plan, SeedService.Seed, Floor, reshuffleIndex) : -1;
             _neighbourTrap = Floor == config.playerFloor;
+            _radioCell = Floor == _radioFloor
+                ? NeighbourPlacement.OtherDoorCell(Plan, SeedService.Seed, NeighbourPlacement.RadioStream, Floor, reshuffleIndex, _neighbourCell) : -1;
+            _argumentCell = Floor == _argumentFloor
+                ? NeighbourPlacement.OtherDoorCell(Plan, SeedService.Seed, NeighbourPlacement.ArgumentStream, Floor, reshuffleIndex, _neighbourCell, _radioCell) : -1;
             HasCoSource = false;
             DoorFronts.Clear();
             DoorWalls.Clear();
@@ -216,6 +223,15 @@ namespace Vchod.World
             {
                 var go = Instantiate(config.neighbourDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
                 go.GetComponent<Neighbour>().Setup(this, player, _neighbourTrap, _neighbourDone);
+            }
+            else if (index == _radioCell && config.radioDoorPrefab != null)
+            {
+                var go = Instantiate(config.radioDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
+                go.GetComponent<RadioNeighbour>().Setup(player);
+            }
+            else if (index == _argumentCell && config.arguingDoorPrefab != null)
+            {
+                Instantiate(config.arguingDoorPrefab, WallPoint(center, cell.FeatureSide), Inward(cell.FeatureSide), root);
             }
             else if (feature != null)
             {

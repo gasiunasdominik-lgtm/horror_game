@@ -260,6 +260,86 @@ namespace Vchod.Audio
             return Make("Mumble", data);
         }
 
+        /// <summary>Adds one muffled voice phrase (syllables on a sawtooth, doubly low-passed) into data.</summary>
+        private static void AddPhrase(float[] data, System.Random rng, float start, float length, float f0, float rate, float gain, float muffle)
+        {
+            var from = (int)(start * SampleRate);
+            var to = System.Math.Min(data.Length, (int)((start + length) * SampleRate));
+            float phase = 0f, lp1 = 0f, lp2 = 0f, hp = 0f, prev = 0f;
+            var sylStart = start;
+            var sylLength = 0.16f / rate;
+            var pitch = f0;
+            for (var i = from; i < to; i++)
+            {
+                var t = (float)i / SampleRate;
+                if (t - sylStart > sylLength)
+                {
+                    sylStart = t + 0.02f / rate;
+                    sylLength = (0.09f + (float)rng.NextDouble() * 0.15f) / rate;
+                    pitch = f0 * (0.85f + (float)rng.NextDouble() * 0.35f);
+                }
+                var s = t - sylStart;
+                var env = s >= 0f && s <= sylLength ? Mathf.Sin(Mathf.PI * s / sylLength) : 0f;
+                var edge = Mathf.Clamp01((t - start) / 0.05f) * Mathf.Clamp01((start + length - t) / 0.15f);
+                phase += pitch / SampleRate;
+                var saw = 2f * (phase - Mathf.Floor(phase)) - 1f;
+                lp1 += muffle * (saw - lp1);
+                lp2 += muffle * (lp1 - lp2);
+                hp = 0.97f * (hp + lp2 - prev);
+                prev = lp2;
+                data[i] += hp * env * edge * gain;
+            }
+        }
+
+        /// <summary>
+        /// Two people arguing behind a wall: a man and a woman cutting into each other, getting louder.
+        /// A fixed 12 s loop, so the same fight repeats word for word (it is a TV, GDD).
+        /// </summary>
+        public static AudioClip CreateArgument()
+        {
+            const float length = 12f;
+            var data = new float[(int)(SampleRate * length)];
+            var rng = new System.Random(4242);
+            var t = 0.2f;
+            var man = true;
+            while (t < length - 1f)
+            {
+                var phrase = 0.8f + (float)rng.NextDouble() * 1.6f;
+                var anger = 0.6f + t / length * 0.8f;
+                AddPhrase(data, rng, t, Mathf.Min(phrase, length - 0.3f - t), man ? 125f : 235f, 1.15f, 5f * anger, 0.07f);
+                t += phrase - (rng.NextDouble() < 0.4 ? 0.3f : -0.25f); // sometimes they talk over each other
+                man = !man;
+            }
+            for (var i = 0; i < data.Length; i++) data[i] = Mathf.Clamp(data[i], -0.9f, 0.9f);
+            return Make("Argument", data);
+        }
+
+        /// <summary>An old kitchen radio through a door: tinny music, crackle and a news reader. 8 s loop.</summary>
+        public static AudioClip CreateRadio()
+        {
+            const float length = 8f;
+            var data = new float[(int)(SampleRate * length)];
+            var rng = new System.Random(77);
+            float[] chord = { 220f, 277.2f, 329.6f, 246.9f, 311.1f, 370f };
+            float bp = 0f, hp = 0f, prev = 0f;
+            for (var i = 0; i < data.Length; i++)
+            {
+                var t = (float)i / SampleRate;
+                var bar = (int)(t / 1f) % 2;
+                var music = 0f;
+                for (var k = 0; k < 3; k++) music += Mathf.Sin(2f * Mathf.PI * chord[bar * 3 + k] * t);
+                music *= 0.12f * (0.7f + 0.3f * Mathf.Sin(2f * Mathf.PI * 4f * t)) * (t < 5f ? 1f : Mathf.Clamp01((5.5f - t) / 0.5f));
+                var crackle = rng.NextDouble() < 0.002 ? (float)(rng.NextDouble() * 2 - 1) * 0.6f : (float)(rng.NextDouble() * 2 - 1) * 0.03f;
+                bp += 0.35f * (music + crackle - bp);  // tinny speaker: cut the lows and highs
+                hp = 0.95f * (hp + bp - prev);
+                prev = bp;
+                data[i] = hp;
+            }
+            AddPhrase(data, rng, 5.4f, 2.4f, 140f, 1.3f, 3f, 0.15f); // "...a nyní zprávy..."
+            for (var i = 0; i < data.Length; i++) data[i] = Mathf.Clamp(data[i], -0.9f, 0.9f);
+            return Make("Radio", data);
+        }
+
         /// <summary>Fluorescent tube hum: 100 Hz mains buzz with harmonics, 1 s seamless loop.</summary>
         public static AudioClip CreateTubeHum()
         {

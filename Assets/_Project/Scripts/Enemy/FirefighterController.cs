@@ -291,7 +291,8 @@ namespace Vchod.Enemy
 
         private void OnNoise(NoiseMade e)
         {
-            if ((e.Position - transform.position).sqrMagnitude <= e.Radius * e.Radius) Notice(e.Position);
+            var radius = e.Radius * NoiseMask.FactorAt(e.Position); // the TV argument covers steps
+            if ((e.Position - transform.position).sqrMagnitude <= radius * radius) Notice(e.Position);
         }
 
         // The whole floor lights up: he knows where the switch was pressed.
@@ -415,6 +416,7 @@ namespace Vchod.Enemy
         private void Update()
         {
             if (!_placed || Brain.HasCaughtPlayer) return;
+            HouseState.FirefighterFloor = Time.time < _roamFrom ? -1 : CurrentFloor;
             if (_offstage)
             {
                 SeesPlayer = false;
